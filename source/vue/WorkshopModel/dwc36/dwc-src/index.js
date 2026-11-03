@@ -12,6 +12,7 @@ import * as serviceProblem from './service-problem.js'
 
 import page from './ModelExplorer.vue'
 import './theme.css'
+import './look.css' // the friendlier look of this plugin (mo-* classes only, on top of the family)
 
 // HOOK (shared piece, outside this plugin): this plugin does not use the workshop service, so its page bar must not report a missing
 // service, or a Duet without a Raspberry, as a fault. When vue/_shared36/service-problem.js exports markServiceOptional() -- a
@@ -21,7 +22,7 @@ if (typeof serviceProblem.markServiceOptional === 'function') serviceProblem.mar
 registerRoute(page, {
 	Plugins: {
 		WorkshopModel: {
-			icon: 'mdi-file-tree',
+			icon: 'mdi-telescope',
 			caption: 'plugins.WorkshopModel.common.menu_caption',
 			path: '/Plugins/Model'
 		}

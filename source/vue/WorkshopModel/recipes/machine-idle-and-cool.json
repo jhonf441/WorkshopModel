@@ -1,0 +1,33 @@
+{
+  "id": "machine-idle-and-cool",
+  "title": {
+    "en": "Machine idle and a heater cool",
+    "es": "Máquina en reposo y un calentador frío"
+  },
+  "description": {
+    "en": "True when nothing is running and the heater is under the limit: safe to touch, or ready for the next job. Change the limit to what is safe for your machine.",
+    "es": "Verdadero cuando nada corre y el calentador está bajo el límite: seguro de tocar, o listo para el próximo trabajo. Cambia el límite por el que sea seguro en tu máquina."
+  },
+  "kind": "condition",
+  "template": "state.status = \"idle\" && heat.heaters[<heater>].current < <limit>",
+  "holes": {
+    "heater": {
+      "type": "index",
+      "en": "The number of the heater in heat.heaters (0 is usually the bed).",
+      "es": "El número del calentador en heat.heaters (0 suele ser la cama)."
+    },
+    "limit": {
+      "type": "number",
+      "en": "The temperature in degrees under which it counts as cool.",
+      "es": "La temperatura en grados bajo la cual cuenta como frío."
+    }
+  },
+  "since": "3.1",
+  "example": {
+    "filled": "state.status = \"idle\" && heat.heaters[0].current < 40",
+    "result": "bool"
+  },
+  "author": "jhonf441",
+  "tags": ["heaters", "state", "safety"],
+  "sample": true
+}

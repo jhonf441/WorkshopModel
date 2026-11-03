@@ -1,17 +1,20 @@
 <template>
 	<div class="mo-topics">
 		<div v-if="!cards.length" class="mo-faint" role="status">{{ t('topics_none') }}</div>
-		<topic-card v-for="c in cards" :key="c.id" :card="c" @open="emit('open', $event)" />
+		<diagnosis-card v-if="model" :card="diagnosis" @open="emit('open', $event)" />
+		<topic-card v-for="c in cards" :key="c.id" :card="c" :change-times="changeTimes" :now="now" @open="emit('open', $event)" />
 	</div>
 </template>
 
 <script setup>
 // The Topics view (the default of the Model section): one card per area of the machine, built from what the live model has
-// (topic-catalog.js). A view of VIEW-CONTRACT.md: it declares every prop of the contract and emits only its events.
+// (topic-catalog.js). A view of VIEW-CONTRACT.md: it declares every prop of the contract and emits only its events. The cards get the
+// change times so a value that just changed glows.
 import { computed } from 'vue'
 import { i18n } from './dwc-host.js'
 import TopicCard from './TopicCard.vue'
-import { topicsOf } from './topic-catalog.js'
+import DiagnosisCard from './DiagnosisCard.vue'
+import { topicsOf, diagnosisTopic } from './topic-catalog.js'
 
 const props = defineProps({
 	tick: { type: Number, default: 0 },
@@ -32,6 +35,14 @@ const emit = defineEmits(['select', 'open', 'watch', 'unwatch', 'pin', 'unpin', 
 
 const t = (k, p) => i18n.t('plugins.WorkshopModel.model.' + k, p)
 
+const now = computed(() => {
+	void props.tick
+	return Date.now()
+})
+const diagnosis = computed(() => {
+	void props.tick
+	return diagnosisTopic(props.model, { tier: props.tier })
+})
 const cards = computed(() => {
 	void props.tick
 	return topicsOf(props.model, { globalsOk: props.globalsOk, tier: props.tier })

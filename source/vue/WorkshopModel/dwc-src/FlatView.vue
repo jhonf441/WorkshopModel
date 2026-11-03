@@ -1,8 +1,14 @@
 <template>
 	<div class="mo-flat">
-		<div class="mo-toolbar">
-			<v-text-field v-model="query" density="compact" variant="outlined" hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('flat_filter')" :placeholder="t('flat_filter_hint')" />
+		<div class="mo-flat-filters" role="group" :aria-label="t('vs_title')">
+			<span class="mo-faint">{{ t('vs_title') }}</span>
+			<button v-for="m in VALUE_MODES" :key="m" type="button" class="wf-cat" :aria-pressed="mode === m ? 'true' : 'false'" :title="t('vs_mode_help')" @click="mode = m">{{ t('vs_mode_' + m) }}</button>
 		</div>
+		<choice-help :choice="VALUE_SEARCH_HELP" :title="t('vs_title')" class="mb-1" />
+		<div class="mo-toolbar">
+			<v-text-field v-model="query" density="compact" variant="outlined" hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="mode === 'values' ? t('vs_label') : t('flat_filter')" :placeholder="mode === 'values' ? t('vs_hint') : t('flat_filter_hint')" />
+		</div>
+		<div v-if="reading" :class="['mo-faint', 'mb-1', { 'wf-state warn': reading.invalid }]" role="status">{{ t(reading.key, reading.params) }}</div>
 		<div class="mo-flat-filters" role="group" :aria-label="t('flat_types')">
 			<button v-for="g in KIND_GROUPS" :key="g.id" type="button" class="wf-cat" :aria-pressed="groups.indexOf(g.id) >= 0 ? 'true' : 'false'" @click="toggleGroup(g.id)">{{ t('group_' + g.id) }}</button>
 			<v-switch v-model="onlyChanged" density="compact" color="primary" hide-details :label="t('flat_changed')" />
@@ -45,6 +51,8 @@ import { humanize } from './value-human.js'
 import { leafInfo } from './value-kind.js'
 import KindChip from './KindChip.vue'
 import FavoriteStar from './FavoriteStar.vue'
+import ChoiceHelp from './ChoiceHelp.vue'
+import { VALUE_MODES, VALUE_SEARCH_HELP, parseValueQuery, searchValues, describeQuery } from './value-search.js'
 
 const props = defineProps({
 	tick: { type: Number, default: 0 },
@@ -73,18 +81,26 @@ const onlyWatched = ref(false)
 const sortKey = ref('path')
 const desc = ref(false)
 const pages = ref(1)
+const mode = ref('names')
 
 const watchedSet = computed(() => new Set(props.watched))
+const reading = computed(() => {
+	const q = mode.value === 'values' ? parseValueQuery(query.value) : null
+	const d = describeQuery(q)
+	return d ? Object.assign({ invalid: q.kind === 'invalid' }, d) : null
+})
 const filtered = computed(() => !!(query.value || groups.value.length || onlyChanged.value || onlyWatched.value))
 const shown = computed(() => {
 	void props.tick
 	const now = Date.now()
-	const list = filterLeaves(props.leaves, { query: query.value, groups: groups.value, onlyChanged: onlyChanged.value, onlyWatched: onlyWatched.value, times: props.changeTimes, watched: props.watched, now, recentMs: RECENT_MS })
+	const byValue = mode.value === 'values'
+	const base = byValue ? searchValues(props.leaves, query.value).leaves : props.leaves
+	const list = filterLeaves(base, { query: byValue ? '' : query.value, groups: groups.value, onlyChanged: onlyChanged.value, onlyWatched: onlyWatched.value, times: props.changeTimes, watched: props.watched, now, recentMs: RECENT_MS })
 	return sortLeaves(list, sortKey.value, desc.value, props.changeTimes)
 })
 const page = computed(() => pageOf(shown.value, pages.value, FLAT_PAGE))
 
-watch([query, groups, onlyChanged, onlyWatched], () => { pages.value = 1 })
+watch([query, mode, groups, onlyChanged, onlyWatched], () => { pages.value = 1 })
 
 function toggleGroup(id) {
 	groups.value = groups.value.indexOf(id) >= 0 ? groups.value.filter(g => g !== id) : groups.value.concat([id])

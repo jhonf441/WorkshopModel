@@ -5,9 +5,11 @@
 		<div class="mo-faint">{{ preview.count ? t(preview.level === 2 ? 'preview_level2' : 'preview_level1', { n: preview.count }) : t('preview_nothing') }}</div>
 		<div v-if="!canSend && disabledReason" class="mo-faint">{{ disabledReason }}</div>
 		<div class="mo-actions">
-			<v-btn size="small" variant="flat" :color="armed ? 'amber-darken-3' : 'primary'" :disabled="!canSend || !preview.count || sending" @click="press">
-				{{ sending ? t('preview_sending') : (armed ? t('preview_tap_again', { what: preview.lines[0] }) : t('preview_send')) }}
-			</v-btn>
+			<span :title="!canSend && disabledTitle ? disabledTitle : null">
+				<v-btn size="small" variant="flat" :color="armed ? 'amber-darken-3' : 'primary'" :disabled="!canSend || !preview.count || sending" @click="press">
+					{{ sending ? t('preview_sending') : (armed ? t('preview_tap_again', { what: preview.lines[0] }) : t('preview_send')) }}
+				</v-btn>
+			</span>
 		</div>
 		<div v-if="slow" class="mo-faint" role="status">{{ t('preview_slow') }}</div>
 		<div v-if="reply" class="mo-reply" role="status"><span class="mo-faint">{{ t('preview_reply') }}</span> <code>{{ reply }}</code></div>
@@ -18,7 +20,8 @@
 <script setup>
 // The exact G-code before it goes to the board (design item 4): editable, classified by command-preview.js. Level 1 (meta
 // commands, reads) is one tap; level 2 (any other G or M code) is the double tap of DESIGN.md: the button turns amber and asks
-// "Tap again" for 4 s. Lines are sent one by one; the reply of the board is shown; after 15 s without an answer it says so.
+// "Tap again" for 4 s. Lines are sent one by one; the reply of the board is shown; after 15 s without an answer it says so. While
+// it cannot be sent, `disabledReason` is written under the code and `disabledTitle` is the tooltip of the button (one or the other).
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { i18n } from './dwc-host.js'
 import { sendCode } from './model-host.js'
@@ -31,6 +34,7 @@ const props = defineProps({
 	code: { type: String, default: '' },
 	canSend: { type: Boolean, default: true },
 	disabledReason: { type: String, default: '' },
+	disabledTitle: { type: String, default: '' },
 	editable: { type: Boolean, default: true }
 })
 const emit = defineEmits(['sent'])

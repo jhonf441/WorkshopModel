@@ -10,7 +10,9 @@ export const SECTION_COLORS = {
 	presets: '#AB47BC',
 	usage: '#7E57C2',
 	snapshots: '#5C6BC0',
-	tester: '#8D6E63'
+	tester: '#8D6E63',
+	alerts: '#F4511E',
+	report: '#546E7A'
 }
 
 export function sectionColor(id) {

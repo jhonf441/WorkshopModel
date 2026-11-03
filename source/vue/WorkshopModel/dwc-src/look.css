@@ -1,0 +1,191 @@
+/* The friendlier look of the Model Explorer (2026-11-03): only the content of this plugin (prefix mo-), on top of the family
+   (design/family.css: bar, menu, cards, buttons, chips) and of the base rules in ModelExplorer.vue. The same file in both DWC lines.
+   What it brings: one section head with a soft icon box and a lead, pills with a dot, empty and loading states, the cards of the
+   Globals section (a big readable value, a switch or a stepper in place, marks in words), item rows for snapshots and presets, the
+   watch rows that wrap instead of scrolling sideways, and calm motion that stops with prefers-reduced-motion. Touch: 44 px targets. */
+
+/* ================= tokens ================= */
+.workshop-theme.mo-page { --mo-r: 12px; --mo-r-s: 8px; --mo-soft: rgba(128, 128, 128, 0.07); --mo-soft2: rgba(128, 128, 128, 0.12); --mo-line: rgba(128, 128, 128, 0.22); --mo-line2: rgba(128, 128, 128, 0.4); --mo-glow: rgba(251, 140, 0, 0.35); }
+
+/* ================= the head of a section: a soft icon box, a title, one lead line, pills on the right ================= */
+.workshop-theme.mo-page .mo-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 12px; }
+.workshop-theme.mo-page .mo-head-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: var(--mo-soft2); color: var(--wf-icon); }
+.workshop-theme.mo-page .mo-head-icon .v-icon { color: var(--wf-icon); font-size: 22px; }
+.workshop-theme.mo-page .mo-head-text { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.workshop-theme.mo-page .mo-head-title { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.workshop-theme.mo-page .mo-head-lead { margin: 0; font-size: 13px; line-height: 1.4; opacity: 0.75; }
+.workshop-theme.mo-page .mo-head-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
+.workshop-theme.mo-page .mo-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 1px 10px; border: 1px solid var(--mo-line2); border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.workshop-theme.mo-page .mo-pill .v-icon { color: var(--wf-icon); font-size: 14px; }
+.workshop-theme.mo-page .mo-pill-dot::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(128, 128, 128, 0.6); }
+.workshop-theme.mo-page .mo-pill-dot.ok::before { background: var(--wf-ok); }
+.workshop-theme.mo-page .mo-pill-dot.warn::before { background: var(--wf-warn); }
+.workshop-theme.mo-page .mo-pill-dot.info::before { background: var(--wf-info); }
+.workshop-theme.mo-page .mo-pill-dot.err::before { background: var(--wf-err); }
+.workshop-theme.mo-page .mo-pill-quiet { opacity: 0.6; }
+.workshop-theme.mo-page .mo-note { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0; padding: 8px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); font-size: 13px; line-height: 1.45; }
+.workshop-theme.mo-page .mo-note .v-icon { flex: none; margin-top: 1px; color: var(--wf-icon); }
+.workshop-theme.mo-page .mo-note.warn { border-color: var(--wf-warn); }
+.workshop-theme.mo-page .mo-note.warn .v-icon { color: var(--wf-warn); }
+.workshop-theme.mo-page .mo-note.ok { border-color: var(--wf-ok); }
+.workshop-theme.mo-page .mo-note.ok .v-icon { color: var(--wf-ok); }
+.workshop-theme.mo-page .mo-note-text { flex: 1 1 200px; min-width: 0; }
+.workshop-theme.mo-page .mo-will-save { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 2px 0 8px; font-size: 13px; }
+.workshop-theme.mo-page .mo-will-save-name { font-family: var(--tp-font-mono, monospace); font-size: 13px; font-weight: 600; word-break: break-all; }
+.workshop-theme.mo-page .mo-will-save.bad { color: rgb(var(--v-theme-error, 198, 40, 40)); }
+
+/* ================= empty and loading states ================= */
+.workshop-theme.mo-page .mo-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 12px; border: 1px dashed var(--mo-line2); border-radius: var(--mo-r); text-align: center; }
+.workshop-theme.mo-page .mo-empty .mo-empty-icon { color: var(--wf-icon); font-size: 40px; opacity: 0.8; }
+.workshop-theme.mo-page .mo-empty-title { font-size: 16px; font-weight: 600; }
+.workshop-theme.mo-page .mo-empty-text { max-width: 60ch; font-size: 13px; line-height: 1.45; opacity: 0.8; }
+.workshop-theme.mo-page .mo-empty-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.workshop-theme.mo-page .mo-empty-small { padding: 16px 12px; }
+.workshop-theme.mo-page .mo-skeleton { display: flex; flex-direction: column; gap: 8px; padding: 6px 0; }
+.workshop-theme.mo-page .mo-skeleton-bar { height: 14px; border-radius: 7px; background: var(--mo-soft2); animation: mo-pulse 1.2s ease-in-out infinite; }
+.workshop-theme.mo-page .mo-skeleton-bar:nth-child(2) { width: 80%; animation-delay: 0.15s; }
+.workshop-theme.mo-page .mo-skeleton-bar:nth-child(3) { width: 60%; animation-delay: 0.3s; }
+.workshop-theme.mo-page .mo-skeleton-text { font-size: 12px; opacity: 0.7; }
+@keyframes mo-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* ================= the Globals section ================= */
+.workshop-theme.mo-page .mo-gtools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 8px; }
+.workshop-theme.mo-page .mo-gtools .mo-search { flex: 1 1 220px; max-width: 520px; }
+.workshop-theme.mo-page .mo-gchips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 10px; }
+.workshop-theme.mo-page .mo-gchips-label { font-size: 12px; opacity: 0.7; margin-right: 2px; }
+.workshop-theme.mo-page .mo-gchip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 12px; border: 1px solid var(--mo-line2); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: background-color 0.12s ease, border-color 0.12s ease; }
+.workshop-theme.mo-page .mo-gchip .v-icon { color: var(--wf-icon); font-size: 16px; }
+.workshop-theme.mo-page .mo-gchip:hover { background: var(--mo-soft2); }
+.workshop-theme.mo-page .mo-gchip:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
+.workshop-theme.mo-page .mo-gchip[aria-pressed='true'] { border-color: var(--wf-accent); background: rgba(25, 118, 210, 0.16); font-weight: 600; }
+.workshop-theme.mo-page .mo-gchip[aria-pressed='true'] .v-icon { color: var(--wf-accent); }
+.workshop-theme.mo-page .mo-gchip-sort { margin-left: auto; }
+.workshop-theme.mo-page .mo-gchip-clear { border-style: dashed; }
+.workshop-theme.mo-page .mo-ggroup { margin-bottom: 10px; }
+.workshop-theme.mo-page .mo-ggroup-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 4px 6px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: var(--mo-r-s) var(--mo-r-s) 0 0; background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; transition: background-color 0.12s ease; }
+.workshop-theme.mo-page .mo-ggroup-head:hover { background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-ggroup-head:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: -2px; }
+.workshop-theme.mo-page .mo-ggroup-head .v-icon { color: var(--wf-icon); }
+.workshop-theme.mo-page .mo-ggroup-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workshop-theme.mo-page .mo-ggroup-count { font-size: 12px; font-weight: 500; opacity: 0.7; }
+.workshop-theme.mo-page .mo-ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; padding: 10px 0 2px; align-items: start; }
+.workshop-theme.mo-page .mo-gcard { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 12px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r); background: var(--mo-soft); transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.4s ease; }
+.workshop-theme.mo-page .mo-gcard:hover { border-color: var(--mo-line2); }
+.workshop-theme.mo-page .mo-gcard:focus-within { border-color: var(--wf-accent); }
+.workshop-theme.mo-page .mo-gcard-kept { border-left: 4px solid var(--wf-ok); }
+.workshop-theme.mo-page .mo-gcard-flash { animation: mo-glow 2.4s ease-out; }
+@keyframes mo-glow { 0% { background-color: var(--mo-glow); box-shadow: 0 0 0 3px var(--mo-glow); } 100% { background-color: var(--mo-soft); box-shadow: none; } }
+.workshop-theme.mo-page .mo-gcard-head { display: flex; align-items: center; gap: 6px; min-height: 32px; }
+.workshop-theme.mo-page .mo-gcard-name { flex: 1 1 auto; min-width: 0; font-family: var(--tp-font-mono, monospace); font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workshop-theme.mo-page .mo-gcard-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 36px; }
+.workshop-theme.mo-page .mo-gcard-value { font-family: var(--tp-font-mono, monospace); font-size: 20px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.workshop-theme.mo-page .mo-gcard-value-text { font-size: 16px; font-weight: 500; }
+.workshop-theme.mo-page .mo-gcard-more { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; opacity: 0.8; }
+.workshop-theme.mo-page .mo-gcard-more:hover { background: var(--mo-soft2); opacity: 1; }
+.workshop-theme.mo-page .mo-gcard-switch { display: inline-flex; align-items: center; gap: 8px; }
+.workshop-theme.mo-page .mo-gcard-switch .mo-gcard-value { font-size: 16px; }
+.workshop-theme.mo-page .mo-gcard-stepper { display: inline-flex; align-items: center; gap: 4px; }
+.workshop-theme.mo-page .mo-gcard-step { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 40px; height: 40px; border: 1px solid var(--mo-line2); border-radius: 10px; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background-color 0.12s ease; }
+.workshop-theme.mo-page .mo-gcard-step .v-icon { color: var(--wf-icon); }
+.workshop-theme.mo-page .mo-gcard-step:hover { background: var(--mo-soft2); }
+.workshop-theme.mo-page .mo-gcard-step:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
+.workshop-theme.mo-page .mo-gcard-step:disabled { opacity: 0.4; cursor: not-allowed; }
+.workshop-theme.mo-page .mo-gcard-num { width: 120px; }
+.workshop-theme.mo-page .mo-gcard-num input { font-family: var(--tp-font-mono, monospace); font-size: 16px; font-weight: 600; text-align: center; }
+.workshop-theme.mo-page .mo-gcard-marks { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12px; opacity: 0.85; }
+.workshop-theme.mo-page .mo-gcard-mark { display: inline-flex; align-items: center; gap: 4px; }
+.workshop-theme.mo-page .mo-gcard-mark .v-icon { color: var(--wf-icon); font-size: 14px; }
+.workshop-theme.mo-page .mo-gcard-full { margin: 2px 0 0; }
+.workshop-theme.mo-page .mo-gcard-edit { margin-top: 4px; }
+.workshop-theme.mo-page .mo-gcard-hint { font-size: 12px; opacity: 0.7; }
+/* compact density: the cards become tidy rows */
+.workshop-theme.mo-page .mo-density-compact .mo-ggrid { display: flex; flex-direction: column; gap: 0; padding: 0; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 4px 8px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: 0; background: transparent; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-kept { border-left: 3px solid var(--wf-ok); }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-head { flex: 1 1 220px; min-width: 0; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-body { flex: 1 1 200px; min-height: 32px; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-value { font-size: 15px; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-step { width: 32px; height: 32px; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-marks { flex: 0 1 auto; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-full, .workshop-theme.mo-page .mo-density-compact .mo-gcard-edit, .workshop-theme.mo-page .mo-density-compact .mo-gcard-preview { flex-basis: 100%; }
+/* the guided creator */
+.workshop-theme.mo-page .mo-creator-steps { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 6px 0 12px; padding: 0; list-style: none; }
+.workshop-theme.mo-page .mo-creator-step { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; opacity: 0.6; }
+.workshop-theme.mo-page .mo-creator-step.on { opacity: 1; font-weight: 600; }
+.workshop-theme.mo-page .mo-creator-step.done { opacity: 0.85; }
+.workshop-theme.mo-page .mo-creator-step .mo-creator-n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid var(--mo-line2); border-radius: 50%; font-size: 12px; font-weight: 700; }
+.workshop-theme.mo-page .mo-creator-step.on .mo-creator-n { border-color: var(--wf-accent); color: var(--wf-accent); }
+.workshop-theme.mo-page .mo-creator-step.done .mo-creator-n { border-color: var(--wf-ok); color: var(--wf-ok); }
+.workshop-theme.mo-page .mo-creator-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 8px; margin: 6px 0; }
+.workshop-theme.mo-page .mo-creator-type { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-height: 64px; padding: 10px 12px; border: 1px solid var(--mo-line2); border-radius: var(--mo-r-s); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background-color 0.12s ease, border-color 0.12s ease; }
+.workshop-theme.mo-page .mo-creator-type .v-icon { color: var(--wf-icon); }
+.workshop-theme.mo-page .mo-creator-type:hover { background: var(--mo-soft2); }
+.workshop-theme.mo-page .mo-creator-type:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
+.workshop-theme.mo-page .mo-creator-type[aria-pressed='true'] { border-color: var(--wf-accent); background: rgba(25, 118, 210, 0.16); }
+.workshop-theme.mo-page .mo-creator-type-name { font-size: 14px; font-weight: 600; }
+.workshop-theme.mo-page .mo-creator-type-say { font-size: 12px; opacity: 0.75; }
+.workshop-theme.mo-page .mo-creator-field { max-width: 420px; margin: 6px 0; }
+.workshop-theme.mo-page .mo-creator-done { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 14px; font-weight: 600; }
+.workshop-theme.mo-page .mo-creator-done .v-icon { color: var(--wf-ok); animation: mo-upop 0.5s ease-out; }
+
+/* ================= item rows (snapshots, presets): no table, nothing scrolls sideways ================= */
+.workshop-theme.mo-page .mo-items { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+.workshop-theme.mo-page .mo-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 10px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r); background: var(--mo-soft); transition: border-color 0.15s ease, background-color 0.15s ease; }
+.workshop-theme.mo-page .mo-item:hover { border-color: var(--mo-line2); }
+.workshop-theme.mo-page .mo-item.on { border-color: var(--wf-accent); background: rgba(25, 118, 210, 0.1); }
+.workshop-theme.mo-page .mo-item-main { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.workshop-theme.mo-page .mo-item-name { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.workshop-theme.mo-page .mo-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; font-size: 12px; opacity: 0.8; }
+.workshop-theme.mo-page .mo-item-meta .v-icon { color: var(--wf-icon); font-size: 14px; margin-right: 2px; }
+.workshop-theme.mo-page .mo-item-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-left: auto; }
+
+/* ================= watch rows and recent changes ================= */
+.workshop-theme.mo-page .mo-wrows { display: flex; flex-direction: column; margin: 6px 0; }
+.workshop-theme.mo-page .mo-wrow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 8px 6px; border-bottom: 1px solid var(--mo-line); }
+.workshop-theme.mo-page .mo-wrow-path { flex: 1 1 200px; min-width: 0; }
+.workshop-theme.mo-page .mo-wrow-path .mo-link { font-family: var(--tp-font-mono, monospace); font-size: 13px; }
+.workshop-theme.mo-page .mo-wrow-value { font-family: var(--tp-font-mono, monospace); font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.workshop-theme.mo-page .mo-wrow-range { font-size: 12px; opacity: 0.75; white-space: nowrap; }
+.workshop-theme.mo-page .mo-wrow-graph { flex: 0 1 auto; display: inline-flex; align-items: center; gap: 6px; }
+.workshop-theme.mo-page .mo-wrow-actions { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.workshop-theme.mo-page .mo-wrow-more { flex-basis: 100%; padding: 4px 0 2px 8px; }
+.workshop-theme.mo-page .mo-crows { display: flex; flex-direction: column; margin: 6px 0; }
+.workshop-theme.mo-page .mo-crow { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-height: 36px; padding: 4px 6px; border-bottom: 1px solid var(--mo-line); font-size: 13px; }
+.workshop-theme.mo-page .mo-crow-time { font-family: var(--tp-font-mono, monospace); font-size: 12px; opacity: 0.7; }
+.workshop-theme.mo-page .mo-crow-path { flex: 1 1 180px; min-width: 0; }
+.workshop-theme.mo-page .mo-crow-vals { display: inline-flex; align-items: center; gap: 6px; font-family: var(--tp-font-mono, monospace); font-size: 12px; }
+.workshop-theme.mo-page .mo-crow-vals .v-icon { color: var(--wf-icon); font-size: 14px; }
+.workshop-theme.mo-page .mo-crow-after { font-weight: 600; }
+
+/* ================= small shared touches ================= */
+.workshop-theme.mo-page .mo-topic { border-radius: var(--mo-r); transition: border-color 0.15s ease; }
+.workshop-theme.mo-page .mo-topic:hover { border-color: var(--mo-line2); }
+.workshop-theme.mo-page .mo-topic-row-changed .mo-topic-value { animation: mo-value-glow 2s ease-out; border-radius: 4px; }
+@keyframes mo-value-glow { 0% { background-color: var(--mo-glow); } 100% { background-color: transparent; } }
+.workshop-theme.mo-page .mo-off { display: flex; align-items: flex-start; gap: 8px; border-radius: var(--mo-r); padding: 10px 12px; }
+.workshop-theme.mo-page .mo-off .v-icon { flex: none; color: var(--wf-warn); }
+.workshop-theme.mo-page .mo-sub { border-radius: var(--mo-r-s); }
+.workshop-theme.mo-page .mo-alert-banner { border-radius: var(--mo-r); }
+.workshop-theme.mo-page .mo-flat-scroll, .workshop-theme.mo-page .mo-tree { border-radius: var(--mo-r-s); }
+.workshop-theme.mo-page .mo-fade-in { animation: mo-ufade 0.22s ease-out; }
+
+/* ================= touch screens and phones ================= */
+@media (pointer: coarse) {
+	.workshop-theme.mo-page .mo-gchip, .workshop-theme.mo-page .mo-gcard-more, .workshop-theme.mo-page .mo-pill-btn { min-height: 44px; }
+	.workshop-theme.mo-page .mo-gcard-step { width: 44px; height: 44px; }
+	.workshop-theme.mo-page .mo-density-compact .mo-gcard-step { width: 40px; height: 40px; }
+	.workshop-theme.mo-page .mo-ggroup-head { min-height: 44px; }
+	.workshop-theme.mo-page .mo-creator-type { min-height: 72px; }
+}
+@media (max-width: 599px) {
+	.workshop-theme.mo-page .mo-head-right { margin-left: 0; }
+	.workshop-theme.mo-page .mo-gchip-sort { margin-left: 0; }
+	.workshop-theme.mo-page .mo-ggrid { grid-template-columns: minmax(0, 1fr); }
+	.workshop-theme.mo-page .mo-item-actions, .workshop-theme.mo-page .mo-wrow-actions { margin-left: 0; flex-basis: 100%; }
+	.workshop-theme.mo-page .mo-gcard-value { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.workshop-theme.mo-page .mo-gcard, .workshop-theme.mo-page .mo-item, .workshop-theme.mo-page .mo-gchip, .workshop-theme.mo-page .mo-creator-type, .workshop-theme.mo-page .mo-topic { transition: none; }
+	.workshop-theme.mo-page .mo-gcard-flash, .workshop-theme.mo-page .mo-skeleton-bar, .workshop-theme.mo-page .mo-creator-done .v-icon, .workshop-theme.mo-page .mo-fade-in, .workshop-theme.mo-page .mo-topic-row-changed .mo-topic-value { animation: none; }
+	.workshop-theme.mo-page .mo-gcard-flash { background-color: var(--mo-glow); }
+}

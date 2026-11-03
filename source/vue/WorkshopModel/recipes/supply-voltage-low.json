@@ -1,0 +1,33 @@
+{
+  "id": "supply-voltage-low",
+  "title": {
+    "en": "Supply voltage of a board under a limit",
+    "es": "Tensión de alimentación de una placa bajo un límite"
+  },
+  "description": {
+    "en": "True when the input voltage the board measures is under the limit: a weak power supply, a thin cable or a load that is too big. Put the limit a little under the nominal voltage (for 24 V, try 22).",
+    "es": "Verdadero cuando la tensión de entrada que mide la placa está bajo el límite: una fuente débil, un cable fino o una carga muy grande. Pon el límite un poco bajo la tensión nominal (para 24 V, prueba 22)."
+  },
+  "kind": "condition",
+  "template": "boards[<board>].vIn.current < <volts>",
+  "holes": {
+    "board": {
+      "type": "index",
+      "en": "The number of the board in boards (0 is the main board).",
+      "es": "El número de la placa en boards (0 es la placa principal)."
+    },
+    "volts": {
+      "type": "number",
+      "en": "The voltage under which it counts as low.",
+      "es": "La tensión bajo la cual cuenta como baja."
+    }
+  },
+  "since": "3.1",
+  "example": {
+    "filled": "boards[0].vIn.current < 22",
+    "result": "bool"
+  },
+  "author": "jhonf441",
+  "tags": ["boards", "power", "diagnosis"],
+  "sample": true
+}

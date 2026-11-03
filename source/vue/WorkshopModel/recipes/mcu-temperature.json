@@ -1,0 +1,28 @@
+{
+  "id": "mcu-temperature",
+  "title": {
+    "en": "Temperature of the processor of a board",
+    "es": "Temperatura del procesador de una placa"
+  },
+  "description": {
+    "en": "The temperature the processor of the board reports now, in degrees. Useful in a closed cabinet or next to a hot bed.",
+    "es": "La temperatura que reporta ahora el procesador de la placa, en grados. Útil en un gabinete cerrado o junto a una cama caliente."
+  },
+  "kind": "expression",
+  "template": "boards[<board>].mcuTemp.current",
+  "holes": {
+    "board": {
+      "type": "index",
+      "en": "The number of the board in boards (0 is the main board).",
+      "es": "El número de la placa en boards (0 es la placa principal)."
+    }
+  },
+  "since": "3.1",
+  "example": {
+    "filled": "boards[0].mcuTemp.current",
+    "result": "number"
+  },
+  "author": "jhonf441",
+  "tags": ["boards", "diagnosis"],
+  "sample": true
+}

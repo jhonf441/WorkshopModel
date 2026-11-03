@@ -13,6 +13,7 @@
 // Pure apart from the injected io: test/usage-scope.test.js.
 
 import { scanUsage } from './usage-scan.js'
+import { macroInfo } from './macro-map.js'
 import { chainStart, m98Targets, activeDirs, isExcluded, isJunk, folderOn, cleanScope, ROOT_DIRS } from './usage-scope.js'
 
 export const REFS_PER_FILE = 300
@@ -60,7 +61,7 @@ async function scanFile(ctx, path, meta) {
 	const key = metaKey(meta)
 	const old = ctx.cache.get(path)
 	let entry = null
-	if (old && key && old.key === key) {
+	if (old && key && old.key === key && (old.map || !ctx.needMap)) {
 		entry = old
 		ctx.result.fromCache++
 	} else if (meta && Number(meta.size) > ctx.budget.bytesPerFile) {
@@ -68,13 +69,13 @@ async function scanFile(ctx, path, meta) {
 	} else {
 		const text = await ctx.io.readText(path)
 		if (text !== null && text !== undefined) {
-			entry = { key, refs: scanUsage(path, text).slice(0, REFS_PER_FILE), targets: m98Targets(text) }
+			entry = { key, refs: scanUsage(path, text).slice(0, REFS_PER_FILE), targets: m98Targets(text), map: macroInfo(path, text) }
 			ctx.result.read++
 		}
 	}
 	if (entry) ctx.next.set(path, entry)
 	ctx.done++
-	ctx.onProgress(ctx.done, ctx.done + ctx.pending)
+	ctx.onProgress(ctx.done, ctx.done + ctx.pending, path)
 	return entry
 }
 
@@ -158,7 +159,8 @@ async function walkDefinitions(ctx) {
 // the folders that could hold a definition and were not read: a root switched off (0:/sys is read for definitions anyway) and every
 // folder outside 0:/sys left out, switched off or below the depth (backups and examples never count: they do not run)
 function unscannedFolders(ctx) {
-	const out = ctx.result.unscanned.slice()
+	const read = new Set(ctx.result.folders.filter(f => f.on && f.reached).map(f => f.dir))
+	const out = ctx.result.unscanned.filter(f => !read.has(f.dir))
 	for (const root of ROOT_DIRS) if (root !== DEFS_ROOT && !ctx.scope.dirs[root]) out.push({ dir: root, depth: 1 })
 	for (const f of ctx.result.folders) {
 		if (!f.junk && !under(f.dir, DEFS_ROOT) && (!f.on || !f.reached)) out.push({ dir: f.dir, depth: f.depth })
@@ -176,12 +178,13 @@ function collectRefs(ctx) {
 	return refs
 }
 
-// io = { listDir, readText }; opts = { scope, budget: { files, bytesPerFile }, pluginIds, cache (Map), onProgress(done, total), cancelled() }
+// io = { listDir, readText }; opts = { scope, budget: { files, bytesPerFile }, pluginIds, cache (Map), onProgress(done, total, the file just read), cancelled(), needMap }
+// needMap: a cached file without its macro map (macro-map.js, kept in memory only) is read again
 // -> { refs, cache (the new Map: only the files of this run), read, fromCache, skipped, files, folders, unscanned, defsComplete, cancelled }
 export async function runScan(io, opts) {
 	const o = opts || {}
 	const ctx = {
-		io, scope: cleanScope(o.scope), budget: o.budget || { files: 80, bytesPerFile: 131072 }, pluginIds: o.pluginIds || [], cache: o.cache || new Map(),
+		io, needMap: o.needMap === true, scope: cleanScope(o.scope), budget: o.budget || { files: 80, bytesPerFile: 131072 }, pluginIds: o.pluginIds || [], cache: o.cache || new Map(),
 		next: new Map(), listings: new Map(), taken: new Set(), defsOnly: new Set(), pending: 0, done: 0,
 		onProgress: o.onProgress || (() => {}), cancelled: o.cancelled || (() => false),
 		result: { read: 0, fromCache: 0, skipped: 0, folders: [], unscanned: [], defsComplete: true }

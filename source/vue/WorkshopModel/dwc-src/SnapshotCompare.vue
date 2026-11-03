@@ -1,8 +1,13 @@
 <template>
 	<v-card class="mb-3">
 		<v-card-text>
-			<div class="mo-part"><v-icon size="20" class="mr-1">mdi-compare-horizontal</v-icon>{{ t('compare_title') }}</div>
-			<div class="mo-faint mb-2">{{ t('compare_help') }}</div>
+			<div class="mo-head">
+				<span class="mo-head-icon"><v-icon>mdi-compare-horizontal</v-icon></span>
+				<div class="mo-head-text">
+					<h2 class="mo-head-title">{{ t('compare_title') }}</h2>
+					<p class="mo-head-lead">{{ t('compare_help') }}</p>
+				</div>
+			</div>
 			<div class="mo-form">
 				<v-select :model-value="from" :items="items" item-title="title" item-value="value" density="compact" variant="outlined" hide-details class="mo-field" :label="t('compare_from')" @update:model-value="emit('pick-from', $event)" />
 				<v-select :model-value="to" :items="items" item-title="title" item-value="value" density="compact" variant="outlined" hide-details class="mo-field" :label="t('compare_to')" @update:model-value="emit('pick-to', $event)" />

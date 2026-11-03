@@ -35,6 +35,25 @@ function fullPath(scope, rel) {
 	return scope + (rel.startsWith('[') ? '' : '.') + rel
 }
 
+// the name a snapshot gets when the person leaves the field empty: "<prefix> [<last part of the branch>] yyyy-mm-dd hh:mm" in local time,
+// cut to the name limit, and numbered "(2)", "(3)"... when that name is already taken
+export function defaultSnapshotName(prefix, scope, now, taken) {
+	const d = now instanceof Date ? now : new Date()
+	const p2 = n => String(n).padStart(2, '0')
+	const stamp = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes())
+	const part = String(scope || '').split(/[.[\]]+/).filter(Boolean).pop() || ''
+	const used = new Set((taken || []).map(x => (x && x.name !== undefined ? x.name : x)))
+	const label = (part ? String(prefix) + ' ' + part : String(prefix)).slice(0, 40 - stamp.length - 1).trim()
+	const base = label + ' ' + stamp
+	if (!used.has(base)) return base
+	for (let n = 2; n < 1000; n++) {
+		const suffix = ' (' + n + ')'
+		const name = base.slice(0, 40 - suffix.length) + suffix
+		if (!used.has(name)) return name
+	}
+	return base
+}
+
 // root + scope ('' = the whole model, else a path) -> { name, createdAt, scope, values: { path: value }, count, truncated }
 export function makeSnapshot(name, root, scope, now, maxLeaves) {
 	const at = now instanceof Date ? now : new Date()

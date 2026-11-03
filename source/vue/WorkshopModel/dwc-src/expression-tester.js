@@ -8,6 +8,7 @@
 
 import { helpChoice } from './view-choices.js'
 import { clip } from './value-format.js'
+import { openPlaceholder } from './expression-insert.js'
 
 export const TESTER_MODES = [helpChoice('tester', 'echo', { icon: 'mdi-function-variant' }), helpChoice('tester', 'm409', { icon: 'mdi-code-json' })]
 export const TESTER_HISTORY = 10
@@ -19,13 +20,15 @@ export function isModelPath(text) {
 }
 
 // mode + text (+ whether the path is a branch, for M409 to read all of it) -> { ok, code }
-// or { ok: false, error: 'empty' | 'one_line' | 'redirect' | 'not_path' }
+// or { ok: false, error: 'empty' | 'one_line' | 'redirect' | 'not_path' | 'placeholder' } (a <name> from the builder not filled in yet)
 export function testerCommand(mode, text, branch) {
 	const s = String(text === null || text === undefined ? '' : text)
 	if (/[\r\n]/.test(s.trim())) return { ok: false, error: 'one_line' }
-	const e = s.trim()
+	// a leading `echo` typed by hand is the command the tester sends anyway: it is not doubled
+	const e = mode === 'm409' ? s.trim() : s.trim().replace(/^echo(?=\s)\s*/i, '')
 	if (!e) return { ok: false, error: 'empty' }
 	if (e.startsWith('>')) return { ok: false, error: 'redirect' }
+	if (openPlaceholder(e)) return { ok: false, error: 'placeholder' }
 	if (mode === 'm409') {
 		if (!isModelPath(e)) return { ok: false, error: 'not_path' }
 		return { ok: true, code: 'M409 K"' + e + '"' + (branch ? ' F"d99"' : '') }

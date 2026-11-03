@@ -1,0 +1,28 @@
+{
+  "id": "fan-percent",
+  "title": {
+    "en": "Speed of a fan as a percentage",
+    "es": "Velocidad de un ventilador en porcentaje"
+  },
+  "description": {
+    "en": "The real speed of a fan from 0 to 100, as M106 shows it, instead of the fraction from 0 to 1 the model keeps.",
+    "es": "La velocidad real de un ventilador de 0 a 100, como la muestra M106, en vez de la fracción de 0 a 1 que guarda el modelo."
+  },
+  "kind": "expression",
+  "template": "floor(fans[<fan>].actualValue * 100)",
+  "holes": {
+    "fan": {
+      "type": "index",
+      "en": "The number of the fan in fans (the one M106 P uses).",
+      "es": "El número del ventilador en fans (el que usa M106 P)."
+    }
+  },
+  "since": "3.1",
+  "example": {
+    "filled": "floor(fans[0].actualValue * 100)",
+    "result": "number"
+  },
+  "author": "jhonf441",
+  "tags": ["fans"],
+  "sample": true
+}

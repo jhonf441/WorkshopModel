@@ -11,6 +11,7 @@ import { fanRows, sensorRows, boardRows, networkRows, pluginRows, globalRows } f
 import { childrenOf, childCount } from './model-tree.js'
 import { isBranch } from './value-format.js'
 import { isMap } from './model-path.js'
+import { diagnose } from './diagnosis.js'
 
 export const TOPIC_ROWS = 10
 
@@ -28,6 +29,11 @@ export const TOPICS = [
 	{ id: 'plugins', root: 'plugins', icon: 'mdi-puzzle-outline', rows: pluginRows },
 	{ id: 'global', root: 'global', icon: 'mdi-variable', rows: globalRows, gate: 'globals' }
 ]
+// the quick diagnosis card (diagnosis.js): it is not one of the cards above (it reads every branch, not one), the Topics view shows it first
+export const DIAGNOSIS_TOPIC = { id: 'diagnosis', icon: 'mdi-stethoscope', title: 'topic_diagnosis' }
+export function diagnosisTopic(model, ctx) {
+	return Object.assign({ result: diagnose(model, ctx) }, DIAGNOSIS_TOPIC)
+}
 export const OTHER_TOPIC = { id: 'other', icon: 'mdi-dots-horizontal-circle-outline' }
 
 // a branch that holds something: a value, an object, a non-empty array or Map

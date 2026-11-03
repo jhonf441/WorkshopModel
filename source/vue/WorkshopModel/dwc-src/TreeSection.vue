@@ -1,8 +1,19 @@
 <template>
 	<v-card class="mb-3 mo-views" :class="'mo-density-' + density">
 		<v-card-text>
-			<div class="mo-part"><v-icon size="20" class="mr-1">mdi-file-tree</v-icon>{{ t('tree_title') }}</div>
-			<div class="mo-faint mb-2">{{ t('tree_help') }}</div>
+			<div class="mo-head">
+				<span class="mo-head-icon"><v-icon>mdi-view-dashboard-outline</v-icon></span>
+				<div class="mo-head-text">
+					<h2 class="mo-head-title">{{ t('tree_title') }}</h2>
+					<p class="mo-head-lead">{{ t('tree_help') }}</p>
+				</div>
+				<div class="mo-head-right">
+					<span v-if="paused" class="mo-pill mo-pill-dot warn">{{ t('look_paused') }}</span>
+					<span v-else class="mo-pill mo-pill-dot ok">{{ t('look_live') }}</span>
+				</div>
+			</div>
+			<pinned-strip :pinned="pinned" :tick="tick" :model="viewProps.model" class="mb-2" @select="select" @open="openTechnical" @unpin="unpin" />
+			<choice-help :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
 			<div class="mo-views-head">
 				<view-tabs :choices="VIEW_CHOICES" :current="view" @pick="pickView" />
 				<div class="mo-views-tools">
@@ -10,8 +21,6 @@
 					<v-btn size="small" variant="outlined" @click="emit('update:paused', !paused)"><v-icon size="small" start>{{ paused ? 'mdi-play' : 'mdi-pause' }}</v-icon>{{ paused ? t('resume') : t('pause') }}</v-btn>
 				</div>
 			</div>
-			<pinned-strip :pinned="pinned" :tick="tick" :model="viewProps.model" class="mb-2" @select="select" @open="openTechnical" @unpin="unpin" />
-			<choice-help v-if="!pinned.length" :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
 			<choice-help :choice="choice" :title="t('view_how')" class="mb-2" />
 			<div :class="{ 'mo-split': choice.layout === 'split' }">
 				<div class="mo-view">

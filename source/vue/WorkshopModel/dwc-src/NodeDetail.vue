@@ -29,6 +29,7 @@
 			</template>
 			<div v-if="!table && children.length < count" class="mo-faint">{{ t('detail_more', { n: count - children.length }) }}</div>
 			<global-editor v-if="globalName" class="mt-3" :name="globalName" :exists="true" :value="value" :can-edit="canEdit" :globals-ok="globalsOk" :persistent="persistent" :show-persist="true" @persist="(n, l) => emit('persist', n, l)" />
+			<path-meaning :path="path" :firmware="firmware" />
 			<div class="mo-sub mt-3">
 				<div class="mo-part">{{ t('snippets_title') }}</div>
 				<div class="mo-faint mb-1">{{ t('snippets_help') }}</div>
@@ -53,6 +54,8 @@ import GlobalEditor from './GlobalEditor.vue'
 import ValueTable from './ValueTable.vue'
 import KindChip from './KindChip.vue'
 import FavoriteStar from './FavoriteStar.vue'
+import PathMeaning from './PathMeaning.vue'
+import { firmwareVersionOf } from './rrf-version.js'
 import { kindInfo } from './value-kind.js'
 import { getAtPath, globalNameOf, joinPath } from './model-path.js'
 import { childrenOf, childCount } from './model-tree.js'
@@ -94,6 +97,10 @@ const children = computed(() => childrenOf(value.value).slice(0, DETAIL_MAX).map
 	const h = isBranch(c.value) ? null : humanize(p, c.value)
 	return { key: c.key, path: p, text: formatValue(c.value), color: h && h.color ? h.color : '', human: h && !h.color ? t(h.key, h.params) : '' }
 }))
+const firmware = computed(() => {
+	void props.tick
+	return firmwareVersionOf(liveModel()) || ''
+})
 const globalName = computed(() => globalNameOf(props.path))
 const snippets = computed(() => pathSnippets(props.path, value.value))
 

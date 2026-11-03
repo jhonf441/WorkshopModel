@@ -21,7 +21,7 @@ export const SCOPE_SETTINGS = {
 	folder: helpChoice('usage_set', 'folder'),
 	depth: helpChoice('usage_set', 'depth'),
 	hide: helpChoice('usage_set', 'hide'),
-	problems: helpChoice('usage_set', 'problems')
+	cards: helpChoice('usage_set', 'cards')
 }
 
 // { chain: read config.g and its M98 chain, dirs: { folder: on }, depth, hide: leave out backups, examples and plugin folders }
@@ -61,10 +61,12 @@ export function saveScope(storage, scope) {
 
 const BACKUP_RE = /(^|[._\-\s])(bak|backups?|old|orig)([._\-\s]|$)|~$/i
 const EXAMPLE_RE = /(^|[._\-\s])examples?([._\-\s]|$)/i
+// copies left when files are moved (path-migration/<date>/..., leftover): never run
+const MIGRATION_RE = /^path-migration$/i
 
-// a backup or an example (a file or a folder anywhere in the path): never run, so never where a live global is defined
+// a backup, an example or a migration copy (a file or a folder anywhere in the path): never run, so never where a live global is defined
 export function isJunk(path) {
-	return String(path || '').replace(/^0:\//, '').split('/').filter(Boolean).some(p => BACKUP_RE.test(p) || EXAMPLE_RE.test(p))
+	return String(path || '').replace(/^0:\//, '').split('/').filter(Boolean).some(p => BACKUP_RE.test(p) || EXAMPLE_RE.test(p) || MIGRATION_RE.test(p))
 }
 
 // a folder or a file left out with `hide`: a backup, an example, or a folder named like an installed plugin (or "plugins")

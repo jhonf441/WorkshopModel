@@ -1,8 +1,14 @@
 <template>
 	<div class="mo-flat">
-		<div class="mo-toolbar">
-			<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('flat_filter')" :placeholder="t('flat_filter_hint')" />
+		<div class="mo-flat-filters" role="group" :aria-label="t('vs_title')">
+			<span class="mo-faint">{{ t('vs_title') }}</span>
+			<button v-for="m in VALUE_MODES" :key="m" type="button" class="wf-cat" :aria-pressed="mode === m ? 'true' : 'false'" :title="t('vs_mode_help')" @click="mode = m">{{ t('vs_mode_' + m) }}</button>
 		</div>
+		<choice-help :choice="VALUE_SEARCH_HELP" :title="t('vs_title')" class="mb-1" />
+		<div class="mo-toolbar">
+			<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="mode === 'values' ? t('vs_label') : t('flat_filter')" :placeholder="mode === 'values' ? t('vs_hint') : t('flat_filter_hint')" />
+		</div>
+		<div v-if="reading" :class="['mo-faint', 'mb-1', { 'wf-state warn': reading.invalid }]" role="status">{{ t(reading.key, reading.params) }}</div>
 		<div class="mo-flat-filters" role="group" :aria-label="t('flat_types')">
 			<button v-for="g in KIND_GROUPS" :key="g.id" type="button" class="wf-cat" :aria-pressed="groups.indexOf(g.id) >= 0 ? 'true' : 'false'" @click="toggleGroup(g.id)">{{ t('group_' + g.id) }}</button>
 			<v-switch v-model="onlyChanged" dense color="primary" hide-details :label="t('flat_changed')" />
@@ -46,11 +52,13 @@ import { humanize } from './value-human.js'
 import { leafInfo } from './value-kind.js'
 import KindChip from './KindChip.vue'
 import FavoriteStar from './FavoriteStar.vue'
+import ChoiceHelp from './ChoiceHelp.vue'
+import { VALUE_MODES, VALUE_SEARCH_HELP, parseValueQuery, searchValues, describeQuery } from './value-search.js'
 
 const COLUMNS = [{ id: 'path', label: 'detail_path' }, { id: 'value', label: 'value' }, { id: 'type', label: 'type' }, { id: 'changed', label: 'flat_col_changed' }]
 
 export default {
-	components: { KindChip, FavoriteStar },
+	components: { KindChip, FavoriteStar, ChoiceHelp },
 	props: {
 		tick: { type: Number, default: 0 },
 		model: { type: Object, default: null },
@@ -67,18 +75,25 @@ export default {
 		tier: { type: Object, default: () => ({ sbc: false, extras: false }) }
 	},
 	data() {
-		return { query: '', groups: [], onlyChanged: false, onlyWatched: false, sortKey: 'path', desc: false, pages: 1, KIND_GROUPS, FLAT_PAGE, COLUMNS }
+		return { mode: 'names', VALUE_MODES, VALUE_SEARCH_HELP, query: '', groups: [], onlyChanged: false, onlyWatched: false, sortKey: 'path', desc: false, pages: 1, KIND_GROUPS, FLAT_PAGE, COLUMNS }
 	},
 	computed: {
 		watchedSet() {
 			return new Set(this.watched)
+		},
+		reading() {
+			const q = this.mode === 'values' ? parseValueQuery(this.query) : null
+			const d = describeQuery(q)
+			return d ? Object.assign({ invalid: q.kind === 'invalid' }, d) : null
 		},
 		filtered() {
 			return !!(this.query || this.groups.length || this.onlyChanged || this.onlyWatched)
 		},
 		shown() {
 			void this.tick
-			const list = filterLeaves(this.leaves, { query: this.query, groups: this.groups, onlyChanged: this.onlyChanged, onlyWatched: this.onlyWatched, times: this.changeTimes, watched: this.watched, now: Date.now(), recentMs: RECENT_MS })
+			const byValue = this.mode === 'values'
+			const base = byValue ? searchValues(this.leaves, this.query).leaves : this.leaves
+			const list = filterLeaves(base, { query: byValue ? '' : this.query, groups: this.groups, onlyChanged: this.onlyChanged, onlyWatched: this.onlyWatched, times: this.changeTimes, watched: this.watched, now: Date.now(), recentMs: RECENT_MS })
 			return sortLeaves(list, this.sortKey, this.desc, this.changeTimes)
 		},
 		page() {
@@ -87,6 +102,7 @@ export default {
 	},
 	watch: {
 		query() { this.pages = 1 },
+		mode() { this.pages = 1 },
 		groups() { this.pages = 1 },
 		onlyChanged() { this.pages = 1 },
 		onlyWatched() { this.pages = 1 }

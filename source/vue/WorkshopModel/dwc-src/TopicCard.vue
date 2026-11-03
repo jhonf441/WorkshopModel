@@ -8,7 +8,7 @@
 		<div v-if="card.off" class="mo-faint" role="status">{{ t(card.off) }}</div>
 		<div v-else-if="card.empty" class="mo-faint">{{ t('topic_empty') }}</div>
 		<div v-if="card.id === 'other'" class="mo-faint mb-1">{{ t('topic_other_help') }}</div>
-		<button v-for="r in card.rows" :key="r.id" type="button" class="mo-topic-row" :title="t('topic_open_row', { path: r.path })" @click="emit('open', r.path)">
+		<button v-for="r in card.rows" :key="r.id" type="button" class="mo-topic-row" :class="{ 'mo-topic-row-changed': justChanged(r.path) }" :title="t('topic_open_row', { path: r.path })" @click="emit('open', r.path)">
 			<span class="mo-topic-main">
 				<span class="mo-topic-label">{{ labelOf(r) }}</span>
 				<span v-if="r.aside || (r.state && r.unit !== 'state')" class="mo-topic-sub">
@@ -25,12 +25,16 @@
 <script setup>
 // One card of the Topics view (topic-catalog.js): a title with its gray icon, "See all" (the branch in the technical tree), and the
 // readable rows: the label, the value with its unit (value-human.js), a short second line (a target, the machine position) and the
-// state as a dot + the word (DESIGN.md). A row opens its own path in the technical tree.
+// state as a dot + the word (DESIGN.md). A row opens its own path in the technical tree. A value that just changed glows for a moment
+// (changeTimes of the view contract, globals-quick.js recentlyChanged).
 import { i18n } from './dwc-host.js'
 import { unitText } from './value-human.js'
+import { recentlyChanged } from './globals-quick.js'
 
-defineProps({
-	card: { type: Object, required: true }
+const props = defineProps({
+	card: { type: Object, required: true },
+	changeTimes: { type: Map, default: () => new Map() },
+	now: { type: Number, default: 0 }
 })
 const emit = defineEmits(['open'])
 
@@ -48,5 +52,8 @@ function asideOf(r) {
 }
 function wordOf(s) {
 	return s.key ? t(s.key) : s.text
+}
+function justChanged(path) {
+	return !!props.now && recentlyChanged(props.changeTimes.get(path), props.now)
 }
 </script>

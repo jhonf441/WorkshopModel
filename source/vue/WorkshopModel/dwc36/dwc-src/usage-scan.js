@@ -13,6 +13,8 @@ export const SCAN_MAX_DEPTH = 4
 const DEFINE_RE = /^\s*(?:if\b.*?\s)?global\s+([A-Za-z_][A-Za-z0-9_]*)\s*=/
 const SET_RE = /^\s*set\s+global\.([A-Za-z_][A-Za-z0-9_]*)/
 const READ_RE = /global\.([A-Za-z_][A-Za-z0-9_]*)/g
+// a read on a line that first asks exists(global.x): the macro copes with the global missing, so it is not a problem if nothing creates it
+const GUARD_RE = /exists\s*\(\s*global\.([A-Za-z_][A-Za-z0-9_]*)\s*\)/g
 
 export function scanFileAllowed(name) {
 	return /\.g$/i.test(String(name || ''))
@@ -58,7 +60,7 @@ export function stripComment(line) {
 	return s
 }
 
-// -> [{ name, file, line (1-based), kind: 'define' | 'set' | 'read' }]
+// -> [{ name, file, line (1-based), kind: 'define' | 'set' | 'read', guarded (reads only: the line checks exists(global.name)) }]
 export function scanUsage(file, text) {
 	const out = []
 	const lines = String(text || '').split(/\r?\n/)
@@ -71,7 +73,10 @@ export function scanUsage(file, text) {
 		if (def) out.push({ name: def[1], file, line: i + 1, kind: 'define' })
 		if (set) out.push({ name: set[1], file, line: i + 1, kind: 'set' })
 		const seen = new Set()
+		const guards = new Set()
 		let m
+		GUARD_RE.lastIndex = 0
+		while ((m = GUARD_RE.exec(code))) guards.add(m[1])
 		READ_RE.lastIndex = 0
 		while ((m = READ_RE.exec(code))) {
 			if (m[1] === written && !seen.has(m[1]) && set) {
@@ -80,7 +85,7 @@ export function scanUsage(file, text) {
 			}
 			if (!seen.has(m[1]) && m[1] !== written) {
 				seen.add(m[1])
-				out.push({ name: m[1], file, line: i + 1, kind: 'read' })
+				out.push(guards.has(m[1]) ? { name: m[1], file, line: i + 1, kind: 'read', guarded: true } : { name: m[1], file, line: i + 1, kind: 'read' })
 			}
 		}
 	}
@@ -92,21 +97,24 @@ export function usageSummary(refs, liveNames) {
 	const live = new Set(liveNames || [])
 	const byName = new Map()
 	for (const r of refs || []) {
-		if (!byName.has(r.name)) byName.set(r.name, { name: r.name, defines: 0, sets: 0, reads: 0, files: [], live: live.has(r.name) })
+		if (!byName.has(r.name)) byName.set(r.name, { name: r.name, defines: 0, sets: 0, reads: 0, unguarded: 0, files: [], live: live.has(r.name) })
 		const e = byName.get(r.name)
 		if (r.kind === 'define') e.defines++
 		else if (r.kind === 'set') e.sets++
-		else e.reads++
+		else {
+			e.reads++
+			if (!r.guarded) e.unguarded++
+		}
 		if (e.files.indexOf(r.file) < 0) e.files.push(r.file)
 	}
 	live.forEach(name => {
-		if (!byName.has(name)) byName.set(name, { name, defines: 0, sets: 0, reads: 0, files: [], live: true })
+		if (!byName.has(name)) byName.set(name, { name, defines: 0, sets: 0, reads: 0, unguarded: 0, files: [], live: true })
 	})
 	const names = Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name))
 	return {
 		names,
 		unusedDefined: names.filter(e => (e.defines > 0 || e.live) && e.reads === 0).map(e => e.name),
-		undefinedUsed: names.filter(e => e.reads > 0 && e.defines === 0 && !e.live).map(e => e.name)
+		undefinedUsed: names.filter(e => e.unguarded > 0 && e.defines === 0 && !e.live).map(e => e.name)
 	}
 }
 

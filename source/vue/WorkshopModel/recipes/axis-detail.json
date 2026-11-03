@@ -1,0 +1,28 @@
+{
+  "id": "axis-detail",
+  "title": {
+    "en": "Everything about one axis",
+    "es": "Todo sobre un eje"
+  },
+  "description": {
+    "en": "The whole branch of one axis read with M409: letter, positions, limits, speed, acceleration, homed state and more, in one answer.",
+    "es": "Toda la rama de un eje leída con M409: letra, posiciones, límites, velocidad, aceleración, estado de home y más, en una sola respuesta."
+  },
+  "kind": "m409",
+  "template": "move.axes[<axis>]",
+  "holes": {
+    "axis": {
+      "type": "index",
+      "en": "The number of the axis in move.axes (0 is X on most machines).",
+      "es": "El número del eje en move.axes (0 es X en la mayoría de las máquinas)."
+    }
+  },
+  "since": "3.0",
+  "example": {
+    "filled": "move.axes[0]",
+    "result": "object"
+  },
+  "author": "jhonf441",
+  "tags": ["axes", "m409"],
+  "sample": true
+}
