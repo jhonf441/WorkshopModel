@@ -4,7 +4,7 @@
 
 Page `/Plugins/Model` ("Model Explorer"). The object model of the board, live, seen in the way that suits the question: readable cards by topic, a flat sortable list, columns like a file browser, one level at a time, only what changed, or the technical tree. Around it: the global variables with a typed editor and quick edits, a watch list drawn by the kind of each value, snapshots of the model to compare two moments, an expression tester, presets, the persistence of globals across reboots and a usage finder over your macros. It needs no WorkshopService and no Raspberry Pi: everything goes through the machine API of DWC itself (`rr_` on a standalone Duet, DSF with a Pi), so it works on a standalone Duet. With a Pi in SBC mode it turns a few extras on by itself.
 
-Version documented: 1.5 (see the CHANGELOG of the plugin).
+Version documented: 1.7 (see the CHANGELOG of the plugin).
 
 ## 1. Requirements
 
@@ -20,6 +20,10 @@ Version documented: 1.5 (see the CHANGELOG of the plugin).
 The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, Expression tester, Alerts and Report. The start-up card lives in the header.
 
 ### 3.1 Model: the views of the live model
+
+![Topics view with the quick diagnosis](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/01-topics-and-quick-diagnosis.png)
+
+![Technical tree with the meaning of a path](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/02-technical-tree-and-path-dictionary.png)
 - What: one selector of tabs over the same live model, remembered in this browser. Each view has a fold "How this view works" (what it is, what it is for, what you lose without it, how to use it).
   - Topics (the default): one card per area (machine state, temperatures, motion and axes, job, tools, fans, sensors, boards and drivers, network, plugins, globals) with readable names, units and live values. The cards come from what your model has: nothing of the workshop is assumed, and every top-level key no card covers is in Other. A row or "See all" opens that path in the technical tree. In the Plugins card a plugin without a process on the Pi reads "browser only", never "stopped". On top sits Quick diagnosis: one look at everything abnormal, errors first, each line with a fold that says what it means and what to check and an Open button. It checks the stepper drivers (stall, overtemperature, open load, short; RRF 3.5 and newer report them), the supply and 12 V voltages, the processor temperature, heaters in fault, offline or over their limit, temperature sensors that fail, filament monitors, cards that are not mounted, network interfaces that are down, a halted or powered-off machine, start-up errors, error messages and plugins that have lost their process. With nothing wrong it says how many checks ran; a check whose branch your model does not have is skipped and not counted.
   - Flat list: every value in one sortable table (path, value, type, last change) with filters by text, type, changed in the last minute and watched; bytes and durations are shown in words beside the raw value. A switch Names / Values changes what the box looks at: Names searches paths and values as before; Values searches only the values over the whole model: a word (contains), `=idle` or `"idle"` (equals), `!=0` (different), `>30`, `>=30`, `<5`, `<=5` (numbers), `10..20` (between), `true`, `false`, `null` and `empty`. A line under the box says how the text was read; sort, filters and the page size work on the matches.
@@ -30,6 +34,8 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 - Around the views: a density switch (comfortable or compact rows), favourites (a star on any path, the pinned paths with their live values on top) and the detail panel of the selected path: the value in words (bytes, durations), a swatch for a colour, arrays as small tables, the kind as a chip, the meaning of the path (what it is, its unit, whether it can be changed and with which G-code, and the firmware it needs; a dictionary of the common RRF 3.x paths, covering move, heat, fans, tools, sensors, boards, state, job, network, directories, limits, volumes, inputs, spindles and global, with a fold of help), the path helper (`M409`, `M291`, `echo`, an expression, a condition) and Test (the expression tester).
 
 ### 3.2 Globals
+
+![Globals as cards, with filters and a quick edit](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/03-globals-cards.png)
 - What: the global variables in groups by the start of their name (before the first underscore or capital letter), folded or open as you leave them; a search, filters (kind, kept across reboots, changed in the last minute, watched) and a sort (name, type, last change; favourites first). Each row: star, name, kind, short value (a tap shows all of it), a save icon when kept, in how many files the last usage scan saw it, a quick edit for a boolean (a switch) or a number (a field and Enter), and one menu (edit with the typed editor, open in the tree, watch, favourite). "Create a global" opens a dialog with the typed editor.
 - Watch out: RRF cannot delete a global until the next reboot; the plugin says so instead of offering a delete button.
 
@@ -49,10 +55,14 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 - Watch out: files that did not change are not read again (memory in the page; in SBC mode also in the watch file). On a standalone Duet the budget is small (the files come through the board).
 
 ### 3.7 Snapshots
+
+![Snapshots: the name is shown before it is saved](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/05-snapshots-default-name.png)
 - What: save the whole model or the selected branch under a name (`0:/sys/workshop-model-snapshots.json`), compare two snapshots or one with the model now (changed, added, removed), export one as a JSON file and import one back.
 - Watch out: on a standalone Duet the plugin keeps 4 snapshots of up to 4000 values (the file goes through the board); in SBC mode 20 of up to 10000. The oldest goes when a new one does not fit.
 
 ### 3.8 Expression builder (and tester)
+
+![Expression builder: fill in the blanks one by one](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/04-expression-builder-fill-in-the-blanks.png)
 - What: write an RRF expression (sent with `echo`) or a path (read with `M409`) and see the answer of the board in place, with a short history. It only reads: one line, through the command preview with one tap; an expression that starts with `>` (which would write a file) is refused.
 - Build it, do not just type it: four tabs under the field. Paths: any path of the live model with a search, its type and its value now, inserted where the cursor is. What you can write: a searchable catalog of what an RRF expression can do (operators, text with `^`, `?:`, math and angle functions, `exists()`, `#`, indexing, `null`, `true`, `false`, `iterations`, `result`, `param.`, `global.`, `var.`, model paths, and the G-code forms with `{}` which are copied, not tested) with a one-line explanation and an example each; inserting a pattern selects its first blank (written between `<` and `>`) so you type over it, and a selection is wrapped into it. What the board's firmware does not have is hidden and can be shown, marked "needs RRF x.y". Recipes: ready expressions made with the real paths of this machine (a heater above a limit, an axis inside its limits, a job running and its layer, a global or a default with `exists()`, the bed temperature). Saved: the expressions you keep with the star, remembered in this browser (30 at most).
 - While you write: the value and type of the path under the cursor, and warnings with no call to the board (an unclosed bracket or quote, a blank left in, a global that does not exist and is not guarded by `exists()`).
