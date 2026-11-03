@@ -1,0 +1,22 @@
+{
+  "id": "WorkshopModel",
+  "name": "Model Explorer",
+  "author": "jhonf441",
+  "version": "1.5.1",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/jhonf441/WorkshopModel",
+  "tags": [
+    "object model",
+    "globals",
+    "variables"
+  ],
+  "dwcVersion": "3.6",
+  "sbcRequired": false,
+  "data": {},
+  "dwcFiles": [
+    "css/WorkshopModel.ac6536e0.css",
+    "css/WorkshopModel.ac6536e0.css.gz",
+    "js/WorkshopModel.203ec429.js",
+    "js/WorkshopModel.203ec429.js.gz"
+  ]
+}
