@@ -1,5 +1,13 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.17 -- 2026-11-04
+
+- ErrorNotice: no second sign-in notice (the page bar chip says it)
+
+## 1.7.16 -- 2026-11-04
+
+- Start-up card locked without a session; shared help tip; session chip class
+
 ## 1.7.15 -- 2026-11-04
 
 - Alerts path finder; shared help button; share-recipe blanks aligned; global detail and file viewer fixes
