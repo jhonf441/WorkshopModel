@@ -33,10 +33,7 @@
 				<button v-if="draft !== current && !armed" type="button" class="mo-gcard-step mo-gcard-apply" :aria-label="t('look_card_apply')" :title="t('look_card_apply')" @click="arm"><v-icon small>mdi-check</v-icon></button>
 			</div>
 			<span v-else-if="noValue" class="mo-gcard-value mo-gcard-value-text mo-faint">{{ t('unit_none') }}</span>
-			<button v-else-if="detail && item.summary.long" type="button" class="mo-gcard-more" :aria-expanded="expanded ? 'true' : 'false'" :title="expanded ? t('globals_show_less') : t('globals_show_more')" @click="expanded = !expanded">
-				<span class="mo-gcard-value mo-gcard-value-text" :title="hoverText">{{ item.summary.short }}</span><v-icon small>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-			</button>
-			<span v-else class="mo-gcard-value" :class="{ 'mo-gcard-value-text': item.kind === 'string' }" :title="hoverText">{{ item.summary.short }}</span>
+			<span v-else-if="!(detail && item.summary.long)" class="mo-gcard-value" :class="{ 'mo-gcard-value-text': item.kind === 'string' }" :title="hoverText">{{ item.summary.short }}</span>
 		</div>
 		<div class="mo-gcard-marks">
 			<span v-if="item.persistent" class="wf-state ok" :title="t('persist_help')">{{ t('look_card_kept') }}</span>
@@ -64,7 +61,7 @@
 				</li>
 			</ul>
 		</div>
-		<pre v-if="detail && (expanded || item.summary.long)" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
+		<pre v-if="detail && item.summary.long" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
 		<div v-if="quickResult" class="mo-gcard-preview mo-fade-in">
 			<div v-if="feedback.level === 'error'" class="mo-error" role="alert">{{ t(feedback.key) }}</div>
 			<command-preview v-else :code="quickResult.code" :can-send="canEdit && globalsOk" :editable="false" @sent="onSent" />
@@ -192,9 +189,18 @@ export default {
 			const lines = f ? f.define.concat(f.set).sort((a, b) => a - b) : []
 			this.showFiles = true
 			this.peek = { path, line: lines.length ? lines[0] : 0 }
+			this.showPeek()
 		},
 		openLine(path, line) {
 			this.peek = this.peek && this.peek.path === path && this.peek.line === line ? null : { path, line }
+			if (this.peek) this.showPeek()
+		},
+		// the viewer opens under the file of the chip: in a long list that is below the part of the dialog the person sees, so it is brought into view
+		showPeek() {
+			this.$nextTick(() => {
+				const el = this.$el && this.$el.querySelector && this.$el.querySelector('.mo-gfile-peek')
+				if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+			})
 		},
 		setDraft(v) {
 			this.draft = v

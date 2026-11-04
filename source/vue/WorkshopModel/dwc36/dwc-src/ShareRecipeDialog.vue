@@ -217,7 +217,10 @@ export default {
 .mo-page .mo-rs-foot { flex-wrap: wrap; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--wf-line, rgba(128, 128, 128, 0.3)); }
 .mo-page .mo-rs-state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .mo-page .mo-rs-pair { display: flex; flex-wrap: wrap; gap: 8px; }
-.mo-page .mo-rs-hole { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
+/* one blank: its name on its own line, then the three fields in a tidy grid that all start at the same edge (they used to wrap one by one and look shifted) */
+.mo-page .mo-rs-hole { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); align-items: center; gap: 8px; margin: 10px 0; }
+.mo-page .mo-rs-hole > code { grid-column: 1 / -1; justify-self: start; }
+.mo-page .mo-rs-hole .mo-field, .mo-page .mo-rs-hole .mo-field-type { flex: none; width: 100%; min-width: 0; }
 .mo-page .mo-rs-problems ul { margin: 2px 0 0; padding-left: 20px; font-size: 13px; }
 .mo-page .mo-rs-ready { display: flex; align-items: center; gap: 6px; }
 .mo-page .mo-rs-json { font-family: var(--tp-font-mono, monospace); font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 240px; overflow: auto; border: 1px solid rgba(128, 128, 128, 0.25); border-radius: 8px; padding: 8px 10px; margin: 0 0 6px; }

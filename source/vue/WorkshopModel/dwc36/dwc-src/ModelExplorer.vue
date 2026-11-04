@@ -29,7 +29,7 @@
 				<presets-section v-if="section === 'presets'" :tick="tick" :support="globals" :can-edit="canEdit" />
 				<usage-section v-if="section === 'usage'" :tick="tick" :tier="tier" :support="globals" :can-edit="canEdit" :cache="usageCache" :auto-scan="autoScan" @select="openInTree" @update:cache="setUsageCache" />
 				<snapshots-section v-if="section === 'snapshots'" :tick="tick" :tier="tier" :can-edit="canEdit" :selected="selectedPath" @select="openInTree" />
-				<alerts-section v-if="section === 'alerts'" :monitor="monitor" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @clear-events="clearAlertEvents" />
+				<alerts-section v-if="section === 'alerts'" :tick="tick" :monitor="monitor" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @clear-events="clearAlertEvents" />
 				<report-section v-if="section === 'report'" :tick="tick" />
 				<tester-section v-if="section === 'tester'" :tick="tick" :connected="connected" :prefill="testerPrefill" />
 			</div>

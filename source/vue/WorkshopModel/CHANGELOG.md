@@ -1,7 +1,24 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.15 -- 2026-11-04
+
+- Alerts path finder; shared help button; share-recipe blanks aligned; global detail and file viewer fixes
+
+## 1.7.14 -- 2026-11-04
+
+- Global detail shows a long value once; the file viewer of a usage chip scrolls into view
+
+## 1.7.13 -- 2026-11-04
+
+- InfoTip help buttons in Report, Usage scope and share dialog; Topics 'See all' now scrolls to and highlights the node in the tree
+
 ## Unreleased
 
+- Model: the alerts rule form has a Find the path button next to the path field: it opens the path finder of the expression builder in a dialog (numbers only when the rule compares numbers) and the chosen path fills the field
+- Model: the "?" help buttons are the shared family piece (HelpTip), the same look and four lines as in every plugin
+- Model: in the Share this recipe dialog each blank is a tidy block (its name, then type and the two texts in a grid aligned to the same edge) instead of fields that wrapped one by one and looked shifted
+- Model: the detail of a global with a long value (a list) shows it once, whole, instead of a short form above and the same value again below
+- Model: the small file viewer opened from a usage chip (created, written, read) is brought into view when it opens, so a chip of a file lower in the list no longer looks like it shows nothing
 - Model: opening a path from the Topics (See all) now unfolds the technical tree down to it, scrolls the tree to the row (centered, inside the tree only) and flashes it briefly; later folds by the person are kept
 - Model: Report, Usage scope and the recipe share dialog show a small "?" help next to each field (titled with the field name) instead of a "How to use it" fold under every option
 

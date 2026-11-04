@@ -37,6 +37,7 @@
 				<div class="mo-form">
 					<v-text-field v-model="draft.path" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.path.label)"><template v-slot:append-outer><info-tip :choice="S.path" :title="t(S.path.label)" /></template></v-text-field>
 					<v-select v-if="watched.length" :value="null" :items="watched" dense outlined hide-details class="mo-field" :label="t('alerts_pick_watched')" @change="draft.path = $event" />
+					<v-btn small outlined class="mo-field-find" :title="t('alerts_find_path_help')" @click="pickOpen = true"><v-icon small left>mdi-magnify</v-icon>{{ t('alerts_find_path') }}</v-btn>
 				</div>
 				<div class="mo-form">
 					<v-select v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details class="mo-field-type" :label="t(S.op.label)"><template v-slot:append-outer><info-tip :choice="S.op" :title="t(S.op.label)" /></template></v-select>
@@ -47,6 +48,12 @@
 					<v-text-field v-model="draft.cooldown" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.cooldown.label)"><template v-slot:append-outer><info-tip :choice="S.cooldown" :title="t(S.cooldown.label)" /></template></v-text-field>
 				</div>
 				<div v-if="invalid" class="mo-error" role="alert">{{ t('alerts_invalid') }}</div>
+				<v-dialog v-model="pickOpen" max-width="760" scrollable content-class="workshop-theme mo-page">
+					<v-card class="workshop-theme mo-page">
+						<v-card-title class="d-flex align-center">{{ t('alerts_find_path_title') }}<v-spacer /><v-btn icon small :aria-label="t('close')" :title="t('close')" @click="pickOpen = false"><v-icon>mdi-close</v-icon></v-btn></v-card-title>
+						<v-card-text><path-picker :tick="tick" :wanted="numeric ? 'number' : ''" :hole-name="t(S.path.label)" @insert="usePath" /></v-card-text>
+					</v-card>
+				</v-dialog>
 				<v-btn small depressed color="primary" @click="add">{{ t('alerts_add') }}</v-btn>
 			</v-card-text>
 		</v-card>
@@ -81,17 +88,19 @@
 import i18n from '../../i18n'
 import ChoiceHelp from './ChoiceHelp.vue'
 import InfoTip from './InfoTip.vue'
+import PathPicker from './PathPicker.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp } from './alert-rules.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
 export default {
-	components: { ChoiceHelp, InfoTip },
+	components: { ChoiceHelp, InfoTip, PathPicker },
 	props: {
 		monitor: { type: Object, required: true },
-		watched: { type: Array, default: () => [] }
+		watched: { type: Array, default: () => [] },
+		tick: { type: Number, default: 0 } // the live model of the path finder
 	},
 	data() {
-		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, invalid: false, S: ALERT_SETTINGS }
+		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, invalid: false, S: ALERT_SETTINGS, pickOpen: false }
 	},
 	computed: {
 		numeric() {
@@ -117,6 +126,11 @@ export default {
 	methods: {
 		t(k, p) {
 			return i18n.t('plugins.WorkshopModel.model.' + k, p)
+		},
+		// a path chosen in the finder goes into the field of the rule and the finder closes
+		usePath(path) {
+			this.draft.path = path
+			this.pickOpen = false
 		},
 		add() {
 			const rule = cleanRule(Object.assign({}, this.draft))

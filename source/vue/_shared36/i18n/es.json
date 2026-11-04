@@ -1,5 +1,10 @@
 {
 	"shared": {
+		"help_tip_open": "Ayuda",
+		"help_tip_what": "Que es",
+		"help_tip_why": "Para que sirve",
+		"help_tip_missing": "Sin esto",
+		"help_tip_how": "Como se usa",
 		"sidebar_pin_label": "Fijar",
 		"sidebar_pin": "Fijar la barra abierta",
 		"sidebar_unpin": "Soltar la barra (se pliega al elegir)",
