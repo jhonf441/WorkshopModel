@@ -12,8 +12,6 @@
 					<span v-else class="mo-pill mo-pill-dot ok">{{ t('look_live') }}</span>
 				</div>
 			</div>
-			<pinned-strip :pinned="pinned" :tick="tick" :model="viewProps.model" class="mb-2" @select="select" @open="openTechnical" @unpin="unpin" />
-			<choice-help :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
 			<div class="mo-views-head">
 				<view-tabs :choices="VIEW_CHOICES" :current="view" @pick="pickView" />
 				<div class="mo-views-tools">
@@ -60,7 +58,6 @@ import ColumnsView from './ColumnsView.vue'
 import BrowseView from './BrowseView.vue'
 import ChangesView from './ChangesView.vue'
 import DensitySwitch from './DensitySwitch.vue'
-import PinnedStrip from './PinnedStrip.vue'
 import { VIEW_CHOICES, TECHNICAL_VIEW, choiceOf, readView, saveView } from './view-choices.js'
 import { loadDensity, saveDensity, normalizeDensity } from './density.js'
 import { PINS_ROW, loadPins, savePins, addPin, removePin } from './pins.js'
@@ -74,7 +71,7 @@ function storage() {
 }
 
 export default {
-	components: { ViewTabs, ChoiceHelp, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch, PinnedStrip },
+	components: { ViewTabs, ChoiceHelp, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch },
 	props: {
 		tick: { type: Number, default: 0 },
 		paused: { type: Boolean, default: false },

@@ -19,14 +19,15 @@
 				/>
 				<globals-section
 					v-if="section === 'globals'" :tick="tick" :support="globals" :can-edit="canEdit" :persist="persistEntries" :config-includes="configIncludes" :watched="watchedPaths" :change-times="tracker.times" :usage-cache="usageCache"
-					@select="openInTree" @watch="addWatch" @unwatch="removeWatch" @persist="setPersist" @update-persist="updatePersistValues"
+					@select="openInTree" @watch="addWatch" @unwatch="removeWatch" @persist="setPersist" @update-persist="updatePersistValues" @scan-usage="openUsageScan"
 				/>
+				<favorites-section v-if="section === 'favorites'" :tick="tick" @select="openInTree" />
 				<watch-section
 					v-if="section === 'watch'" :tick="tick" :entries="watchEntries" :changes="changes" :track="trackChanges" :storage="watchStorage"
 					@unwatch="removeWatch" @select="openInTree" @update:track="trackChanges = $event" @clear="changes = []"
 				/>
 				<presets-section v-if="section === 'presets'" :tick="tick" :support="globals" :can-edit="canEdit" />
-				<usage-section v-if="section === 'usage'" :tick="tick" :tier="tier" :support="globals" :cache="usageCache" @select="openInTree" @update:cache="setUsageCache" />
+				<usage-section v-if="section === 'usage'" :tick="tick" :tier="tier" :support="globals" :can-edit="canEdit" :cache="usageCache" :auto-scan="autoScan" @select="openInTree" @update:cache="setUsageCache" />
 				<snapshots-section v-if="section === 'snapshots'" :tick="tick" :tier="tier" :can-edit="canEdit" :selected="selectedPath" @select="openInTree" />
 				<alerts-section v-if="section === 'alerts'" :monitor="monitor" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @clear-events="clearAlertEvents" />
 				<report-section v-if="section === 'report'" :tick="tick" />
@@ -54,6 +55,8 @@ import ErrorNotice from './ErrorNotice.vue' // vue/_shared36
 import TreeSection from './TreeSection.vue'
 import GlobalsSection from './GlobalsSection.vue'
 import WatchSection from './WatchSection.vue'
+import FavoritesSection from './FavoritesSection.vue'
+import { loadPins } from './pins.js'
 import PresetsSection from './PresetsSection.vue'
 import UsageSection from './UsageSection.vue'
 import SnapshotsSection from './SnapshotsSection.vue'
@@ -92,11 +95,11 @@ function globalTexts(model) {
 }
 
 export default {
-	components: { PageHeader, SideTabs, StartupPanel, ErrorNotice, TreeSection, GlobalsSection, WatchSection, PresetsSection, UsageSection, SnapshotsSection, TesterSection, AlertsSection, AlertBanner, ReportSection },
+	components: { PageHeader, SideTabs, StartupPanel, ErrorNotice, TreeSection, GlobalsSection, WatchSection, FavoritesSection, PresetsSection, UsageSection, SnapshotsSection, TesterSection, AlertsSection, AlertBanner, ReportSection },
 	mixins: [roleMixin],
 	data() {
 		return {
-			section: 'tree', tick: 0, paused: false, selectedPath: '', watchEntries: [], changes: [], trackChanges: true,
+			section: 'tree', autoScan: false, tick: 0, paused: false, selectedPath: '', watchEntries: [], changes: [], trackChanges: true,
 			persistEntries: null, configIncludes: null, problem: null, BADGE, treeFocus: '', testerPrefill: ''
 		}
 	},
@@ -127,7 +130,7 @@ export default {
 		sections() {
 			void this.tick
 			const m = liveModel()
-			return navItems(k => this.t('model.' + k), { globals: childCount(m && m.global), watched: this.watchEntries.length, alerts: this.alertBannerItems().length })
+			return navItems(k => this.t('model.' + k), { globals: childCount(m && m.global), watched: this.watchEntries.length, alerts: this.alertBannerItems().length, favorites: this.favoriteCount() })
 		},
 		watchedPaths() {
 			return this.watchEntries.map(e => e.path)
@@ -334,6 +337,16 @@ export default {
 				return v === undefined ? e : { name: e.name, literal: rrfLiteral(toPlain(v)) }
 			})
 			return this.writePersist(next)
+		},
+		// "Buscar dónde se usa" on a global card: the usage page opens and the search starts by itself
+		// how many paths are starred (the count next to Favoritos in the side bar; the list is the one of pins.js)
+		favoriteCount() {
+			return loadPins(typeof localStorage === 'undefined' ? null : localStorage).length
+		},
+		openUsageScan() {
+			this.autoScan = true
+			this.section = 'usage'
+			this.$nextTick(() => scrollToPageTop())
 		},
 		openInTree(path) {
 			this.selectedPath = path

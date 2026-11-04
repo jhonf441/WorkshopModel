@@ -3,9 +3,11 @@
 		<span v-if="flash" :key="item.changedAt" class="mo-gcard-glow" aria-hidden="true"></span>
 		<div class="mo-gcard-head">
 			<favorite-star :path="item.path" :pinned="pinned" @pin="onPin" @unpin="onUnpin" />
-			<span class="mo-gcard-name" :title="item.path">{{ item.name }}</span>
+			<span class="mo-gcard-name" :title="hoverText">{{ item.name }}</span>
 			<kind-chip v-if="!noValue" :info="chip" />
 			<span v-else class="mo-pill mo-pill-dot mo-pill-quiet" :title="t('look_card_novalue_help')">{{ t('look_card_novalue') }}</span>
+		</div>
+		<div class="mo-gcard-menu">
 			<v-menu offset-y>
 				<template #activator="{ on, attrs }">
 					<v-btn small icon v-bind="attrs" :aria-label="t('globals_menu', { name: item.name })" :title="t('globals_menu', { name: item.name })" v-on="on"><v-icon small>mdi-dots-vertical</v-icon></v-btn>
@@ -31,16 +33,34 @@
 			</div>
 			<span v-else-if="noValue" class="mo-gcard-value mo-gcard-value-text mo-faint">{{ t('unit_none') }}</span>
 			<button v-else-if="item.summary.long" type="button" class="mo-gcard-more" :aria-expanded="expanded ? 'true' : 'false'" :title="expanded ? t('globals_show_less') : t('globals_show_more')" @click="expanded = !expanded">
-				<span class="mo-gcard-value mo-gcard-value-text">{{ item.summary.short }}</span><v-icon small>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+				<span class="mo-gcard-value mo-gcard-value-text" :title="hoverText">{{ item.summary.short }}</span><v-icon small>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 			</button>
-			<span v-else class="mo-gcard-value" :class="{ 'mo-gcard-value-text': item.kind === 'string' }">{{ item.summary.short }}</span>
+			<span v-else class="mo-gcard-value" :class="{ 'mo-gcard-value-text': item.kind === 'string' }" :title="hoverText">{{ item.summary.short }}</span>
 		</div>
 		<div class="mo-gcard-marks">
 			<span v-if="item.persistent" class="wf-state ok" :title="t('persist_help')">{{ t('look_card_kept') }}</span>
 			<span v-if="item.watched" class="mo-gcard-mark"><v-icon x-small>mdi-eye-outline</v-icon>{{ t('look_card_watched') }}</span>
-			<span v-if="item.usedIn !== null" class="mo-gcard-mark" :title="t('globals_used_help')"><v-icon x-small>mdi-file-document-outline</v-icon>{{ t('globals_used_in', { n: item.usedIn }) }}</span>
+			<button v-if="item.usedIn !== null" type="button" class="mo-gcard-mark mo-gcard-markbtn" :aria-expanded="showFiles ? 'true' : 'false'" :title="t('globals_used_help')" @click="showFiles = !showFiles"><v-icon x-small>mdi-file-document-outline</v-icon>{{ t('globals_used_in', { n: item.usedIn }) }}<v-icon x-small>{{ showFiles ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon></button>
+			<button v-else type="button" class="mo-gcard-mark mo-gcard-markbtn mo-gcard-scan" :title="t('globals_scan_help')" @click="$emit('scan-usage')"><v-icon x-small>mdi-file-search-outline</v-icon>{{ t('globals_scan') }}</button>
 			<span v-if="ago" class="mo-gcard-mark"><v-icon x-small>mdi-clock-outline</v-icon>{{ t('look_card_changed_ago', { ago: t(ago.key, { n: ago.n }) }) }}</span>
-			<span v-if="noValue" class="mo-gcard-mark mo-gcard-hint">{{ t(filler.key, filler.params) }}</span>
+			<span v-if="noValue && setterFiles.length" class="mo-gcard-mark mo-gcard-hint">{{ t('look_card_filler_open') }}
+				<button v-for="f in setterFiles" :key="f" type="button" class="mo-gcard-markbtn mo-gcard-setter" :title="t('look_card_setter_open', { file: f })" @click="openSetter(f)">{{ f }}</button>
+			</span>
+			<span v-else-if="noValue" class="mo-gcard-mark mo-gcard-hint">{{ t(filler.key, filler.params) }}</span>
+		</div>
+		<div v-if="showFiles" class="mo-gfiles mo-fade-in">
+			<div class="mo-part">{{ t('globals_used_where') }}</div>
+			<div v-if="!usageFiles.length" class="mo-faint">{{ t('globals_used_none') }}</div>
+			<ul v-else class="mo-gfiles-list">
+				<li v-for="f in usageFiles" :key="f.path" class="mo-gfile">
+					<code class="mo-gfile-path mo-files" :title="f.path">{{ f.path }}</code>
+					<span class="mo-udetail-lines">
+						<button v-for="c in chipsOf(f)" :key="c.kind + c.n" type="button" class="mo-uline-chip" :class="['k-' + c.kind, { on: peek && peek.path === f.path && peek.line === c.n }]" :aria-pressed="peek && peek.path === f.path && peek.line === c.n ? 'true' : 'false'" :title="t('usage_open_line', { n: c.n })" @click="openLine(f.path, c.n)">{{ t('usage_kind_' + c.kind) }} {{ t('usage_detail_line', { n: c.n }) }}</button>
+					</span>
+					<span v-if="f.guarded" class="mo-faint">{{ t('globals_used_guarded', { n: f.guarded }) }}</span>
+					<file-peek v-if="peek && peek.path === f.path" class="mo-gfile-peek" :path="peek.path" :line="peek.line" :name="item.name" @close="peek = null" />
+				</li>
+			</ul>
 		</div>
 		<pre v-if="expanded" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
 		<div v-if="quickResult" class="mo-gcard-preview mo-fade-in">
@@ -67,9 +87,11 @@ import GlobalEditor from './GlobalEditor.vue'
 import { kindInfo } from './value-kind.js'
 import { editCommand, editText } from './globals-typing.js'
 import { quickKind, stepped, recentlyChanged, changedAgo, hasNoValue, editFeedback, settersOf, fillerLine } from './globals-quick.js'
+import FilePeek from './FilePeek.vue'
+import { usageOf } from './usage-view.js'
 
 export default {
-	components: { KindChip, FavoriteStar, CommandPreview, GlobalEditor },
+	components: { KindChip, FavoriteStar, CommandPreview, GlobalEditor, FilePeek },
 	props: {
 		item: { type: Object, required: true },
 		pinned: { type: Array, default: () => [] },
@@ -80,7 +102,7 @@ export default {
 	},
 	data() {
 		// the draft starts as the live value: an untouched card never shows a command, let alone a red message (globals-quick.js)
-		return { expanded: false, editing: false, draft: editText(this.item.value), armed: false }
+		return { expanded: false, editing: false, draft: editText(this.item.value), armed: false, showFiles: false, peek: null }
 	},
 	computed: {
 		now() {
@@ -89,6 +111,11 @@ export default {
 		},
 		chip() {
 			return kindInfo(this.item.value, this.item.path)
+		},
+		// what the pointer shows over the name or the value: the path and, when the value is long, all of it (the card itself shows the basics)
+		hoverText() {
+			const full = this.item.summary && this.item.summary.full
+			return full && full !== this.item.summary.short ? this.item.path + String.fromCharCode(10) + full : this.item.path
 		},
 		noValue() {
 			return hasNoValue(this.item.value)
@@ -118,8 +145,16 @@ export default {
 		ago() {
 			return changedAgo(this.item.changedAt, this.now)
 		},
+		// the files that give a value to a global that has none yet, as buttons that open the file at the line of the assignment (at most 3)
+		setterFiles() {
+			return this.noValue ? settersOf(this.usageCache, this.item.name).files.slice(0, 3) : []
+		},
 		filler() {
 			return fillerLine(this.noValue ? settersOf(this.usageCache, this.item.name) : null)
+		},
+		// only worked out when the list is open: every file of the memory of the usage finder is looked through
+		usageFiles() {
+			return this.showFiles ? usageOf(this.usageCache, this.item.name) : []
 		}
 	},
 	watch: {
@@ -134,6 +169,22 @@ export default {
 	methods: {
 		t(k, p) {
 			return i18n.t('plugins.WorkshopModel.model.' + k, p)
+		},
+		// every use of this global in a file as one chip per line, like the By file tab of Usage: kind (created, written, read) and line, in file order
+		chipsOf(f) {
+			const out = []
+			for (const kind of ['define', 'set', 'read']) for (const n of f[kind]) out.push({ kind, n })
+			return out.sort((x, y) => x.n - y.n).slice(0, 40)
+		},
+		// the file that sets it, open in the small viewer at its first define or set line
+		openSetter(path) {
+			const f = usageOf(this.usageCache, this.item.name).find(x => x.path === path)
+			const lines = f ? f.define.concat(f.set).sort((a, b) => a - b) : []
+			this.showFiles = true
+			this.peek = { path, line: lines.length ? lines[0] : 0 }
+		},
+		openLine(path, line) {
+			this.peek = this.peek && this.peek.path === path && this.peek.line === line ? null : { path, line }
 		},
 		setDraft(v) {
 			this.draft = v

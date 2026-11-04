@@ -25,8 +25,10 @@
 				<div v-else class="mo-wrows">
 					<div v-for="r in rows" :key="r.path" class="mo-wrow">
 						<div class="mo-wrow-path"><button type="button" class="mo-link" :title="t('open_in_tree')" @click="$emit('select', r.path)">{{ r.path }}</button></div>
-						<span class="mo-wrow-value">{{ r.text }}</span>
-						<span v-if="r.mode === 'sparkline'" class="mo-wrow-range">{{ t('changes_range', { min: r.min, max: r.max }) }}</span>
+						<div class="mo-wrow-valuebox">
+							<span class="mo-wrow-value" :title="r.text">{{ r.text }}</span>
+							<span v-if="r.mode === 'sparkline'" class="mo-wrow-range">{{ t('changes_range', { min: r.min, max: r.max }) }}</span>
+						</div>
 						<span class="mo-wrow-graph">
 							<sparkline v-if="r.mode === 'sparkline'" :series="r.series" :width="160" :height="28" :marks="r.marks" />
 							<watch-bands v-else-if="r.mode !== 'inner'" :events="r.events" :onoff="r.mode === 'onoff'" :tick="tick" />

@@ -37,6 +37,8 @@
 					<span class="mo-faint mo-snippet-label">{{ t('snippet_' + s.id) }}</span>
 					<code class="mo-snippet-code">{{ s.code }}</code>
 					<v-btn x-small text :title="t('copy')" @click="copy(s.code, s.id)">{{ copied === s.id ? t('copied') : t('copy') }}</v-btn>
+					<v-btn v-if="s.send" x-small text color="primary" :title="t('send_here_title')" @click="sending = sending === s.id ? '' : s.id">{{ t('send_here') }}</v-btn>
+					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : t('look_globals_readonly')" @sent="sending = ''" />
 				</div>
 			</div>
 		</template>
@@ -52,6 +54,7 @@
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import GlobalEditor from './GlobalEditor.vue'
+import CommandPreview from './CommandPreview.vue'
 import ValueTable from './ValueTable.vue'
 import KindChip from './KindChip.vue'
 import FavoriteStar from './FavoriteStar.vue'
@@ -69,7 +72,7 @@ import { copyText } from './copy-text.js'
 const DETAIL_MAX = 400
 
 export default {
-	components: { GlobalEditor, ValueTable, KindChip, FavoriteStar, PathMeaning },
+	components: { CommandPreview, GlobalEditor, ValueTable, KindChip, FavoriteStar, PathMeaning },
 	props: {
 		path: { type: String, default: '' },
 		tick: { type: Number, default: 0 },
@@ -80,7 +83,7 @@ export default {
 		pinned: { type: Array, default: () => [] }
 	},
 	data() {
-		return { copied: '' }
+		return { copied: '', sending: '' } // sending: the id of the snippet whose Send is open
 	},
 	computed: {
 		value() {

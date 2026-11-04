@@ -20,11 +20,12 @@
 					<div class="mo-toolbar">
 						<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('usage_search')" :placeholder="t('usage_search_hint')" />
 					</div>
+					<usage-legend />
 					<view-tabs :choices="TABS" :current="tab" :label="t('usage_tabs_label')" @pick="tab = $event" />
 					<div :key="tab" class="mo-utab mo-ufade">
 						<usage-results v-if="tab === 'global'" :rows="rows" :card="card" :query="query || ''" :kinds="kinds" :file="file" @select="onSelect" @reset="resetFilters" />
 						<usage-by-file v-else-if="tab === 'file'" :refs="result.refs" :rows="rows" :live-names="liveNames" :query="query || ''" @select="onSelect" />
-						<usage-macro-map v-else :files="result.cache" :query="query || ''" />
+						<usage-macro-map v-else :files="result.cache" :query="query || ''" :can-edit="canEdit" />
 					</div>
 				</v-card-text>
 			</v-card>
@@ -48,6 +49,7 @@ import UsageScanBar from './UsageScanBar.vue'
 import UsageOptions from './UsageOptions.vue'
 import UsageBanner from './UsageBanner.vue'
 import UsageCards from './UsageCards.vue'
+import UsageLegend from './UsageLegend.vue'
 import UsageResults from './UsageResults.vue'
 import UsageByFile from './UsageByFile.vue'
 import UsageMacroMap from './UsageMacroMap.vue'
@@ -68,12 +70,17 @@ function storage() {
 }
 
 export default {
-	components: { ErrorNotice, ViewTabs, UsageScanBar, UsageOptions, UsageBanner, UsageCards, UsageResults, UsageByFile, UsageMacroMap },
+	components: { UsageLegend, ErrorNotice, ViewTabs, UsageScanBar, UsageOptions, UsageBanner, UsageCards, UsageResults, UsageByFile, UsageMacroMap },
 	props: {
 		tick: { type: Number, default: 0 },
 		tier: { type: Object, default: () => ({ extras: false }) },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },
-		cache: { type: Map, default: () => new Map() }
+		cache: { type: Map, default: () => new Map() },
+		autoScan: { type: Boolean, default: false }, // opened from "Buscar dónde se usa": the search starts when the page opens
+		canEdit: { type: Boolean, default: false } // may send commands (the macro map offers to send a call)
+	},
+	mounted() {
+		if (this.autoScan && !this.scanning) this.scan()
 	},
 	data() {
 		// result is kept out of Vue's observation (Object.freeze): it can hold thousands of references

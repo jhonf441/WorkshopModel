@@ -16,7 +16,7 @@ import { holesOf } from './expression-insert.js'
 import { pathsOfType, collectionChoices, globalNames, CHOICES_LIMIT } from './expression-paths.js'
 
 export const GUIDED_HELP = { assist: helpChoice('guided', 'assist'), checks: helpChoice('guided', 'checks') }
-export const FIT_REASONS = ['in_string', 'hole_word', 'hole_path', 'hole_type', 'selection_word', 'selection_path', 'selection_type']
+export const FIT_REASONS = ['in_string', 'hole_word', 'hole_path', 'hole_type', 'selection_word', 'selection_path', 'selection_type', 'after_value']
 
 const COLLECTIONS = { 'move.axes': 'axis', 'heat.heaters': 'heater', tools: 'tool', fans: 'fan' }
 const COLLECTION_OF_KIND = { axis: 'move.axes', heater: 'heat.heaters', tool: 'tools', fan: 'fans' }
@@ -172,6 +172,7 @@ export function fitOfInsert(entry, context) {
 		if (!typeFits(entry.returns, need)) return { ok: false, reason: 'hole_type', need, got: entry.returns }
 		return { ok: true }
 	}
+	if (c.afterValue) return { ok: false, reason: 'after_value' }
 	const sel = c.selection
 	const names = Object.keys((entry && entry.holes) || {})
 	if (sel && String(sel.text || '').trim() && names.length) {

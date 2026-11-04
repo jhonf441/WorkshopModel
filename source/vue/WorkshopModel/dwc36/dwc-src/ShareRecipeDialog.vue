@@ -1,10 +1,16 @@
 <template>
-	<v-dialog :value="true" max-width="760" scrollable @input="$emit('close')">
+	<v-dialog :value="true" max-width="760" scrollable content-class="workshop-theme mo-page" @input="$emit('close')">
 		<v-card class="workshop-theme mo-page mo-rs-dialog">
-			<v-card-text>
-				<div class="mo-part"><v-icon :size="20" class="mr-1">mdi-share-variant-outline</v-icon>{{ t('recipes_share_title') }}</div>
-				<div class="mo-faint mb-1">{{ t('recipes_share_lead') }}</div>
-				<div class="mo-faint mb-3">{{ t('recipes_share_private_note') }}</div>
+			<div class="mo-rs-head">
+				<span class="mo-rs-badge" aria-hidden="true"><v-icon :size="22">mdi-share-variant-outline</v-icon></span>
+				<div class="mo-rs-head-txt">
+					<div class="mo-rs-title" role="heading" aria-level="2">{{ t('recipes_share_title') }}</div>
+					<div class="mo-faint">{{ t('recipes_share_lead') }}</div>
+				</div>
+				<v-btn icon small :aria-label="t('recipes_share_close')" :title="t('recipes_share_close')" @click="$emit('close')"><v-icon :size="20">mdi-close</v-icon></v-btn>
+			</div>
+			<v-card-text class="mo-rs-body">
+				<div class="mo-rs-note mb-3"><v-icon :size="16" class="mr-1">mdi-shield-lock-outline</v-icon>{{ t('recipes_share_private_note') }}</div>
 
 				<v-text-field v-model="draft.id" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('recipes_share_id')" />
 				<choice-help :choice="ROWS.id" :title="t('recipes_share_id')" class="mb-3" />
@@ -56,16 +62,9 @@
 					<div class="mo-error">{{ t('recipes_share_problems') }}</div>
 					<ul><li v-for="(p, i) in problems" :key="i">{{ problemText(p) }}</li></ul>
 				</div>
-				<div v-else class="mo-faint mo-rs-ready" role="status"><span class="wf-state ok"></span>{{ t('recipes_share_ready') }}</div>
 
 				<div class="mo-part mt-3">{{ t('recipes_share_json') }}</div>
 				<pre class="mo-rs-json">{{ json }}</pre>
-				<div class="mo-actions">
-					<v-btn small outlined :disabled="problems.length > 0" @click="copy">{{ t('recipes_share_copy') }}</v-btn>
-					<v-btn small outlined :disabled="problems.length > 0" @click="download">{{ t('recipes_share_download', { name: fileName }) }}</v-btn>
-					<v-btn v-if="fileLink" small outlined :href="fileLink" target="_blank" rel="noopener">{{ t('recipes_share_open_file') }}</v-btn>
-					<v-btn v-if="issue" small outlined :href="issue" target="_blank" rel="noopener">{{ t('recipes_share_open_issue') }}</v-btn>
-				</div>
 				<div v-if="!problems.length && !fileLink && !issue" class="mo-faint">{{ t('recipes_share_link_long') }}</div>
 				<div v-if="note" class="mo-faint" :class="{ 'mo-result-bad': !note.ok }" role="status">{{ note.text }}</div>
 
@@ -77,8 +76,16 @@
 				</ol>
 				<div class="mo-faint"><a :href="RECIPES_REPO" target="_blank" rel="noopener">{{ t('recipes_share_repo') }}</a> &middot; <a :href="RECIPES_GUIDE" target="_blank" rel="noopener">{{ t('recipes_share_guide_link') }}</a></div>
 				<choice-help :choice="ROWS.publish" :title="t('recipes_share_publish')" class="mb-2" />
-				<div class="mo-actions"><v-btn small text @click="$emit('close')">{{ t('recipes_share_close') }}</v-btn></div>
 			</v-card-text>
+			<v-card-actions class="mo-rs-foot">
+				<span class="mo-rs-state" role="status" :class="problems.length ? 'mo-result-bad' : ''"><span class="wf-state" :class="problems.length ? 'err' : 'ok'"></span>{{ problems.length ? t('recipes_share_problems') : t('recipes_share_ready') }}</span>
+				<v-spacer />
+				<v-btn small text @click="$emit('close')">{{ t('recipes_share_close') }}</v-btn>
+				<v-btn v-if="fileLink" small outlined :href="fileLink" target="_blank" rel="noopener">{{ t('recipes_share_open_file') }}</v-btn>
+				<v-btn v-if="issue" small outlined :href="issue" target="_blank" rel="noopener">{{ t('recipes_share_open_issue') }}</v-btn>
+				<v-btn small outlined :disabled="problems.length > 0" @click="download">{{ t('recipes_share_download', { name: fileName }) }}</v-btn>
+				<v-btn small color="primary" depressed :disabled="problems.length > 0" @click="copy">{{ t('recipes_share_copy') }}</v-btn>
+			</v-card-actions>
 		</v-card>
 	</v-dialog>
 </template>
@@ -181,6 +188,17 @@ export default {
 
 <style>
 /* The share dialog and the import of recipes: own classes only (the look of cards, buttons and chips is the family's) */
+/* the head and the foot stay in view; only the body scrolls (the dialog is scrollable) */
+.mo-page.mo-rs-dialog { display: flex; flex-direction: column; }
+.mo-page .mo-rs-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--wf-line, rgba(128, 128, 128, 0.3)); }
+.mo-page .mo-rs-badge { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: var(--wf-accent, #1976d2); }
+.mo-page .mo-rs-badge .v-icon { color: #fff; }
+.mo-page .mo-rs-head-txt { flex: 1 1 auto; min-width: 0; }
+.mo-page .mo-rs-title { font-size: 17px; font-weight: 600; line-height: 1.25; }
+.mo-page .mo-rs-body { padding-top: 14px; }
+.mo-page .mo-rs-note { display: flex; align-items: flex-start; gap: 4px; padding: 8px 10px; border-radius: 8px; background: var(--wf-soft, rgba(128, 128, 128, 0.07)); font-size: 12px; opacity: 0.9; }
+.mo-page .mo-rs-foot { flex-wrap: wrap; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--wf-line, rgba(128, 128, 128, 0.3)); }
+.mo-page .mo-rs-state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
 .mo-page .mo-rs-pair { display: flex; flex-wrap: wrap; gap: 8px; }
 .mo-page .mo-rs-hole { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
 .mo-page .mo-rs-problems ul { margin: 2px 0 0; padding-left: 20px; font-size: 13px; }

@@ -19,13 +19,13 @@
 				<div class="mo-part">{{ t('usage_byfile_uses', { file, n: uses.length }) }}</div>
 				<div v-for="u in uses" :key="u.name" class="mo-ufilerow">
 					<button v-if="live.has(u.name)" type="button" class="mo-link mo-key" :title="t('open_in_tree')" @click="$emit('select', 'global.' + u.name)">{{ u.name }}</button>
-					<span v-else class="mo-key">{{ u.name }}</span>
+					<span v-else class="mo-key" :title="t('usage_not_live')">{{ u.name }}</span>
 					<span v-if="u.state" class="wf-state" :class="u.state.tone">{{ t(u.state.key) }}</span>
 					<span class="mo-udetail-lines">
-						<button v-for="c in u.lines" :key="c.kind + c.n" type="button" class="mo-uline-chip" :class="'k-' + c.kind" :title="t('usage_detail_copy_ref', { ref: file + ':' + c.n })" @click="copy(file + ':' + c.n)">{{ t('usage_kind_' + c.kind) }} {{ t('usage_detail_line', { n: c.n }) }}</button>
+						<button v-for="c in u.lines" :key="c.kind + c.n" type="button" class="mo-uline-chip" :class="['k-' + c.kind, { on: isOpen(u.name, c.n) }]" :aria-pressed="isOpen(u.name, c.n) ? 'true' : 'false'" :title="t('peek_open', { ref: file + ':' + c.n })" @click="toggle(u.name, c.n)">{{ t('usage_kind_' + c.kind) }} {{ t('usage_detail_line', { n: c.n }) }}</button>
 					</span>
 				</div>
-				<div v-if="copied" class="mo-faint mt-1" role="status">{{ t('usage_detail_copied', { text: copied }) }}</div>
+				<file-peek v-if="peek" :path="file" :line="peek.line" :name="peek.name" @close="peek = null" />
 			</div>
 		</div>
 	</div>
@@ -36,13 +36,15 @@
 
 // The "By file" tab of the usage finder: the files that were read (narrowed by the search of the section) and, for the one picked,
 // every global it uses with its state and the lines, created, written or read (usage-view.js fileView). A file is always picked while
-// there is one, so the right side never says "no problems": it says what the file uses. A click on a line copies "file:line".
+// there is one, so the right side never says "no problems": it says what the file uses. A click on a line opens the file in a small viewer
+// (FilePeek.vue) with that line selected; the viewer has its own button to copy "file:line".
 import i18n from '../../i18n'
-import { copyText } from './copy-text.js'
+import FilePeek from './FilePeek.vue'
 import { REF_KINDS, fileList, filterFiles, fileView } from './usage-view.js'
 import { usageState } from './usage-phrase.js'
 
 export default {
+	components: { FilePeek },
 	props: {
 		refs: { type: Array, default: () => [] },
 		rows: { type: Array, default: () => [] },
@@ -50,7 +52,13 @@ export default {
 		query: { type: String, default: '' }
 	},
 	data() {
-		return { picked: '', copied: '' }
+		return { picked: '', peek: null }
+	},
+	watch: {
+		// another file: the viewer of the previous one goes
+		file() {
+			this.peek = null
+		}
 	},
 	computed: {
 		files() {
@@ -71,8 +79,12 @@ export default {
 		t(k, p) {
 			return i18n.t('plugins.WorkshopModel.model.' + k, p)
 		},
-		async copy(text) {
-			if (await copyText(text)) this.copied = text
+		isOpen(name, line) {
+			return !!this.peek && this.peek.name === name && this.peek.line === line
+		},
+		// a second click on the same line closes the viewer
+		toggle(name, line) {
+			this.peek = this.isOpen(name, line) ? null : { name, line }
 		}
 	}
 }

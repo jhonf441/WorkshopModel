@@ -7,7 +7,8 @@
 			</g>
 		</svg>
 		<div class="mo-bands-legend">
-			<span v-for="l in legend" :key="l.text" class="mo-bands-item"><span class="mo-bands-box" :style="{ background: l.fill }" />{{ l.label }} <span class="mo-faint">{{ l.time }}</span></span>
+			<span v-for="l in legendShown" :key="l.text" class="mo-bands-item" :title="l.label"><span class="mo-bands-box" :style="{ background: l.fill }" /><span class="mo-bands-word">{{ l.label }}</span><span class="mo-faint mo-bands-time">{{ l.time }}</span></span>
+			<button v-if="legend.length > LEGEND_ROWS" type="button" class="mo-link mo-bands-more" :aria-expanded="showAll ? 'true' : 'false'" @click="showAll = !showAll">{{ showAll ? t('watch_legend_less') : t('watch_legend_more', { n: legend.length - LEGEND_ROWS }) }}</button>
 		</div>
 	</div>
 </template>
@@ -28,6 +29,8 @@ const PALETTE = Object.values(PLUGIN_COLORS).map(c => c.badge)
 const ON = 'var(--wf-ok)'
 const OFF = 'rgba(128, 128, 128, 0.35)'
 
+const LEGEND_ROWS = 5
+
 export default {
 	props: {
 		events: { type: Array, default: () => [] },
@@ -36,7 +39,13 @@ export default {
 		width: { type: Number, default: 160 },
 		height: { type: Number, default: 22 }
 	},
+	data() {
+		return { showAll: false, LEGEND_ROWS }
+	},
 	computed: {
+		legendShown() {
+			return this.showAll ? this.legend : this.legend.slice(0, LEGEND_ROWS)
+		},
 		bands() {
 			void this.tick
 			return this.onoff ? onOffBands(this.events, Date.now()) : buildBands(this.events, Date.now(), undefined, PALETTE.length)

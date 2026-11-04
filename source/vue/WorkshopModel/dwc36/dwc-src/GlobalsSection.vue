@@ -30,7 +30,6 @@
 						<div class="mo-empty-text mo-faint">{{ t('look_globals_empty_config') }}</div>
 					</div>
 					<template v-else>
-						<pinned-strip v-if="starred.length" :pinned="pinned" :tick="tick" only="global." class="mb-2" @select="showOne" @open="onSelect" @unpin="unpin" />
 						<div class="mo-gtools">
 							<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('look_globals_search')" :placeholder="t('look_globals_search_hint')" />
 							<v-btn v-if="canEdit" small depressed color="primary" @click="creating = true"><v-icon small left>mdi-plus</v-icon>{{ t('look_globals_new') }}</v-btn>
@@ -60,7 +59,7 @@
 							<div v-if="folded.indexOf(g.id) < 0" class="mo-ggrid">
 								<global-row
 									v-for="it in g.items" :key="it.name" :item="it" :pinned="pinned" :can-edit="canEdit" :globals-ok="support.ok" :tick="tick" :usage-cache="usageCache"
-									@select="onSelect" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @persist="onPersist"
+									@select="onSelect" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @persist="onPersist" @scan-usage="$emit('scan-usage')"
 								/>
 							</div>
 						</section>
@@ -70,7 +69,7 @@
 			</v-card-text>
 		</v-card>
 		<persist-panel v-if="support.ok" :persist="persist" :config-includes="configIncludes" :attention="attention" :can-edit="canEdit" @update-persist="$emit('update-persist')" />
-		<v-dialog v-model="creating" max-width="720" scrollable>
+		<v-dialog v-model="creating" max-width="720" scrollable content-class="workshop-theme mo-page">
 			<global-creator v-if="creating" :can-edit="canEdit" :globals-ok="support.ok" :existing="names" @close="creating = false" />
 		</v-dialog>
 	</div>
@@ -91,7 +90,6 @@ import { liveModel } from './model-host.js'
 import GlobalCreator from './GlobalCreator.vue'
 import GlobalRow from './GlobalRow.vue'
 import PersistPanel from './PersistPanel.vue'
-import PinnedStrip from './PinnedStrip.vue'
 import ChoiceHelp from './ChoiceHelp.vue'
 import { KIND_GROUPS } from './flat-list.js'
 import { GLOBALS_SETTINGS, globalItems, filterGlobals, sortGlobals } from './globals-filter.js'
@@ -109,7 +107,7 @@ function storage() {
 }
 
 export default {
-	components: { GlobalCreator, GlobalRow, PersistPanel, PinnedStrip, ChoiceHelp },
+	components: { GlobalCreator, GlobalRow, PersistPanel, ChoiceHelp },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },

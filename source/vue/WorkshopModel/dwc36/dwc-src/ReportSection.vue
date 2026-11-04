@@ -16,7 +16,7 @@
 					<choice-help :choice="c" :title="t('help_how')" />
 				</div>
 			</div>
-			<v-text-field v-model="dwc" dense outlined hide-details class="mo-field mt-2" spellcheck="false" :label="t(REPORT_DWC_SETTING.label)" />
+			<v-select v-model="dwc" :items="dwcItems" dense outlined hide-details class="mo-field mt-2" :label="t(REPORT_DWC_SETTING.label)" />
 			<choice-help :choice="REPORT_DWC_SETTING" :title="t('help_how')" class="mb-2" />
 			<div class="mo-actions">
 				<v-btn small depressed color="primary" @click="build">{{ text ? t('report_rebuild') : t('report_build') }}</v-btn>
@@ -46,7 +46,7 @@ import { exchangeSaveBlob } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { copyText } from './copy-text.js'
 import { buildReport, detectDwcVersion } from './machine-report.js'
-import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes } from './report-redact.js'
+import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes, dwcVersionChoices } from './report-redact.js'
 
 export default {
 	components: { ChoiceHelp },
@@ -54,9 +54,14 @@ export default {
 		tick: { type: Number, default: 0 }
 	},
 	data() {
-		return { include: cleanIncludes(), dwc: typeof window === 'undefined' ? '' : detectDwcVersion(window), text: '', stale: false, note: null, REPORT_INCLUDES, REPORT_DWC_SETTING }
+		const detected = typeof window === 'undefined' ? '' : detectDwcVersion(window)
+		return { include: cleanIncludes(), dwc: detected, detected, text: '', stale: false, note: null, REPORT_INCLUDES, REPORT_DWC_SETTING }
 	},
 	computed: {
+		// the versions to choose from: what the page detected first when it is new, and "do not state it"
+		dwcItems() {
+			return [{ text: this.t('report_dwc_none'), value: '' }].concat(dwcVersionChoices(this.detected).map(v => ({ text: v, value: v })))
+		},
 		// the name the download would get if pressed now
 		downloadName() {
 			void this.tick

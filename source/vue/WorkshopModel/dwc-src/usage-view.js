@@ -152,6 +152,33 @@ export function fileView(refs, file) {
 }
 
 // how many files use each global, from the memory of the usage finder (usage-runner.js cache): Map name -> files; empty before a scan
+// Where a global is used, from the memory of the usage finder (cache: path -> { refs: [{ name, line, kind: 'define' | 'set' | 'read', guarded? }] }):
+// [{ path, define: [lines], set: [lines], read: [lines], guarded: how many of the reads check exists(global.x) first }]. The files that create or
+// write it come first (they decide its value), then the ones that only read it, each group by path.
+export function usageOf(cache, name) {
+	const out = []
+	const m = cache && typeof cache.forEach === 'function' ? cache : null
+	if (!m) return out
+	m.forEach((entry, path) => {
+		const f = { path, define: [], set: [], read: [], guarded: 0 }
+		for (const r of (entry && entry.refs) || []) {
+			if (r.name !== name || !f[r.kind]) continue
+			if (typeof r.line === 'number' && f[r.kind].indexOf(r.line) < 0) f[r.kind].push(r.line)
+			if (r.kind === 'read' && r.guarded) f.guarded++
+		}
+		if (f.define.length || f.set.length || f.read.length) out.push(f)
+	})
+	const writes = f => (f.define.length || f.set.length ? 0 : 1)
+	return out.sort((a, b) => writes(a) - writes(b) || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0))
+}
+
+// "5, 12, 30" with at most `max` numbers and a trailing ellipsis when there are more
+export function linesText(lines, max) {
+	const l = (lines || []).slice().sort((a, b) => a - b)
+	const cap = max || 6
+	return l.slice(0, cap).join(', ') + (l.length > cap ? ', ...' : '')
+}
+
 export function usageCounts(cache) {
 	const files = new Map()
 	const m = cache || new Map()

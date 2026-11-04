@@ -21,6 +21,7 @@
 					v-if="section === 'globals'" :tick="tick" :support="globals" :can-edit="canEdit" :persist="persistEntries" :config-includes="configIncludes" :watched="watchedPaths" :change-times="tracker.times" :usage-cache="usageCache"
 					@select="openInTree" @watch="addWatch" @unwatch="removeWatch" @persist="setPersist" @update-persist="updatePersistValues"
 				/>
+				<favorites-section v-if="section === 'favorites'" :tick="tick" @select="openInTree" />
 				<watch-section
 					v-if="section === 'watch'" :tick="tick" :entries="watchEntries" :changes="changes" :track="trackChanges" :storage="watchStorage"
 					@unwatch="removeWatch" @select="openInTree" @update:track="trackChanges = $event" @clear="changes = []"
@@ -51,6 +52,8 @@ import ErrorNotice from './ErrorNotice.vue' // vue/_shared
 import TreeSection from './TreeSection.vue'
 import GlobalsSection from './GlobalsSection.vue'
 import WatchSection from './WatchSection.vue'
+import FavoritesSection from './FavoritesSection.vue'
+import { loadPins } from './pins.js'
 import PresetsSection from './PresetsSection.vue'
 import UsageSection from './UsageSection.vue'
 import SnapshotsSection from './SnapshotsSection.vue'
@@ -125,7 +128,7 @@ const canEdit = computed(() => atLeast('technician'))
 const sections = computed(() => {
 	void tick.value
 	const m = liveModel()
-	return navItems(k => t('model.' + k), { globals: childCount(m && m.global), watched: watchEntries.value.length, alerts: alertBanner.value.length })
+	return navItems(k => t('model.' + k), { globals: childCount(m && m.global), watched: watchEntries.value.length, alerts: alertBanner.value.length, favorites: loadPins(typeof localStorage === 'undefined' ? null : localStorage).length })
 })
 const watchedPaths = computed(() => watchEntries.value.map(e => e.path))
 const persistentNames = computed(() => (persistEntries.value || []).map(e => e.name))

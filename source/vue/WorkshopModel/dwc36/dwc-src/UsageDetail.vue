@@ -7,16 +7,18 @@
 				<v-btn small outlined @click="copy(row.name)"><v-icon :size="16" class="mr-1">mdi-content-copy</v-icon>{{ t('usage_detail_copy_name') }}</v-btn>
 			</span>
 		</div>
+		<div v-if="!row.live" class="mo-faint mb-1">{{ t('usage_not_live') }}</div>
 		<div v-if="row.maybe" class="mo-faint mb-1">{{ t('usage_maybe_help') }}</div>
 		<div v-else-if="row.hint" class="mo-faint mb-1">{{ t('usage_hint_help') }}</div>
 		<div v-if="!groups.length" class="mo-faint">{{ t('usage_detail_no_files') }}</div>
 		<div v-for="g in groups" :key="g.file" class="mo-udetail-file">
 			<div class="mo-files">{{ g.file }}</div>
 			<div class="mo-udetail-lines">
-				<button v-for="(x, i) in g.items" :key="i" type="button" class="mo-uline-chip" :class="'k-' + x.kind" :title="t('usage_detail_copy_ref', { ref: g.file + ':' + x.line })" @click="copy(g.file + ':' + x.line)">
+				<button v-for="(x, i) in g.items" :key="i" type="button" class="mo-uline-chip" :class="['k-' + x.kind, { on: isOpen(g.file, x.line) }]" :aria-pressed="isOpen(g.file, x.line) ? 'true' : 'false'" :title="t('peek_open', { ref: g.file + ':' + x.line })" @click="toggle(g.file, x.line)">
 					{{ t('usage_kind_' + x.kind) }} {{ t('usage_detail_line', { n: x.line }) }}
 				</button>
 			</div>
+			<file-peek v-if="peek && peek.path === g.file" :path="peek.path" :line="peek.line" :name="row.name" @close="peek = null" />
 		</div>
 		<div v-if="copied" class="mo-faint mt-1" role="status">{{ t('usage_detail_copied', { text: copied }) }}</div>
 	</div>
@@ -26,17 +28,20 @@
 'use strict'
 
 // The detail of one global: every file that touches it with the lines, grouped by file, in plain words (created, written, read), with
-// real actions: open it in the tree, copy its name, copy "file:line" (a click on a line). Says what it copied.
+// real actions: open it in the tree, copy its name, and a click on a line opens the file in a small viewer (FilePeek.vue) with that line selected
+// (it has its own button to copy "file:line"). Says what it copied.
 import i18n from '../../i18n'
 import { copyText } from './copy-text.js'
 import { refsByFile } from './usage-view.js'
+import FilePeek from './FilePeek.vue'
 
 export default {
+	components: { FilePeek },
 	props: {
 		row: { type: Object, required: true }
 	},
 	data() {
-		return { copied: '' }
+		return { copied: '', peek: null }
 	},
 	computed: {
 		groups() {
@@ -49,6 +54,13 @@ export default {
 		},
 		async copy(text) {
 			if (await copyText(text)) this.copied = text
+		},
+		isOpen(path, line) {
+			return !!this.peek && this.peek.path === path && this.peek.line === line
+		},
+		// a second click on the same line closes the viewer
+		toggle(path, line) {
+			this.peek = this.isOpen(path, line) ? null : { path, line }
 		}
 	}
 }

@@ -35,22 +35,17 @@
 					<div class="mo-head-text"><h2 class="mo-head-title">{{ t('alerts_add_title') }}</h2></div>
 				</div>
 				<div class="mo-form">
-					<v-text-field v-model="draft.path" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.path.label)" />
+					<v-text-field v-model="draft.path" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.path.label)"><template v-slot:append-outer><info-tip :choice="S.path" :title="t(S.path.label)" /></template></v-text-field>
 					<v-select v-if="watched.length" :value="null" :items="watched" dense outlined hide-details class="mo-field" :label="t('alerts_pick_watched')" @change="draft.path = $event" />
 				</div>
-				<choice-help :choice="S.path" :title="t('help_how')" class="mb-2" />
 				<div class="mo-form">
-					<v-select v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details class="mo-field-type" :label="t(S.op.label)" />
-					<v-text-field v-model="draft.value" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.value.label)" />
+					<v-select v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details class="mo-field-type" :label="t(S.op.label)"><template v-slot:append-outer><info-tip :choice="S.op" :title="t(S.op.label)" /></template></v-select>
+					<v-text-field v-model="draft.value" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.value.label)"><template v-slot:append-outer><info-tip :choice="S.value" :title="t(S.value.label)" /></template></v-text-field>
 				</div>
-				<choice-help :choice="S.op" :title="t('help_how')" />
-				<choice-help :choice="S.value" :title="t('help_how')" class="mb-2" />
 				<div class="mo-form">
-					<v-text-field v-if="numeric" v-model="draft.hysteresis" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.hysteresis.label)" />
-					<v-text-field v-model="draft.cooldown" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.cooldown.label)" />
+					<v-text-field v-if="numeric" v-model="draft.hysteresis" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.hysteresis.label)"><template v-slot:append-outer><info-tip :choice="S.hysteresis" :title="t(S.hysteresis.label)" /></template></v-text-field>
+					<v-text-field v-model="draft.cooldown" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.cooldown.label)"><template v-slot:append-outer><info-tip :choice="S.cooldown" :title="t(S.cooldown.label)" /></template></v-text-field>
 				</div>
-				<choice-help v-if="numeric" :choice="S.hysteresis" :title="t('help_how')" />
-				<choice-help :choice="S.cooldown" :title="t('help_how')" class="mb-2" />
 				<div v-if="invalid" class="mo-error" role="alert">{{ t('alerts_invalid') }}</div>
 				<v-btn small depressed color="primary" @click="add">{{ t('alerts_add') }}</v-btn>
 			</v-card-text>
@@ -85,11 +80,12 @@
 // edits the rules. They work only while the page is open: nothing on the Pi, no notice to a phone.
 import i18n from '../../i18n'
 import ChoiceHelp from './ChoiceHelp.vue'
+import InfoTip from './InfoTip.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp } from './alert-rules.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceHelp, InfoTip },
 	props: {
 		monitor: { type: Object, required: true },
 		watched: { type: Array, default: () => [] }

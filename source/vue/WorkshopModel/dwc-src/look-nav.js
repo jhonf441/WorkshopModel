@@ -9,6 +9,7 @@ export const NAV_GROUPS = ['see', 'change', 'keep', 'check']
 
 export const NAV_ITEMS = [
 	{ id: 'tree', icon: 'mdi-view-dashboard-outline', group: 'see' },
+	{ id: 'favorites', icon: 'mdi-star-outline', group: 'see' },
 	{ id: 'watch', icon: 'mdi-eye-outline', group: 'see' },
 	{ id: 'globals', icon: 'mdi-variable', group: 'change' },
 	{ id: 'presets', icon: 'mdi-bookmark-multiple-outline', group: 'change' },
@@ -22,11 +23,11 @@ export const NAV_ITEMS = [
 // a count worth showing next to a section: 0 shows nothing
 export function navBadge(id, counts) {
 	const c = counts || {}
-	const n = id === 'globals' ? c.globals : id === 'watch' ? c.watched : id === 'alerts' ? c.alerts : 0
+	const n = id === 'globals' ? c.globals : id === 'watch' ? c.watched : id === 'alerts' ? c.alerts : id === 'favorites' ? c.favorites : 0
 	return n > 0 ? String(n > 99 ? '99+' : n) : ''
 }
 
-// the items of SideTabs.vue: t translates a key of plugins.WorkshopModel.model.*; counts = { globals, watched, alerts }
+// the items of SideTabs.vue: t translates a key of plugins.WorkshopModel.model.*; counts = { globals, watched, alerts, favorites }
 export function navItems(t, counts) {
 	return NAV_ITEMS.map(it => ({
 		id: it.id,

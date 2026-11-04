@@ -16,7 +16,7 @@
 					<choice-help :choice="c" :title="t('help_how')" />
 				</div>
 			</div>
-			<v-text-field v-model="dwc" density="compact" variant="outlined" hide-details class="mo-field mt-2" spellcheck="false" :label="t(REPORT_DWC_SETTING.label)" />
+			<v-select v-model="dwc" :items="dwcItems" item-title="text" item-value="value" density="compact" variant="outlined" hide-details class="mo-field mt-2" :label="t(REPORT_DWC_SETTING.label)" />
 			<choice-help :choice="REPORT_DWC_SETTING" :title="t('help_how')" class="mb-2" />
 			<div class="mo-actions">
 				<v-btn size="small" variant="flat" color="primary" @click="build">{{ text ? t('report_rebuild') : t('report_build') }}</v-btn>
@@ -44,7 +44,7 @@ import { exchangeSaveBlob } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { copyText } from './copy-text.js'
 import { buildReport, detectDwcVersion } from './machine-report.js'
-import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes } from './report-redact.js'
+import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes, dwcVersionChoices } from './report-redact.js'
 
 const props = defineProps({
 	tick: { type: Number, default: 0 }
@@ -53,7 +53,10 @@ const props = defineProps({
 const t = (k, p) => i18n.t('plugins.WorkshopModel.model.' + k, p)
 
 const include = reactive(cleanIncludes())
-const dwc = ref(typeof window === 'undefined' ? '' : detectDwcVersion(window))
+const detected = typeof window === 'undefined' ? '' : detectDwcVersion(window)
+const dwc = ref(detected)
+// the versions to choose from: what the page detected first when it is new, and "do not state it"
+const dwcItems = computed(() => [{ text: t('report_dwc_none'), value: '' }].concat(dwcVersionChoices(detected).map(v => ({ text: v, value: v }))))
 const text = ref('')
 const stale = ref(false)
 const note = ref(null)

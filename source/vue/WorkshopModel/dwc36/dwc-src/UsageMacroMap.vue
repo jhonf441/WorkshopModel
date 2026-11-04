@@ -17,7 +17,8 @@
 				<div v-if="open.indexOf(r.file) >= 0" class="mo-sub mo-usage-refs">
 					<div class="mo-faint">{{ r.file }}</div>
 					<div class="mo-part mt-1">{{ t('macromap_example') }}</div>
-					<div class="mo-snippet"><code class="mo-snippet-code">{{ r.example }}</code><v-btn x-small text @click="copyLine(r.example)">{{ t('macromap_copy') }}</v-btn></div>
+					<div class="mo-snippet"><code class="mo-snippet-code">{{ r.example }}</code><v-btn x-small text @click="copyLine(r.example)">{{ t('macromap_copy') }}</v-btn><v-btn x-small text color="primary" :title="t('send_macro_title')" @click="sendOpen = sendOpen === r.file ? '' : r.file">{{ t('send_here') }}</v-btn></div>
+					<command-preview v-if="sendOpen === r.file" class="mo-snippet-send" :code="r.example" :can-send="canEdit" :disabled-reason="canEdit ? '' : t('look_globals_readonly')" @sent="sendOpen = ''" />
 					<div v-if="r.params.length">
 						<div class="mo-part mt-1">{{ t('macromap_params') }}</div>
 						<ul class="mo-list"><li v-for="p in r.params" :key="p.name"><span class="mo-key">param.{{ p.name }}</span> {{ paramText(p) }}</li></ul>
@@ -44,6 +45,7 @@
 // line that shows how to call it. The finder keeps the map of each file in its memory (usage-runner.js, needMap).
 import i18n from '../../i18n'
 import ChoiceHelp from './ChoiceHelp.vue'
+import CommandPreview from './CommandPreview.vue'
 import { copyText } from './copy-text.js'
 import { macroRows, filterMacroRows, MACRO_MAP_SETTING } from './macro-map.js'
 
@@ -51,13 +53,14 @@ const SHOWN = 200
 const GROUPS = [{ key: 'globalsRead', label: 'macromap_globals_read' }, { key: 'globalsWritten', label: 'macromap_globals_written' }, { key: 'globalsDefined', label: 'macromap_globals_defined' }]
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceHelp, CommandPreview },
 	props: {
 		files: { type: Map, default: null },
-		query: { type: String, default: '' }
+		query: { type: String, default: '' },
+		canEdit: { type: Boolean, default: false } // may send commands to the machine (the same rule as the editors)
 	},
 	data() {
-		return { onlyParams: false, onlyCalls: false, open: [], GROUPS, MACRO_MAP_SETTING }
+		return { onlyParams: false, onlyCalls: false, open: [], sendOpen: '', GROUPS, MACRO_MAP_SETTING }
 	},
 	computed: {
 		all() {

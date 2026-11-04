@@ -22,6 +22,7 @@
 				</template>
 				<template v-else>{{ t('pick_cursor_none') }}</template>
 			</div>
+			<expression-flow v-if="mode === 'echo'" :text="text" :cursor="cursor" @insert="put" />
 			<hole-assist v-if="holeList.length" :holes="holeList" :hole="goal" @fill="fill" @prev="goHole(prevHole(holeList, goal ? goal.start : text.length, true))" @next="goHole(nextHole(holeList, goal ? goal.end : 0, true))" @go="goHole" @pick="pickPath" />
 			<div v-if="!command.ok && text.trim() && command.error !== 'placeholder'" class="mo-error" role="alert">{{ t('tester_err_' + command.error) }}</div>
 			<template v-if="notes.length">
@@ -78,6 +79,8 @@ import SavedPanel from './SavedPanel.vue'
 import LiveControl from './LiveControl.vue'
 import ExpressionResult from './ExpressionResult.vue'
 import HoleAssist from './HoleAssist.vue'
+import ExpressionFlow from './ExpressionFlow.vue'
+import { positionRefusal } from './expression-flow.js'
 import { TESTER_MODES, testerCommand, pushHistory, isModelPath } from './expression-tester.js'
 import { BUILDER_TABS, DEFAULT_BUILDER_TAB } from './expression-builder.js'
 import { insertAt, holesOf, isPlaceholder, pathAtCursor } from './expression-insert.js'
@@ -99,7 +102,7 @@ const EXAMPLES = { echo: ['state.status', '#move.axes', 'move.axes[0].userPositi
 const storage = () => (typeof localStorage === 'undefined' ? null : localStorage)
 
 export default {
-	components: { ViewTabs, ChoiceHelp, CommandPreview, KindChip, PathPicker, CatalogPanel, RecipesPanel, SavedPanel, LiveControl, ExpressionResult, HoleAssist },
+	components: { ViewTabs, ChoiceHelp, CommandPreview, KindChip, PathPicker, CatalogPanel, RecipesPanel, SavedPanel, LiveControl, ExpressionResult, HoleAssist, ExpressionFlow },
 	props: {
 		tick: { type: Number, default: 0 },
 		connected: { type: Boolean, default: false },
@@ -170,7 +173,8 @@ export default {
 			const sel = this.selection
 			const chosen = sel && sel.end > sel.start ? this.text.slice(sel.start, sel.end) : ''
 			const selected = chosen && !isPlaceholder(chosen) ? { text: chosen, type: checkExpression(chosen, { model: liveModel(), firmware: this.firmware }).type } : null
-			return { inString: insideString(this.text, this.cursor), hole: this.goal, selection: selected }
+			const hasSelection = !!chosen && !isPlaceholder(chosen)
+			return { inString: insideString(this.text, this.cursor), hole: this.goal, selection: selected, afterValue: this.mode === 'echo' && !this.goal && positionRefusal(this.text, this.cursor, hasSelection) === 'after_value' }
 		},
 		canSend() {
 			return this.connected && this.command.ok && !this.blocked

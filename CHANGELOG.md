@@ -1,5 +1,37 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.11 -- 2026-11-03
+
+- Model: menu at row end, hover detail, no overflow, alerts help tips
+
+## 1.7.10 -- 2026-11-03
+
+- Model: Favoritos como seccion propia, Globales ordenado, usos como en Uso
+
+## 1.7.9 -- 2026-11-03
+
+- Model: advanced expression builder and setter links on globals
+
+## 1.7.8 -- 2026-11-03
+
+- Model: files list of a global opens with lines and viewer, scan button, tidy compact cards
+
+## 1.7.7 -- 2026-11-03
+
+- Dialogs: room above the first line (create global, share recipe)
+
+## 1.7.6 -- 2026-11-03
+
+- Share-recipe dialog: real head and fixed foot
+
+## 1.7.5 -- 2026-11-03
+
+- Model: tidy watch list, where a global is used, usage legend, send from snippets, file viewer centering
+
+## 1.7.4 -- 2026-11-03
+
+- Model: new-global dialog styled, where a global is used (files, lines, viewer), usage legend, DWC version select in the report
+
 ## 1.7.3 -- 2026-11-03
 
 - A topic that opens another part of the model scrolls back to the top of the page

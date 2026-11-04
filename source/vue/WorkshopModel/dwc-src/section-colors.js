@@ -6,6 +6,7 @@
 export const SECTION_COLORS = {
 	tree: '#1E88E5',
 	globals: '#FB8C00',
+	favorites: '#FFB300',
 	watch: '#26A69A',
 	presets: '#AB47BC',
 	usage: '#7E57C2',

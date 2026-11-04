@@ -17,6 +17,18 @@ export const REPORT_INCLUDES = ['name', 'hostname', 'ip', 'mac', 'serial', 'path
 // the version of DWC the person can type when the page cannot tell it
 export const REPORT_DWC_SETTING = helpChoice('report', 'dwc')
 
+// The versions of DWC the report can name, chosen from a list (not typed: a typo made a report nobody could read). The one the page detects goes
+// first when it is not in the list; '' is "do not state it".
+export const REPORT_DWC_VERSIONS = ['3.7.0', '3.6.3', '3.6.2', '3.6.1', '3.6.0', '3.5.2', '3.5.1', '3.5.0', '3.4.6']
+
+// -> [version, ...] the detected one first when it is new
+export function dwcVersionChoices(detected) {
+	const d = String(detected === undefined || detected === null ? '' : detected).trim()
+	const list = REPORT_DWC_VERSIONS.slice()
+	if (d && list.indexOf(d) < 0) list.unshift(d)
+	return list
+}
+
 export function cleanIncludes(o) {
 	const out = {}
 	for (const c of REPORT_INCLUDES) out[c.id] = !!(o && o[c.id] === true)
