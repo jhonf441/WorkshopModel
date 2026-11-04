@@ -5,6 +5,7 @@
 // The same leaves feed every view through the view contract (VIEW-CONTRACT.md). Pure: test/flat-list.test.js.
 
 import { joinPath } from './model-path.js'
+import { naturalCompare } from './natural-order.js'
 import { childrenOf, MAX_DEPTH } from './model-tree.js'
 import { kindOf, isBranch, formatValue } from './value-format.js'
 
@@ -81,7 +82,7 @@ export function filterLeaves(leaves, f) {
 	})
 }
 
-const naturalOrder = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+const naturalOrder = naturalCompare
 
 function compareValues(a, b) {
 	const na = typeof a.value === 'number'

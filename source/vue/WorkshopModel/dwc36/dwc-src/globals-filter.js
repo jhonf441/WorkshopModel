@@ -6,6 +6,7 @@
 // DESIGN.md section 7. Pure: test/globals-groups.test.js.
 
 import { childrenOf } from './model-tree.js'
+import { naturalCompare } from './natural-order.js'
 import { kindOf } from './value-format.js'
 import { kindGroup, RECENT_MS } from './flat-list.js'
 import { summarize } from './value-summary.js'
@@ -20,7 +21,7 @@ export const GLOBALS_SETTINGS = {
 	quick: helpChoice('globals_set', 'quick')
 }
 
-const natural = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' })
+const natural = naturalCompare
 
 // model.global (a Map) + ctx { persistent, watched, pinned (names or paths), times (Map path -> ms), used (Map name -> files) }
 export function globalItems(globals, ctx) {

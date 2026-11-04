@@ -1,5 +1,9 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.18 -- 2026-11-04
+
+- Flat list: shared collator, sorting 4500 leaves 22x faster (was 700 ms every second)
+
 ## 1.7.17 -- 2026-11-04
 
 - ErrorNotice: no second sign-in notice (the page bar chip says it)

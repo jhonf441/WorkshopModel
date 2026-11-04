@@ -3,6 +3,8 @@
 // Change highlight: which of the rows on screen changed since the last tick, and the list of recent changes with before and after.
 // Pure: test/change-diff.test.js.
 
+import { numericCompare } from './natural-order.js'
+
 export const CHANGES_CAP = 100
 
 // rows [{ path, text }] -> Map path -> text (branches, whose text is empty, are left out)
@@ -40,7 +42,7 @@ export function diffMaps(prev, next) {
 	a.forEach((before, path) => {
 		if (!b.has(path)) out.push({ path, before, after: null, state: 'removed' })
 	})
-	return out.sort((x, y) => x.path.localeCompare(y.path, undefined, { numeric: true }))
+	return out.sort((x, y) => numericCompare(x.path, y.path))
 }
 
 // newest first, capped at `cap` entries; t is the time of the tick

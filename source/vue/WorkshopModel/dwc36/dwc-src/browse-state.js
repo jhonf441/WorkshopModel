@@ -7,6 +7,7 @@
 
 import { splitPath, joinPath, getAtPath, parentPath } from './model-path.js'
 import { isBranch } from './value-format.js'
+import { naturalCompare } from './natural-order.js'
 import { childItems } from './columns-state.js'
 import { KINDS } from './value-kind.js'
 
@@ -64,7 +65,7 @@ export function filterItems(items, query) {
 // names compare as words, indices as numbers ('2' before '10')
 function byName(a, b) {
 	if (a.index && b.index) return Number(a.key) - Number(b.key)
-	return a.key.localeCompare(b.key, undefined, { numeric: true, sensitivity: 'base' })
+	return naturalCompare(a.key, b.key)
 }
 
 export function sortItems(items, sort) {
