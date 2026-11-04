@@ -834,6 +834,7 @@
 		"globals_scan": "Buscar dónde se usa",
 		"globals_scan_help": "Todavía no se ha buscado en los archivos: abre Uso y empieza la búsqueda",
 		"usage_open_line": "Ver la línea {n} en el archivo",
+		"globals_detail_open": "Ver el detalle",
 		"globals_used_help": "Archivos que la usan, de la última revisión del buscador de uso",
 		"globals_menu": "Acciones de {name}",
 		"globals_show_more": "Ver todo",
@@ -1838,7 +1839,17 @@
 		"look_export_lead": "Descarga lo que vigilaste como archivo CSV o JSON.",
 		"look_alerts_lead": "Un aviso en todas las secciones cuando un valor cruza un límite que pusiste.",
 		"look_alerts_count": "{n} reglas",
-		"look_report_lead": "Un texto con los datos de la máquina, listo para pegar en el foro o en una incidencia."
+		"look_report_lead": "Un texto con los datos de la máquina, listo para pegar en el foro o en una incidencia.",
+		"chg_empty": "(vacío)",
+		"chg_none": "(no existía)",
+		"chg_empty_tip": "Un texto vacío: el valor se borró y luego se volvió a poner.",
+		"chg_via_empty": "vía vacío",
+		"chg_via_empty_tip": "El valor pasó por un texto vacío que duró {time}.",
+		"chg_fold": "Ocultar pares borrar y poner",
+		"chg_fold_what": "Une A, luego vacío, luego B en una sola fila A a B cuando el paso vacío duró 5 segundos o menos.",
+		"chg_fold_why": "Una macro que borra una global antes de ponerla hace dos cambios cada vez; una fila dice lo mismo.",
+		"chg_fold_missing": "Cada respuesta muestra dos filas, una de ellas con una celda vacía.",
+		"chg_fold_help": "Apágalo para ver cada paso; una fila unida dice vía vacío y su ayuda indica cuánto duró el paso vacío."
 	},
 	"startup": {
 		"row_connection": "Conexión con la placa",

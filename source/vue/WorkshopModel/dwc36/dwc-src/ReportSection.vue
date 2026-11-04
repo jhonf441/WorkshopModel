@@ -13,11 +13,13 @@
 			<div class="mo-report-includes">
 				<div v-for="c in REPORT_INCLUDES" :key="c.id" class="mo-report-inc">
 					<v-checkbox v-model="include[c.id]" dense color="primary" hide-details :label="t(c.label)" />
-					<choice-help :choice="c" :title="t('help_how')" />
+					<info-tip :choice="c" :title="t(c.label)" />
 				</div>
 			</div>
-			<v-select v-model="dwc" :items="dwcItems" dense outlined hide-details class="mo-field mt-2" :label="t(REPORT_DWC_SETTING.label)" />
-			<choice-help :choice="REPORT_DWC_SETTING" :title="t('help_how')" class="mb-2" />
+			<div class="mo-tip-row mt-2 mb-2">
+				<v-select v-model="dwc" :items="dwcItems" dense outlined hide-details class="mo-field" :label="t(REPORT_DWC_SETTING.label)" />
+				<info-tip :choice="REPORT_DWC_SETTING" :title="t(REPORT_DWC_SETTING.label)" />
+			</div>
 			<div class="mo-actions">
 				<v-btn small depressed color="primary" @click="build">{{ text ? t('report_rebuild') : t('report_build') }}</v-btn>
 				<v-btn small outlined :disabled="!text" @click="copy">{{ t('report_copy') }}</v-btn>
@@ -41,7 +43,7 @@
 // name the download will get is shown before the button is pressed.
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
-import ChoiceHelp from './ChoiceHelp.vue'
+import InfoTip from './InfoTip.vue'
 import { exchangeSaveBlob } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { copyText } from './copy-text.js'
@@ -49,7 +51,7 @@ import { buildReport, detectDwcVersion } from './machine-report.js'
 import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes, dwcVersionChoices } from './report-redact.js'
 
 export default {
-	components: { ChoiceHelp },
+	components: { InfoTip },
 	props: {
 		tick: { type: Number, default: 0 }
 	},
@@ -98,5 +100,5 @@ export default {
 
 <style>
 .mo-page .mo-report-includes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 0 16px; }
-.mo-page .mo-report-inc { min-width: 0; }
+.mo-page .mo-report-inc { min-width: 0; display: flex; align-items: center; justify-content: space-between; }
 </style>

@@ -31,8 +31,8 @@
 							<v-btn x-small text class="mo-changes-copy" :title="t('copy_path')" :aria-label="t('copy_path')" @click="copyText(c.path)"><v-icon x-small>mdi-content-copy</v-icon></v-btn>
 							<span class="wf-state" :class="STATE_CLASS[c.status]">{{ t('changes_status_' + c.status) }}</span>
 						</td>
-						<td class="mo-changes-mono mo-changes-before">{{ c.before === null ? t('changes_absent') : c.before }}</td>
-						<td class="mo-changes-mono">{{ c.after === null ? t('changes_absent') : c.after }}</td>
+						<td class="mo-changes-mono mo-changes-before"><span v-if="c.before === ''" class="mo-chg-faint" :title="t('chg_empty_tip')">{{ t('chg_empty') }}</span><template v-else>{{ c.before === null ? t('changes_absent') : c.before }}</template></td>
+						<td class="mo-changes-mono"><span v-if="c.after === ''" class="mo-chg-faint" :title="t('chg_empty_tip')">{{ t('chg_empty') }}</span><template v-else>{{ c.after === null ? t('changes_absent') : c.after }}</template></td>
 						<td class="mo-changes-trend">
 							<sparkline v-if="c.numeric" :series="c.series" :width="80" :height="20" />
 							<span class="mo-changes-mono">{{ c.count ? t('changes_times', { n: c.count }) : t('changes_times_unknown') }}</span>
@@ -224,4 +224,5 @@ export default {
 .mo-page .mo-changes-trend .mo-spark { color: var(--wf-info); vertical-align: middle; margin-right: 6px; }
 .mo-page .mo-changes-range { display: block; color: var(--tp-faint); font-size: 11px; }
 .mo-page .mo-changes-actions { white-space: nowrap; }
+.mo-page .mo-chg-faint { color: var(--tp-faint); font-style: italic; }
 </style>

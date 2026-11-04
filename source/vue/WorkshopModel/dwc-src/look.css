@@ -279,3 +279,11 @@
 .workshop-theme.mo-page .mo-gfile .mo-peek-path { overflow-wrap: anywhere; word-break: break-all; min-width: 0; }
 .workshop-theme.mo-page .mo-gfile .mo-peek-box { max-width: 100%; overflow: auto; }
 .workshop-theme.mo-page .mo-gfile .mo-peek-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* the list of globals is a clean table of rows: a click opens the detail dialog */
+.workshop-theme.mo-page .mo-gcard-click { cursor: pointer; }
+.workshop-theme.mo-page .mo-gcard-click:hover { background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-click .mo-gcard-mark { font-size: 12px; opacity: 0.8; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-click .mo-gcard-marks { flex-wrap: nowrap; overflow: hidden; }
+.workshop-theme.mo-page .mo-gdetail-body { padding-top: 8px; }
+.workshop-theme.mo-page .mo-gcard-detail { display: flex; flex-direction: column; gap: 10px; border: 0; background: transparent; }
+.workshop-theme.mo-page .mo-gcard-detail .mo-gcard-menu { top: 0; right: 0; }

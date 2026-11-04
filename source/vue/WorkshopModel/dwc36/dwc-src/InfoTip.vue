@@ -42,6 +42,8 @@ export default {
 
 <style>
 .mo-page .mo-infotip { margin-top: 2px; }
+.mo-page .mo-tip-row { display: flex; align-items: center; gap: 4px; }
+.mo-page .mo-tip-row > :first-child { flex: 1; min-width: 0; }
 .mo-infotip-card { max-width: 380px; }
 .mo-infotip-card .mo-infotip-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 </style>

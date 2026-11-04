@@ -834,6 +834,7 @@
 		"globals_scan": "Find where it is used",
 		"globals_scan_help": "The files have not been searched yet: opens Usage and starts the search",
 		"usage_open_line": "See line {n} in the file",
+		"globals_detail_open": "See the detail",
 		"globals_used_help": "Files that use it, from the last scan of the usage finder",
 		"globals_menu": "Actions of {name}",
 		"globals_show_more": "Show all",
@@ -1838,7 +1839,17 @@
 		"look_export_lead": "Download what you watched as a CSV or JSON file.",
 		"look_alerts_lead": "A banner on every section when a value crosses a limit you set.",
 		"look_alerts_count": "{n} rules",
-		"look_report_lead": "A text with the facts of the machine, ready to paste in the forum or an issue."
+		"look_report_lead": "A text with the facts of the machine, ready to paste in the forum or an issue.",
+		"chg_empty": "(empty)",
+		"chg_none": "(none)",
+		"chg_empty_tip": "An empty text: the value was cleared and then set again.",
+		"chg_via_empty": "via empty",
+		"chg_via_empty_tip": "The value went through an empty text that lasted {time}.",
+		"chg_fold": "Hide clear-and-set pairs",
+		"chg_fold_what": "Joins A, then empty, then B into one row A to B when the empty step lasted 5 seconds or less.",
+		"chg_fold_why": "A macro that clears a global before setting it makes two changes each time; one row says the same.",
+		"chg_fold_missing": "Every reply shows two rows, one of them with an empty cell.",
+		"chg_fold_help": "Turn it off to see every step; a joined row says via empty and its tooltip gives how long the empty step lasted."
 	},
 	"startup": {
 		"row_connection": "Connection to the board",

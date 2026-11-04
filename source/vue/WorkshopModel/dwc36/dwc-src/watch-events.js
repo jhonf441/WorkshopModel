@@ -62,6 +62,38 @@ export function eventTable(events) {
 	return out
 }
 
+// an empty step that lasted at most this long between two values is a clear-and-set (a macro that blanks a global, then sets it)
+export const EMPTY_FOLD_MS = 5000
+// the toggle and its help (DESIGN.md section 7): keys of plugins.WorkshopModel.model.*
+export const FOLD_CHOICE = { id: 'fold', label: 'chg_fold', what: 'chg_fold_what', why: 'chg_fold_why', ifMissing: 'chg_fold_missing', help: 'chg_fold_help' }
+
+// how a before / after text is shown: 'none' = it did not exist (null / undefined), 'empty' = a real empty text, 'value' = anything else
+export function cellKind(text) {
+	if (text === null || text === undefined) return 'none'
+	return text === '' ? 'empty' : 'value'
+}
+
+// folds A -> '' -> B (rows newest first, as eventTable gives them) into one row A -> B when the empty step lasted `maxMs` or less.
+// The folded row keeps the time and the inner changes of the row that set B, how long A lasted, and `viaEmpty` + `emptyMs`.
+// An empty at the oldest row (nothing before it), at the newest row (still empty), a long empty and other values stay as they are.
+export function foldEmptyPairs(rows, maxMs) {
+	const limit = maxMs === undefined ? EMPTY_FOLD_MS : maxMs
+	const list = rows || []
+	const out = []
+	for (let i = 0; i < list.length; i++) {
+		const set = list[i]
+		const clear = list[i + 1]
+		const pair = clear && set.before === '' && set.after !== '' && clear.after === '' && clear.before !== null && clear.before !== '' && set.lasted !== null && set.lasted <= limit
+		if (!pair) {
+			out.push(set)
+			continue
+		}
+		out.push(Object.assign({}, set, { before: clear.before, lasted: clear.lasted, viaEmpty: true, emptyMs: set.lasted }))
+		i++
+	}
+	return out
+}
+
 // the events kept in the file: plain, without what is only needed in memory
 export function storedEvents(events) {
 	return (events || []).slice(-100).map(e => {

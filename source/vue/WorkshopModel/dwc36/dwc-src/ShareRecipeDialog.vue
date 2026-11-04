@@ -12,26 +12,36 @@
 			<v-card-text class="mo-rs-body">
 				<div class="mo-rs-note mb-3"><v-icon :size="16" class="mr-1">mdi-shield-lock-outline</v-icon>{{ t('recipes_share_private_note') }}</div>
 
-				<v-text-field v-model="draft.id" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('recipes_share_id')" />
-				<choice-help :choice="ROWS.id" :title="t('recipes_share_id')" class="mb-3" />
-
-				<div class="mo-rs-pair">
-					<v-text-field v-model="draft.titleEn" dense outlined hide-details class="mo-field" :label="t('recipes_share_name_en')" />
-					<v-text-field v-model="draft.titleEs" dense outlined hide-details class="mo-field" :label="t('recipes_share_name_es')" />
+				<div class="mo-tip-row mb-3">
+					<v-text-field v-model="draft.id" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('recipes_share_id')" />
+					<info-tip :choice="ROWS.id" :title="t('recipes_share_id')" />
 				</div>
-				<choice-help :choice="ROWS.name" :title="t('recipes_share_name')" class="mb-3" />
 
-				<div class="mo-rs-pair">
-					<v-text-field v-model="draft.descriptionEn" dense outlined hide-details class="mo-field" :label="t('recipes_share_description_en')" />
-					<v-text-field v-model="draft.descriptionEs" dense outlined hide-details class="mo-field" :label="t('recipes_share_description_es')" />
+				<div class="mo-tip-row mb-3">
+					<div class="mo-rs-pair">
+						<v-text-field v-model="draft.titleEn" dense outlined hide-details class="mo-field" :label="t('recipes_share_name_en')" />
+						<v-text-field v-model="draft.titleEs" dense outlined hide-details class="mo-field" :label="t('recipes_share_name_es')" />
+					</div>
+					<info-tip :choice="ROWS.name" :title="t('recipes_share_name')" />
 				</div>
-				<choice-help :choice="ROWS.description" :title="t('recipes_share_description')" class="mb-3" />
 
-				<v-select v-model="draft.kind" :items="kindItems" item-text="text" item-value="value" dense outlined hide-details class="mo-field" :label="t('recipes_share_kind')" />
-				<choice-help :choice="ROWS.kind" :title="t('recipes_share_kind')" class="mb-3" />
+				<div class="mo-tip-row mb-3">
+					<div class="mo-rs-pair">
+						<v-text-field v-model="draft.descriptionEn" dense outlined hide-details class="mo-field" :label="t('recipes_share_description_en')" />
+						<v-text-field v-model="draft.descriptionEs" dense outlined hide-details class="mo-field" :label="t('recipes_share_description_es')" />
+					</div>
+					<info-tip :choice="ROWS.description" :title="t('recipes_share_description')" />
+				</div>
 
-				<v-text-field v-model="draft.template" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('recipes_share_template')" />
-				<choice-help :choice="ROWS.template" :title="t('recipes_share_template')" class="mb-3" />
+				<div class="mo-tip-row mb-3">
+					<v-select v-model="draft.kind" :items="kindItems" item-text="text" item-value="value" dense outlined hide-details class="mo-field" :label="t('recipes_share_kind')" />
+					<info-tip :choice="ROWS.kind" :title="t('recipes_share_kind')" />
+				</div>
+
+				<div class="mo-tip-row mb-3">
+					<v-text-field v-model="draft.template" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('recipes_share_template')" />
+					<info-tip :choice="ROWS.template" :title="t('recipes_share_template')" />
+				</div>
 
 				<template v-if="draft.holes.length">
 					<div v-for="h in draft.holes" :key="h.name" class="mo-rs-hole">
@@ -40,23 +50,31 @@
 						<v-text-field v-model="h.en" dense outlined hide-details class="mo-field" :label="t('recipes_share_hole_en')" />
 						<v-text-field v-model="h.es" dense outlined hide-details class="mo-field" :label="t('recipes_share_hole_es')" />
 					</div>
-					<choice-help :choice="ROWS.holes_row" :title="t('recipes_share_holes_row')" class="mb-3" />
+					<div class="mo-tip-row mb-3"><span class="mo-faint">{{ t('recipes_share_holes_row') }}</span><info-tip :choice="ROWS.holes_row" :title="t('recipes_share_holes_row')" /></div>
 				</template>
 
-				<v-select v-model="draft.since" :items="SINCE_CHOICES" dense outlined hide-details class="mo-field" :label="t('recipes_share_since')" />
-				<choice-help :choice="ROWS.since" :title="t('recipes_share_since')" class="mb-3" />
-
-				<div class="mo-rs-pair">
-					<v-text-field v-model="draft.exampleFilled" dense outlined hide-details spellcheck="false" class="mo-code-field mo-field" :label="t('recipes_share_filled')" />
-					<v-select v-model="draft.exampleResult" :items="resultItems" item-text="text" item-value="value" dense outlined hide-details class="mo-field-type" :label="t('recipes_share_result_label')" />
+				<div class="mo-tip-row mb-3">
+					<v-select v-model="draft.since" :items="SINCE_CHOICES" dense outlined hide-details class="mo-field" :label="t('recipes_share_since')" />
+					<info-tip :choice="ROWS.since" :title="t('recipes_share_since')" />
 				</div>
-				<choice-help :choice="ROWS.sample_row" :title="t('recipes_share_sample_row')" class="mb-3" />
 
-				<v-text-field v-model="draft.author" dense outlined hide-details class="mo-field" :label="t('recipes_share_author')" />
-				<choice-help :choice="ROWS.author" :title="t('recipes_share_author')" class="mb-3" />
+				<div class="mo-tip-row mb-3">
+					<div class="mo-rs-pair">
+						<v-text-field v-model="draft.exampleFilled" dense outlined hide-details spellcheck="false" class="mo-code-field mo-field" :label="t('recipes_share_filled')" />
+						<v-select v-model="draft.exampleResult" :items="resultItems" item-text="text" item-value="value" dense outlined hide-details class="mo-field-type" :label="t('recipes_share_result_label')" />
+					</div>
+					<info-tip :choice="ROWS.sample_row" :title="t('recipes_share_sample_row')" />
+				</div>
 
-				<v-text-field v-model="draft.tags" dense outlined hide-details class="mo-field" :label="t('recipes_share_tags')" :placeholder="t('recipes_share_tags_hint')" />
-				<choice-help :choice="ROWS.tags" :title="t('recipes_share_tags')" class="mb-3" />
+				<div class="mo-tip-row mb-3">
+					<v-text-field v-model="draft.author" dense outlined hide-details class="mo-field" :label="t('recipes_share_author')" />
+					<info-tip :choice="ROWS.author" :title="t('recipes_share_author')" />
+				</div>
+
+				<div class="mo-tip-row mb-3">
+					<v-text-field v-model="draft.tags" dense outlined hide-details class="mo-field" :label="t('recipes_share_tags')" :placeholder="t('recipes_share_tags_hint')" />
+					<info-tip :choice="ROWS.tags" :title="t('recipes_share_tags')" />
+				</div>
 
 				<div v-if="problems.length" class="mo-rs-problems" role="alert">
 					<div class="mo-error">{{ t('recipes_share_problems') }}</div>
@@ -74,8 +92,7 @@
 					<li>{{ t('recipes_share_step_2', { dir: RECIPES_DIR }) }}</li>
 					<li>{{ t('recipes_share_step_3') }}</li>
 				</ol>
-				<div class="mo-faint"><a :href="RECIPES_REPO" target="_blank" rel="noopener">{{ t('recipes_share_repo') }}</a> &middot; <a :href="RECIPES_GUIDE" target="_blank" rel="noopener">{{ t('recipes_share_guide_link') }}</a></div>
-				<choice-help :choice="ROWS.publish" :title="t('recipes_share_publish')" class="mb-2" />
+				<div class="mo-faint mo-tip-row"><span><a :href="RECIPES_REPO" target="_blank" rel="noopener">{{ t('recipes_share_repo') }}</a> &middot; <a :href="RECIPES_GUIDE" target="_blank" rel="noopener">{{ t('recipes_share_guide_link') }}</a></span><info-tip :choice="ROWS.publish" :title="t('recipes_share_publish')" /></div>
 			</v-card-text>
 			<v-card-actions class="mo-rs-foot">
 				<span class="mo-rs-state" role="status" :class="problems.length ? 'mo-result-bad' : ''"><span class="wf-state" :class="problems.length ? 'err' : 'ok'"></span>{{ problems.length ? t('recipes_share_problems') : t('recipes_share_ready') }}</span>
@@ -98,7 +115,7 @@
 // as a file the person copies or downloads, or as a GitHub page pre-filled through its address when the file is short. The page
 // sends nothing by itself. Every row carries its help (DESIGN.md section 7). Emits `close`.
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import InfoTip from './InfoTip.vue'
 import { copyText } from './copy-text.js'
 import { exchangeSave } from './data-exchange-ui.js'
 import { helpChoice } from './view-choices.js'
@@ -108,7 +125,7 @@ import { SINCE_CHOICES, DEFAULT_RESULT, RECIPES_REPO, RECIPES_GUIDE, RECIPES_DIR
 const ROWS = Object.fromEntries(['id', 'name', 'description', 'kind', 'template', 'holes_row', 'since', 'sample_row', 'author', 'tags', 'publish'].map(id => [id, helpChoice('recipes_share', id)]))
 
 export default {
-	components: { ChoiceHelp },
+	components: { InfoTip },
 	props: {
 		entry: { type: Object, default: null },
 		recipe: { type: Object, default: null }
@@ -194,7 +211,7 @@ export default {
 .mo-page .mo-rs-badge { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: var(--wf-accent, #1976d2); }
 .mo-page .mo-rs-badge .v-icon { color: #fff; }
 .mo-page .mo-rs-head-txt { flex: 1 1 auto; min-width: 0; }
-.mo-page .mo-rs-title { font-size: 17px; font-weight: 600; line-height: 1.25; }
+.mo-page .mo-rs-title { font-size: 16px; font-weight: 600; line-height: 1.25; }
 .mo-page .mo-rs-body { padding-top: 14px; }
 .mo-page .mo-rs-note { display: flex; align-items: flex-start; gap: 4px; padding: 8px 10px; border-radius: 8px; background: var(--wf-soft, rgba(128, 128, 128, 0.07)); font-size: 12px; opacity: 0.9; }
 .mo-page .mo-rs-foot { flex-wrap: wrap; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--wf-line, rgba(128, 128, 128, 0.3)); }

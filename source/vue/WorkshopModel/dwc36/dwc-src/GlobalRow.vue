@@ -1,5 +1,5 @@
 <template>
-	<article class="mo-gcard" :class="{ 'mo-gcard-kept': item.persistent, 'mo-gcard-open': expanded || editing, 'mo-gcard-novalue': noValue }" :aria-label="item.name">
+	<article class="mo-gcard" :class="{ 'mo-gcard-kept': item.persistent, 'mo-gcard-open': expanded || editing, 'mo-gcard-novalue': noValue, 'mo-gcard-click': !detail, 'mo-gcard-detail': detail }" :aria-label="item.name" @click="onRowClick">
 		<span v-if="flash" :key="item.changedAt" class="mo-gcard-glow" aria-hidden="true"></span>
 		<div class="mo-gcard-head">
 			<favorite-star :path="item.path" :pinned="pinned" @pin="onPin" @unpin="onUnpin" />
@@ -13,7 +13,8 @@
 					<v-btn small icon v-bind="attrs" :aria-label="t('globals_menu', { name: item.name })" :title="t('globals_menu', { name: item.name })" v-on="on"><v-icon small>mdi-dots-vertical</v-icon></v-btn>
 				</template>
 				<v-list dense>
-					<v-list-item :disabled="!canEdit || !globalsOk" @click="editing = !editing"><v-list-item-icon><v-icon small>mdi-pencil-outline</v-icon></v-list-item-icon><v-list-item-title>{{ t('edit') }}</v-list-item-title></v-list-item>
+					<v-list-item v-if="!detail" @click="$emit('detail', item.name)"><v-list-item-icon><v-icon small>mdi-text-box-search-outline</v-icon></v-list-item-icon><v-list-item-title>{{ t('globals_detail_open') }}</v-list-item-title></v-list-item>
+					<v-list-item v-if="detail" :disabled="!canEdit || !globalsOk" @click="editing = !editing"><v-list-item-icon><v-icon small>mdi-pencil-outline</v-icon></v-list-item-icon><v-list-item-title>{{ t('edit') }}</v-list-item-title></v-list-item>
 					<v-list-item @click="$emit('select', item.path)"><v-list-item-icon><v-icon small>mdi-file-tree</v-icon></v-list-item-icon><v-list-item-title>{{ t('open_in_tree') }}</v-list-item-title></v-list-item>
 					<v-list-item @click="$emit(item.watched ? 'unwatch' : 'watch', item.path)"><v-list-item-icon><v-icon small>{{ item.watched ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon></v-list-item-icon><v-list-item-title>{{ item.watched ? t('watch_remove') : t('watch_add') }}</v-list-item-title></v-list-item>
 					<v-list-item @click="$emit(item.pinned ? 'unpin' : 'pin', item.path)"><v-list-item-icon><v-icon small>{{ item.pinned ? 'mdi-star' : 'mdi-star-outline' }}</v-icon></v-list-item-icon><v-list-item-title>{{ item.pinned ? t('pin_remove', { path: item.path }) : t('pin_add', { path: item.path }) }}</v-list-item-title></v-list-item>
@@ -32,7 +33,7 @@
 				<button v-if="draft !== current && !armed" type="button" class="mo-gcard-step mo-gcard-apply" :aria-label="t('look_card_apply')" :title="t('look_card_apply')" @click="arm"><v-icon small>mdi-check</v-icon></button>
 			</div>
 			<span v-else-if="noValue" class="mo-gcard-value mo-gcard-value-text mo-faint">{{ t('unit_none') }}</span>
-			<button v-else-if="item.summary.long" type="button" class="mo-gcard-more" :aria-expanded="expanded ? 'true' : 'false'" :title="expanded ? t('globals_show_less') : t('globals_show_more')" @click="expanded = !expanded">
+			<button v-else-if="detail && item.summary.long" type="button" class="mo-gcard-more" :aria-expanded="expanded ? 'true' : 'false'" :title="expanded ? t('globals_show_less') : t('globals_show_more')" @click="expanded = !expanded">
 				<span class="mo-gcard-value mo-gcard-value-text" :title="hoverText">{{ item.summary.short }}</span><v-icon small>{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 			</button>
 			<span v-else class="mo-gcard-value" :class="{ 'mo-gcard-value-text': item.kind === 'string' }" :title="hoverText">{{ item.summary.short }}</span>
@@ -40,15 +41,16 @@
 		<div class="mo-gcard-marks">
 			<span v-if="item.persistent" class="wf-state ok" :title="t('persist_help')">{{ t('look_card_kept') }}</span>
 			<span v-if="item.watched" class="mo-gcard-mark"><v-icon x-small>mdi-eye-outline</v-icon>{{ t('look_card_watched') }}</span>
-			<button v-if="item.usedIn !== null" type="button" class="mo-gcard-mark mo-gcard-markbtn" :aria-expanded="showFiles ? 'true' : 'false'" :title="t('globals_used_help')" @click="showFiles = !showFiles"><v-icon x-small>mdi-file-document-outline</v-icon>{{ t('globals_used_in', { n: item.usedIn }) }}<v-icon x-small>{{ showFiles ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon></button>
-			<button v-else type="button" class="mo-gcard-mark mo-gcard-markbtn mo-gcard-scan" :title="t('globals_scan_help')" @click="$emit('scan-usage')"><v-icon x-small>mdi-file-search-outline</v-icon>{{ t('globals_scan') }}</button>
+			<span v-if="item.usedIn !== null && !detail" class="mo-gcard-mark"><v-icon x-small>mdi-file-document-outline</v-icon>{{ t('globals_used_in', { n: item.usedIn }) }}</span>
+			<button v-else-if="item.usedIn !== null" type="button" class="mo-gcard-mark mo-gcard-markbtn" :aria-expanded="showFiles ? 'true' : 'false'" :title="t('globals_used_help')" @click="showFiles = !showFiles"><v-icon x-small>mdi-file-document-outline</v-icon>{{ t('globals_used_in', { n: item.usedIn }) }}<v-icon x-small>{{ showFiles ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon></button>
+			<button v-else-if="detail" type="button" class="mo-gcard-mark mo-gcard-markbtn mo-gcard-scan" :title="t('globals_scan_help')" @click="$emit('scan-usage')"><v-icon x-small>mdi-file-search-outline</v-icon>{{ t('globals_scan') }}</button>
 			<span v-if="ago" class="mo-gcard-mark"><v-icon x-small>mdi-clock-outline</v-icon>{{ t('look_card_changed_ago', { ago: t(ago.key, { n: ago.n }) }) }}</span>
-			<span v-if="noValue && setterFiles.length" class="mo-gcard-mark mo-gcard-hint">{{ t('look_card_filler_open') }}
+			<span v-if="noValue && setterFiles.length && detail" class="mo-gcard-mark mo-gcard-hint">{{ t('look_card_filler_open') }}
 				<button v-for="f in setterFiles" :key="f" type="button" class="mo-gcard-markbtn mo-gcard-setter" :title="t('look_card_setter_open', { file: f })" @click="openSetter(f)">{{ f }}</button>
 			</span>
 			<span v-else-if="noValue" class="mo-gcard-mark mo-gcard-hint">{{ t(filler.key, filler.params) }}</span>
 		</div>
-		<div v-if="showFiles" class="mo-gfiles mo-fade-in">
+		<div v-if="detail && showFiles" class="mo-gfiles mo-fade-in">
 			<div class="mo-part">{{ t('globals_used_where') }}</div>
 			<div v-if="!usageFiles.length" class="mo-faint">{{ t('globals_used_none') }}</div>
 			<ul v-else class="mo-gfiles-list">
@@ -62,7 +64,7 @@
 				</li>
 			</ul>
 		</div>
-		<pre v-if="expanded" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
+		<pre v-if="detail && (expanded || item.summary.long)" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
 		<div v-if="quickResult" class="mo-gcard-preview mo-fade-in">
 			<div v-if="feedback.level === 'error'" class="mo-error" role="alert">{{ t(feedback.key) }}</div>
 			<command-preview v-else :code="quickResult.code" :can-send="canEdit && globalsOk" :editable="false" @sent="onSent" />
@@ -98,11 +100,12 @@ export default {
 		canEdit: { type: Boolean, default: true },
 		globalsOk: { type: Boolean, default: true },
 		tick: { type: Number, default: 0 },
-		usageCache: { type: Map, default: () => new Map() }
+		usageCache: { type: Map, default: () => new Map() },
+		detail: { type: Boolean, default: false } // inside the detail dialog: everything open; in the list: a clean row that opens the dialog
 	},
 	data() {
 		// the draft starts as the live value: an untouched card never shows a command, let alone a red message (globals-quick.js)
-		return { expanded: false, editing: false, draft: editText(this.item.value), armed: false, showFiles: false, peek: null }
+		return { expanded: false, editing: false, draft: editText(this.item.value), armed: false, showFiles: this.detail, peek: null }
 	},
 	computed: {
 		now() {
@@ -177,6 +180,13 @@ export default {
 			return out.sort((x, y) => x.n - y.n).slice(0, 40)
 		},
 		// the file that sets it, open in the small viewer at its first define or set line
+		// a click on the row (not on a control inside it) opens the detail of this global
+		onRowClick(ev) {
+			if (this.detail) return
+			const t = ev && ev.target
+			if (t && t.closest && t.closest('button, input, a, label, .v-input, .v-menu__content, .v-list, .mo-gcard-menu, .mo-gcard-stepper, .mo-gcard-switch, .mo-gcard-edit')) return
+			this.$emit('detail', this.item.name)
+		},
 		openSetter(path) {
 			const f = usageOf(this.usageCache, this.item.name).find(x => x.path === path)
 			const lines = f ? f.define.concat(f.set).sort((a, b) => a - b) : []

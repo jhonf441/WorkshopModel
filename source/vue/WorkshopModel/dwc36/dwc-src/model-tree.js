@@ -86,3 +86,18 @@ export function ancestorsOf(path) {
 	}
 	return out
 }
+
+// the paths to expand so the row of `path` is visible: every ancestor, and the node itself when it is a branch
+export function revealPaths(path, isBranchNode) {
+	const s = String(path || '')
+	if (!s) return []
+	const out = ancestorsOf(s)
+	if (isBranchNode) out.push(s)
+	return out
+}
+
+// the scrollTop that centers a row inside its own scroll container (all numbers in px, rects relative to the viewport)
+export function centeredScrollTop(box, row, scrollTop, scrollHeight) {
+	const want = scrollTop + (row.top - box.top) - (box.height - row.height) / 2
+	return Math.max(0, Math.min(want, Math.max(0, scrollHeight - box.height)))
+}

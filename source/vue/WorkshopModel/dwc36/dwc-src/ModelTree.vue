@@ -1,6 +1,6 @@
 <template>
 	<div class="mo-rows" role="tree">
-		<button v-for="r in rows" :key="r.path" type="button" class="mo-row" :class="{ 'mo-selected': r.path === selected, 'mo-changed': changed.has(r.path) }" :style="{ paddingLeft: (8 + r.depth * 16) + 'px' }" role="treeitem" :aria-expanded="r.branch ? (r.open ? 'true' : 'false') : null" :aria-selected="r.path === selected ? 'true' : 'false'" :title="r.path" @click="$emit('select', r.path)">
+		<button v-for="r in rows" :key="r.path" type="button" class="mo-row" :class="{ 'mo-selected': r.path === selected, 'mo-changed': changed.has(r.path), 'mo-revealed': r.path === revealed }" :data-path="r.path" :style="{ paddingLeft: (8 + r.depth * 16) + 'px' }" role="treeitem" :aria-expanded="r.branch ? (r.open ? 'true' : 'false') : null" :aria-selected="r.path === selected ? 'true' : 'false'" :title="r.path" @click="$emit('select', r.path)">
 			<span class="mo-twisty" @click.stop="r.branch && $emit('toggle', r.path)"><v-icon v-if="r.branch" small>{{ r.open ? 'mdi-chevron-down' : 'mdi-chevron-right' }}</v-icon></span>
 			<span class="mo-key">{{ r.key }}</span>
 			<span v-if="r.branch" class="mo-count">{{ r.kind === 'array' ? '[' + r.count + ']' : '{' + r.count + '}' }}</span>
@@ -18,6 +18,7 @@ export default {
 	props: {
 		rows: { type: Array, default: () => [] },
 		selected: { type: String, default: '' },
+		revealed: { type: String, default: '' },
 		changed: { type: Set, default: () => new Set() }
 	}
 }

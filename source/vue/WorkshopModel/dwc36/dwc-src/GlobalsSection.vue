@@ -1,5 +1,5 @@
 <template>
-	<div :class="'mo-density-' + density">
+	<div class="mo-density-compact">
 		<v-card class="mb-3">
 			<v-card-text>
 				<div class="mo-head">
@@ -59,7 +59,7 @@
 							<div v-if="folded.indexOf(g.id) < 0" class="mo-ggrid">
 								<global-row
 									v-for="it in g.items" :key="it.name" :item="it" :pinned="pinned" :can-edit="canEdit" :globals-ok="support.ok" :tick="tick" :usage-cache="usageCache"
-									@select="onSelect" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @persist="onPersist" @scan-usage="$emit('scan-usage')"
+									@select="onSelect" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @persist="onPersist" @scan-usage="$emit('scan-usage')" @detail="detailName = $event"
 								/>
 							</div>
 						</section>
@@ -72,6 +72,10 @@
 		<v-dialog v-model="creating" max-width="720" scrollable content-class="workshop-theme mo-page">
 			<global-creator v-if="creating" :can-edit="canEdit" :globals-ok="support.ok" :existing="names" @close="creating = false" />
 		</v-dialog>
+		<global-detail
+			v-if="detailItem" :item="detailItem" :pinned="pinned" :can-edit="canEdit" :globals-ok="support.ok" :tick="tick" :usage-cache="usageCache"
+			@close="detailName = ''" @select="onSelect" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @persist="onPersist" @scan-usage="$emit('scan-usage')"
+		/>
 	</div>
 </template>
 
@@ -89,6 +93,7 @@ import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import GlobalCreator from './GlobalCreator.vue'
 import GlobalRow from './GlobalRow.vue'
+import GlobalDetail from './GlobalDetail.vue'
 import PersistPanel from './PersistPanel.vue'
 import ChoiceHelp from './ChoiceHelp.vue'
 import { KIND_GROUPS } from './flat-list.js'
@@ -107,7 +112,7 @@ function storage() {
 }
 
 export default {
-	components: { GlobalCreator, GlobalRow, PersistPanel, ChoiceHelp },
+	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, ChoiceHelp },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },
@@ -121,12 +126,16 @@ export default {
 	data() {
 		return {
 			query: '', sort: 'name', groups: [], state: { persistent: false, watched: false, changed: false }, creating: false,
-			folded: readFolded(storage()), pinned: loadPins(storage()), density: loadDensity(storage()), S: GLOBALS_SETTINGS, KIND_GROUPS, OTHER, STATE_CHIPS, STATE_ICONS
+			detailName: '', folded: readFolded(storage()), pinned: loadPins(storage()), density: loadDensity(storage()), S: GLOBALS_SETTINGS, KIND_GROUPS, OTHER, STATE_CHIPS, STATE_ICONS
 		}
 	},
 	computed: {
 		offText() {
 			return this.support.known ? this.t('globals_off_rrf', { version: this.support.version, minimum: this.support.minimum }) : this.t('globals_off_unknown')
+		},
+		// the global the detail dialog shows (it follows the live list: it closes by itself if the global goes away)
+		detailItem() {
+			return this.detailName ? this.items.find(i => i.name === this.detailName) || null : null
 		},
 		used() {
 			return usageCounts(this.usageCache)

@@ -385,6 +385,9 @@ export default {
 .mo-page .mo-row.mo-selected, .mo-page tr.mo-selected td { background: rgba(25, 118, 210, 0.14); }
 .mo-page .mo-row.mo-changed { animation: mo-flash 1s ease-out; }
 @keyframes mo-flash { from { background: rgba(255, 143, 0, 0.45); } to { background: transparent; } }
+.mo-page .mo-row.mo-revealed { animation: mo-reveal 1.5s ease-out; }
+@keyframes mo-reveal { 0% { outline: 2px solid var(--v-primary-base, #1976d2); outline-offset: -2px; } 100% { outline: 2px solid transparent; outline-offset: -2px; } }
+@media (prefers-reduced-motion: reduce) { .mo-page .mo-row.mo-revealed { animation: none; outline: 2px solid var(--v-primary-base, #1976d2); outline-offset: -2px; } }
 @media (prefers-reduced-motion: reduce) { .mo-page .mo-row.mo-changed { animation: none; background: rgba(255, 143, 0, 0.25); } }
 .mo-page .mo-twisty { flex: none; width: 20px; display: inline-flex; justify-content: center; }
 .mo-page .mo-key { font-family: var(--tp-font-mono, monospace); font-size: 12px; white-space: nowrap; }

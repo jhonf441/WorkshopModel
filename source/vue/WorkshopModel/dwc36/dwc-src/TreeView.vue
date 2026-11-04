@@ -11,7 +11,7 @@
 					<span class="mo-key">{{ r.path }}</span><span class="mo-value">{{ r.text }}</span>
 				</button>
 			</div>
-			<model-tree v-else :rows="rows" :selected="selected" :changed="changed" @toggle="toggle" @select="choose" />
+			<model-tree v-else :rows="rows" :selected="selected" :revealed="revealed" :changed="changed" @toggle="toggle" @select="choose" />
 			<div v-if="truncatedRows && !query" class="mo-faint mt-1">{{ t('tree_truncated', { n: rows.length }) }}</div>
 		</div>
 	</div>
@@ -26,7 +26,7 @@
 // itself too. A view of VIEW-CONTRACT.md.
 import i18n from '../../i18n'
 import ModelTree from './ModelTree.vue'
-import { visibleRows, searchModel, ancestorsOf, SEARCH_LIMIT } from './model-tree.js'
+import { visibleRows, searchModel, revealPaths, centeredScrollTop, SEARCH_LIMIT } from './model-tree.js'
 import { getAtPath } from './model-path.js'
 import { isBranch } from './value-format.js'
 import { diffTexts, textMap } from './change-diff.js'
@@ -49,7 +49,7 @@ export default {
 		tier: { type: Object, default: () => ({ sbc: false, extras: false }) }
 	},
 	data() {
-		return { query: '', expanded: {}, changed: new Set(), SEARCH_LIMIT }
+		return { query: '', expanded: {}, changed: new Set(), revealed: '', SEARCH_LIMIT }
 	},
 	computed: {
 		expandedSet() {
@@ -83,8 +83,8 @@ export default {
 		selected: {
 			immediate: true,
 			handler(p) {
-				for (const a of ancestorsOf(p)) this.$set(this.expanded, a, true)
-				if (p && isBranch(getAtPath(this.model, p))) this.$set(this.expanded, p, true)
+				for (const a of revealPaths(p, !!p && isBranch(getAtPath(this.model, p)))) this.$set(this.expanded, a, true)
+				if (p) this.$nextTick(() => this.reveal(p))
 			}
 		}
 	},
@@ -99,6 +99,17 @@ export default {
 		choose(path) {
 			this.$emit('select', path)
 			if (this.query) this.query = ''
+		},
+		// scroll the tree's own container (never the page) to the row and flash it; only runs when the selected path changes
+		reveal(path) {
+			const box = this.$el && this.$el.querySelector ? this.$el.querySelector('.mo-tree') : null
+			if (!box || this.query) return
+			const row = Array.from(box.querySelectorAll('[data-path]')).find(el => el.getAttribute('data-path') === path)
+			if (!row) return
+			box.scrollTop = centeredScrollTop(box.getBoundingClientRect(), row.getBoundingClientRect(), box.scrollTop, box.scrollHeight)
+			this.revealed = path
+			clearTimeout(this.revealTimer)
+			this.revealTimer = setTimeout(() => { this.revealed = '' }, 1600)
 		},
 		collapseAll() {
 			this.expanded = {}
