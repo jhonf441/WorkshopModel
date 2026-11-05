@@ -78,7 +78,7 @@
 					<div v-if="wizard.failure" class="error--text text-body-2">{{ wizard.failure }}</div>
 					<div class="d-flex flex-wrap mt-2 startup-buttons">
 						<v-btn small @click="wizard.view = 'question'; wizard.failure = null">{{ tt('back') }}</v-btn>
-						<v-btn small color="success" :disabled="wizard.writing || locked" @click="save(stepCurrent)">{{ wizard.writing ? tt('saving') : tt('save') }}</v-btn>
+						<v-btn small color="success" class="black--text" :disabled="wizard.writing || locked" @click="save(stepCurrent)">{{ wizard.writing ? tt('saving') : tt('save') }}</v-btn>
 					</div>
 				</div>
 

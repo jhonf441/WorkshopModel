@@ -1,5 +1,9 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.22 -- 2026-11-04
+
+- Rebuilt with the readable text colours, the shared start-up card and the session notice
+
 ## 1.7.21 -- 2026-11-04
 
 - Rebuilt with the shared session changes; lists show 50 rows, Flat list sort 22x faster
