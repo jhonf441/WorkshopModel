@@ -10,7 +10,7 @@ import { childrenOf, MAX_DEPTH } from './model-tree.js'
 import { kindOf, isBranch, formatValue } from './value-format.js'
 
 export const FLAT_MAX = 6000
-export const FLAT_PAGE = 200
+export const FLAT_PAGE = 50
 export const RECENT_MS = 60000
 export const SORT_KEYS = ['path', 'value', 'type', 'changed']
 

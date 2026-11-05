@@ -9,7 +9,8 @@
 			</button>
 		</div>
 		<div class="st-scroll">
-			<div v-if="it.group && (i === 0 || items[i - 1].group !== it.group)" :key="'g' + i" class="st-group" :data-group="indexGroup(it.group)">{{ it.group }}</div>
+			<template v-for="(it, i) in items">
+			<div v-if="it.group && (i === 0 || items[i - 1].group !== it.group)" :key="'g' + i" class="st-group" :data-group="indexGroup(it.group)">{{ it.group }}</div>
 			<button
 				:key="'i' + i"
 				type="button"

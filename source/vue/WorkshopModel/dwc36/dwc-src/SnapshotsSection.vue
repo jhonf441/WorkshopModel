@@ -30,7 +30,7 @@
 					<span class="mo-will-save-name">{{ nameState.name }}</span>
 					<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 				</div>
-				<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ t('read_only') }}</span></div>
+				<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('read_only')) }}</span></div>
 				<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 					<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 					<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>
@@ -75,6 +75,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // Snapshots of the model (snapshots.js): save the whole model or the branch selected in the Model section under a name, in the
 // plugin's own file through DWC's machine file API (model-host.js; the same on a standalone Duet and in SBC mode), within the budget
@@ -106,6 +107,7 @@ function storage() {
 }
 
 export default {
+	mixins: [readOnlyNote],
 	components: { ErrorNotice, ViewTabs, ChoiceHelp, BranchPicker, SnapshotCompare },
 	props: {
 		tick: { type: Number, default: 0 },

@@ -38,7 +38,7 @@
 					<code class="mo-snippet-code">{{ s.code }}</code>
 					<v-btn x-small text :title="t('copy')" @click="copy(s.code, s.id)">{{ copied === s.id ? t('copied') : t('copy') }}</v-btn>
 					<v-btn v-if="s.send" x-small text color="primary" :title="t('send_here_title')" @click="sending = sending === s.id ? '' : s.id">{{ t('send_here') }}</v-btn>
-					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : t('look_globals_readonly')" @sent="sending = ''" />
+					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : readOnlyLine(t('look_globals_readonly'))" @sent="sending = ''" />
 				</div>
 			</div>
 		</template>
@@ -47,6 +47,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // The detail of the selected node (design item 1): its value in words (bytes, durations and colours, value-human.js), an array as a
 // small table (value-table.js), the children of an object with their own readable hint, its kind as a chip and the star of the
@@ -72,6 +73,7 @@ import { copyText } from './copy-text.js'
 const DETAIL_MAX = 400
 
 export default {
+	mixins: [readOnlyNote],
 	components: { CommandPreview, GlobalEditor, ValueTable, KindChip, FavoriteStar, PathMeaning },
 	props: {
 		path: { type: String, default: '' },

@@ -64,7 +64,7 @@
 							</div>
 						</section>
 					</template>
-					<div v-if="!canEdit" class="mo-note mt-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ t('look_globals_readonly') }}</span></div>
+					<div v-if="!canEdit" class="mo-note mt-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('look_globals_readonly')) }}</span></div>
 				</template>
 			</v-card-text>
 		</v-card>
@@ -81,6 +81,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // The globals of the machine, friendly at first sight (2026-11-03): one head with the counts, one search and one New button, a row
 // of chips (all, the kinds, kept across reboots, watched, changed recently, and the order that cycles on a tap: globals-filter.js,
@@ -112,6 +113,7 @@ function storage() {
 }
 
 export default {
+	mixins: [readOnlyNote],
 	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, ChoiceHelp },
 	props: {
 		tick: { type: Number, default: 0 },

@@ -28,7 +28,7 @@
 						</span>
 					</div>
 					<div class="mo-actions mt-2">
-						<v-btn small outlined :disabled="!canEdit || !persist.length" @click="$emit('update-persist')">{{ t('persist_update') }}</v-btn>
+						<v-btn small outlined :disabled="!canEdit || !persist.length" :title="canEdit ? null : readOnlyLine(t('read_only'))" @click="$emit('update-persist')">{{ t('persist_update') }}</v-btn>
 					</div>
 					<div class="mo-faint mt-1">{{ t('persist_update_help') }}</div>
 					<div class="mo-faint mt-1">{{ t('cannot_delete_text') }}</div>
@@ -40,6 +40,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // The persistence macro (persist-macro.js) as a folded panel: one line says how it is, and it opens by itself only when something
 // needs the person (a kept global whose saved value is not the live one, or a config.g that does not call the macro:
@@ -49,6 +50,7 @@ import { PERSIST_MACRO, INCLUDE_LINE } from './persist-macro.js'
 import { copyText } from './copy-text.js'
 
 export default {
+	mixins: [readOnlyNote],
 	props: {
 		persist: { type: Array, default: null },
 		configIncludes: { type: Boolean, default: null },

@@ -1,5 +1,17 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.21 -- 2026-11-04
+
+- Rebuilt with the shared session changes; lists show 50 rows, Flat list sort 22x faster
+
+## 1.7.20 -- 2026-11-04
+
+- SideTabs: the side bar renders again (the v-for template was missing)
+
+## 1.7.19 -- 2026-11-04
+
+- Lists show 50 rows at a time; the Flat list opens much lighter
+
 ## 1.7.18 -- 2026-11-04
 
 - Flat list: shared collator, sorting 4500 leaves 22x faster (was 700 ms every second)

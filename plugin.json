@@ -2,7 +2,7 @@
   "id": "WorkshopModel",
   "name": "Model Explorer",
   "author": "jhonf441",
-  "version": "1.7.18",
+  "version": "1.7.21",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/jhonf441/WorkshopModel",
   "tags": [
@@ -14,9 +14,9 @@
   "sbcRequired": false,
   "data": {},
   "dwcFiles": [
-    "css/WorkshopModel.33a30e74.css",
-    "css/WorkshopModel.33a30e74.css.gz",
-    "js/WorkshopModel.12e20758.js",
-    "js/WorkshopModel.12e20758.js.gz"
+    "css/WorkshopModel.c78bd08d.css",
+    "css/WorkshopModel.c78bd08d.css.gz",
+    "js/WorkshopModel.a7e4b8c4.js",
+    "js/WorkshopModel.a7e4b8c4.js.gz"
   ]
 }

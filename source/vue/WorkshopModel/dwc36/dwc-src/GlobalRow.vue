@@ -64,7 +64,7 @@
 		<pre v-if="detail && item.summary.long" class="mo-result-text mo-gcard-full">{{ item.summary.full }}</pre>
 		<div v-if="quickResult" class="mo-gcard-preview mo-fade-in">
 			<div v-if="feedback.level === 'error'" class="mo-error" role="alert">{{ t(feedback.key) }}</div>
-			<command-preview v-else :code="quickResult.code" :can-send="canEdit && globalsOk" :editable="false" @sent="onSent" />
+			<command-preview v-else :code="quickResult.code" :can-send="canEdit && globalsOk" :disabled-reason="canEdit ? '' : readOnlyLine(t('read_only'))" :editable="false" @sent="onSent" />
 		</div>
 		<global-editor v-if="editing" class="mo-gcard-edit mo-fade-in" :name="item.name" :exists="true" :value="item.value" :can-edit="canEdit" :globals-ok="globalsOk" :persistent="item.persistent" :show-persist="true" @persist="onPersist" />
 	</article>
@@ -72,6 +72,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // One global of the Globals section as a card (a tidy row in the compact density): the star, the name, the kind as a chip (or a calm
 // "no value yet" pill), the value big and readable, the marks in words (kept after restart, watched, in how many files, changed N s
@@ -90,6 +91,7 @@ import FilePeek from './FilePeek.vue'
 import { usageOf } from './usage-view.js'
 
 export default {
+	mixins: [readOnlyNote],
 	components: { KindChip, FavoriteStar, CommandPreview, GlobalEditor, FilePeek },
 	props: {
 		item: { type: Object, required: true },

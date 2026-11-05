@@ -30,7 +30,7 @@
 						<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 					</div>
 					<div class="mo-faint mb-2">{{ liveCount ? t('preset_save_help', { n: liveCount }) : t('look_presets_no_globals') }}</div>
-					<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ t('read_only') }}</span></div>
+					<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('read_only')) }}</span></div>
 					<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 						<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 						<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>
@@ -88,7 +88,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<command-preview class="mt-2" :code="applyCode" :can-send="canEdit && !!applyCode" :disabled-reason="applyCode ? (canEdit ? '' : t('read_only')) : t('preset_nothing_to_apply')" />
+				<command-preview class="mt-2" :code="applyCode" :can-send="canEdit && !!applyCode" :disabled-reason="applyCode ? (canEdit ? '' : readOnlyLine(t('read_only'))) : t('preset_nothing_to_apply')" />
 			</v-card-text>
 		</v-card>
 	</div>
@@ -96,6 +96,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // Presets of globals (design item 5): saved in one file of the SD card (presets.js PRESETS_FILE) through DWC's file API, compared
 // with the live values, applied through the command preview, exported and imported as a workshop JSON file (data-exchange-ui.js,
@@ -113,6 +114,7 @@ import { exchangeFileName } from './data-exchange.js'
 import { ARM_MS, pressArmed } from './armed.js'
 
 export default {
+	mixins: [readOnlyNote],
 	components: { ErrorNotice, CommandPreview },
 	props: {
 		tick: { type: Number, default: 0 },

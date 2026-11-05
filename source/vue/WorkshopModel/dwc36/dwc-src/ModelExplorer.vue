@@ -62,6 +62,7 @@ import UsageSection from './UsageSection.vue'
 import SnapshotsSection from './SnapshotsSection.vue'
 import TesterSection from './TesterSection.vue'
 import { roleMixin } from './role-mixin.js' // what the role may do (vue/_shared36)
+import { READ_ONLY_PROVIDE } from './read-only-note.js'
 import { sectionColor } from './section-colors.js'
 import { navItems } from './look-nav.js'
 import { rowsModel } from './startup-rows.js'
@@ -97,6 +98,10 @@ function globalTexts(model) {
 export default {
 	components: { PageHeader, SideTabs, StartupPanel, ErrorNotice, TreeSection, GlobalsSection, WatchSection, FavoritesSection, PresetsSection, UsageSection, SnapshotsSection, TesterSection, AlertsSection, AlertBanner, ReportSection },
 	mixins: [roleMixin],
+	provide() {
+		// why the person cannot change things (signed out or a low role), read again when the session changes
+		return { [READ_ONLY_PROVIDE]: () => (this.canEdit ? '' : this.lockText('technician')) }
+	},
 	data() {
 		return {
 			section: 'tree', autoScan: false, tick: 0, paused: false, selectedPath: '', watchEntries: [], changes: [], trackChanges: true,

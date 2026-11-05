@@ -9,7 +9,7 @@
 				</div>
 			</div>
 			<div v-if="!globalsOk" class="mo-note warn" role="status"><v-icon small>mdi-alert-outline</v-icon><span class="mo-note-text">{{ t('globals_off_short') }}</span></div>
-			<div v-else-if="!canEdit" class="mo-note" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ t('look_globals_readonly') }}</span></div>
+			<div v-else-if="!canEdit" class="mo-note" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('look_globals_readonly')) }}</span></div>
 			<template v-else-if="done">
 				<div class="mo-creator-done" role="status"><v-icon>mdi-check-circle-outline</v-icon>{{ t('look_creator_done', { name: done }) }}</div>
 				<div class="mo-faint">{{ t('look_creator_keep_hint') }}</div>
@@ -62,6 +62,7 @@
 
 <script>
 'use strict'
+import { readOnlyNote } from './read-only-note.js'
 
 // The guided creator of a global (2026-11-03), three steps in one dialog: the name (checked as it is typed, and against the globals
 // that already exist), the type as big choices with one line each and the help fold of the chosen one (globals-quick.js
@@ -75,6 +76,7 @@ import { editCommand, isValidGlobalName } from './globals-typing.js'
 import { CREATOR_TYPES, CREATOR_STEPS, creatorKind, editFeedback } from './globals-quick.js'
 
 export default {
+	mixins: [readOnlyNote],
 	components: { CommandPreview, ChoiceHelp },
 	props: {
 		canEdit: { type: Boolean, default: true },
