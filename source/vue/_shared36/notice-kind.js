@@ -5,7 +5,8 @@
 //
 //   noticeKindOf({ reason, serviceDown, error })   'session' | 'role' | 'down' | 'error' | ''
 //                                                  reason = what accessReason() of workshop-auth.js answers ('signed_out' | 'role' | '')
-//   noticeText(kind, { needed, role }, t)          the one sentence of that cause; needed / role are role ids ('operator', ...)
+//   noticeText(kind, { needed, role, state, action }, t)  the one sentence of that cause; needed / role are role ids ('operator', ...); action = what was
+//                                                  refused, already translated ("Saving the zones"): the 403 sentence then names it (notice_role_action)
 //   roleLabel(role, t)                             "Operador", "Técnico"... (the lockrole_* texts)
 //   NOTICE_ICONS                                   the mdi icon of each cause
 //   NOTICE_COLORS                                  the semantic color token of each cause (family.css --wf-c-<color>, SESSION-TOKENS.md)
@@ -39,13 +40,14 @@ export function roleLabel(role, t) {
 }
 
 // state = sessionState() of workshop-auth.js: an 'expired' session and a 'pin-locked' one say what happened instead of the generic sentence
-export function noticeText(kind, { needed, role, state } = {}, t) {
+export function noticeText(kind, { needed, role, state, action } = {}, t) {
 	if (kind === 'resolving') return t('notice_resolving')
 	if (kind === 'session') {
 		if (state === 'expired') return t('notice_session_expired')
 		if (state === 'pin-locked') return t('notice_pin_locked')
 		return t('notice_session_reason')
 	}
+	if (kind === 'role' && action) return t('notice_role_action', { action, needed: roleLabel(needed, t), role: roleLabel(role, t) })
 	if (kind === 'role') return t('notice_role_reason', { needed: roleLabel(needed, t), role: roleLabel(role, t) })
 	if (kind === 'down') return t('notice_down_reason')
 	return ''

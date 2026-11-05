@@ -245,6 +245,4 @@ export default {
 .mo-page .mo-changes-range { display: block; color: var(--tp-faint); font-size: 11px; }
 .mo-page .mo-changes-actions { white-space: nowrap; }
 .mo-page .mo-chg-faint { color: var(--tp-faint); font-style: italic; }
-/* a state is a dot and the word (DESIGN.md 3): Vuetify's own .info class (solid blue, !important) must not paint the label of "info", or its blue dot sits on blue and cannot be seen */
-.mo-page .wf-state.info { background-color: transparent !important; border-color: transparent !important; }
 </style>

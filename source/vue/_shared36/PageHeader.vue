@@ -30,12 +30,7 @@
 				</v-menu>
 				<slot />
 				<slot name="right" />
-				<button v-if="signedOutNow" type="button" class="wf-session-chip" :aria-label="ts('notice_bar_chip_help')" :title="ts('notice_bar_chip_help')" @click="signIn">
-					<v-icon :size="16" class="wf-session-chip-icon">mdi-account-lock-outline</v-icon><span>{{ ts('notice_bar_chip') }}</span>
-				</button>
-				<span v-else-if="viewerNow" class="wf-session-chip is-role" :title="ts('header_read_only_help')">
-					<v-icon :size="16" class="wf-session-chip-icon">mdi-eye-outline</v-icon><span>{{ ts('header_read_only') }}</span>
-				</span>
+				<session-notice variant="chip" />
 				<slot name="startup" />
 		</div>
 	</div>
@@ -47,14 +42,16 @@
 import { healthLevel, LEVEL_UI } from './page-health.js'
 import { serviceProblemKind, SERVICE_PROBLEM_KEYS } from './service-problem.js'
 import { roleMixin } from './role-mixin.js'
-import { sessionState, signedOut, workshopRole } from './workshop-auth.js'
-import { askLogin, currentIdentity, whoami } from './workshop-api.js'
+import { sessionState, signedOut } from './workshop-auth.js'
+import { currentIdentity, whoami } from './workshop-api.js'
 import { ts } from './shared-t.js'
 import i18n from '../../i18n'
 import { PLUGIN_ID } from './plugin-id.js'
 import { pluginBadge } from './plugin-colors.js'
+import SessionNotice from './SessionNotice.vue'
 
 export default {
+	components: { SessionNotice },
 	mixins: [roleMixin],
 	created() {
 		// who is using this browser: without it a missing session looks like a failure (the pages that never ask do not know yet)
@@ -83,10 +80,6 @@ export default {
 			void this.identityTick
 			return sessionState() === 'resolving'
 		},
-		viewerNow() {
-			void this.identityTick
-			return workshopRole() === 'viewer'
-		},
 		serviceReason() {
 			const kind = serviceProblemKind(this.$store)
 			return kind ? { level: 'error', text: ts(SERVICE_PROBLEM_KEYS[kind].title) } : null
@@ -114,10 +107,7 @@ export default {
 		}
 	},
 	methods: {
-		ts,
-		signIn() {
-			return askLogin()
-		}
+		ts
 	}
 }
 </script>
