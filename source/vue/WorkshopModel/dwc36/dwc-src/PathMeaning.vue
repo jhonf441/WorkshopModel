@@ -1,7 +1,7 @@
 <template>
 	<div class="mo-sub mt-3 mo-meaning">
 		<div class="mo-part">{{ t('dict_title') }}</div>
-		<choice-help :choice="helpChoice" :title="t('view_how')" class="mb-1" />
+		<choice-guide :choice="helpChoice" class="mb-1" />
 		<template v-if="info">
 			<div class="mo-meaning-text">{{ t(info.textKey) }}</div>
 			<dl class="mo-help-list">
@@ -22,11 +22,11 @@
 // The meaning of the selected path (path-dictionary.js): what it is, its unit, whether it can be changed and with which G-code, and the
 // firmware it needs, with the same fold of help every choice of the page has. A path the dictionary does not know says so.
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { describePath, DICT_HELP } from './path-dictionary.js'
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceGuide },
 	props: {
 		path: { type: String, default: '' },
 		firmware: { type: String, default: '' }

@@ -6,7 +6,7 @@
 			<v-btn x-small text :disabled="holes.length < 2" :aria-label="t('guided_prev')" :title="t('guided_prev')" @click="$emit('prev')"><v-icon :size="16">mdi-chevron-left</v-icon></v-btn>
 			<v-btn x-small text :disabled="holes.length < 2" :aria-label="t('guided_next')" :title="t('guided_next')" @click="$emit('next')"><v-icon :size="16">mdi-chevron-right</v-icon></v-btn>
 		</div>
-		<choice-help :choice="help" :title="t('guided_assist')" />
+		<choice-guide :choice="help" :title="t('guided_assist')" />
 		<code class="mo-key mo-xb-preview">{{ shown.before }}<mark class="mo-xb-hole">{{ shown.text }}</mark>{{ shown.after }}</code>
 		<template v-if="hole">
 			<div class="mo-xb-ask">{{ t('guided_hole_' + hole.kind) }}<span v-if="whereText" class="mo-faint"> ({{ whereText }})</span></div>
@@ -38,11 +38,11 @@
 // is not on a blank it says how many are left and offers to go to the first. Emits `fill` with the snippet to put in the blank,
 // `prev`, `next`, `go` with the blank, and `pick` with the type the Paths tab should filter by.
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { GUIDED_HELP, fillSnippet } from './expression-holes.js'
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceGuide },
 	props: {
 		holes: { type: Array, default: () => [] },
 		hole: { type: Object, default: null }
@@ -103,7 +103,7 @@ export default {
 .mo-page .mo-xb-assist { margin-top: 6px; }
 .mo-page .mo-xb-assist-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .mo-page .mo-xb-preview { display: block; margin: 6px 0; white-space: pre-wrap; word-break: break-all; }
-.mo-page .mo-xb-hole { background: rgba(255, 143, 0, 0.3); color: inherit; border-radius: 3px; padding: 0 3px; }
+.mo-page .mo-xb-hole { background: color-mix(in srgb, var(--wf-warn) 30%, transparent); color: inherit; border-radius: 3px; padding: 0 3px; }
 .mo-page .mo-xb-ask { font-size: 13px; margin-top: 4px; }
 .mo-page .mo-xb-choices { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .mo-page .mo-xb-choice-note { margin-left: 4px; }

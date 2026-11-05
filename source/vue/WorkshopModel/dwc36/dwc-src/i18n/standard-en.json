@@ -1,0 +1,14 @@
+{
+	"model": {
+		"peek_legend_write": "Creates or sets",
+		"peek_legend_read": "Reads",
+		"edit_value_open": "Edit value",
+		"globals_assigned": "Set in",
+		"globals_assigned_unknown": "not searched yet",
+		"globals_assigned_none": "no file read sets it",
+		"globals_assigned_n": "{n} files",
+		"globals_assigned_scan": "Find where it is set",
+		"macromap_global_toggle": "Show the lines where {file} uses {name}",
+		"globals_assigned_open": "Open {file} at line {n}"
+	}
+}

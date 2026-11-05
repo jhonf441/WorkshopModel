@@ -77,7 +77,7 @@
 @keyframes mo-glow { 0% { background-color: var(--mo-glow); box-shadow: 0 0 0 3px var(--mo-glow); } 100% { background-color: var(--mo-soft); box-shadow: none; } }
 .workshop-theme.mo-page .mo-gcard-head { padding-right: 36px; display: flex; align-items: center; gap: 6px; min-height: 32px; }
 .workshop-theme.mo-page .mo-gcard-name { flex: 1 1 auto; min-width: 0; font-family: var(--tp-font-mono, monospace); font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.workshop-theme.mo-page .mo-gcard-menu { position: absolute; top: 6px; right: 6px; }
+.workshop-theme.mo-page .mo-gcard-watch { position: absolute; top: 6px; right: 6px; }
 .workshop-theme.mo-page .mo-gcard-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 36px; }
 .workshop-theme.mo-page .mo-gcard-value { font-family: var(--tp-font-mono, monospace); font-size: 20px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
 .workshop-theme.mo-page .mo-gcard-value-text { font-size: 16px; font-weight: 500; }
@@ -110,7 +110,6 @@
 .workshop-theme.mo-page .mo-gfile-line:hover, .workshop-theme.mo-page .mo-gfile-line.on { background: var(--mo-soft2); border-color: var(--wf-accent); }
 .workshop-theme.mo-page .mo-gfile-line:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
 .workshop-theme.mo-page .mo-gfile-peek { flex: 1 1 100%; margin-top: 4px; }
-.workshop-theme.mo-page .mo-gcard-scan { border-color: var(--wf-accent); }
 .workshop-theme.mo-page .mo-ulegend { margin: 8px 0; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: var(--mo-soft); }
 .workshop-theme.mo-page .mo-ulegend-sum { display: flex; align-items: center; padding: 8px 10px; cursor: pointer; font-size: 13px; }
 .workshop-theme.mo-page .mo-ulegend-body { padding: 0 12px 10px; font-size: 13px; }
@@ -118,7 +117,7 @@
 .workshop-theme.mo-page .mo-ulegend-list li { display: flex; align-items: center; gap: 8px; }
 .workshop-theme.mo-page .mo-ulegend-dot { flex: 0 0 auto; width: 12px; height: 12px; border-radius: 3px; }
 .workshop-theme.mo-page .mo-ulegend-dot.k-define { background: rgba(46, 160, 67, 0.85); }
-.workshop-theme.mo-page .mo-ulegend-dot.k-set { background: rgba(255, 143, 0, 0.85); }
+.workshop-theme.mo-page .mo-ulegend-dot.k-set { background: color-mix(in srgb, var(--wf-warn) 85%, transparent); }
 .workshop-theme.mo-page .mo-ulegend-dot.k-read { background: rgba(25, 118, 210, 0.85); }
 .workshop-theme.mo-page .mo-ulegend-chip { flex: 0 0 auto; }
 .workshop-theme.mo-page .mo-ulegend-p { margin: 4px 0 0; }
@@ -139,7 +138,13 @@
 .workshop-theme.mo-page .mo-peek-row.hit { background: rgba(251, 140, 0, 0.22); box-shadow: inset 3px 0 0 var(--wf-accent); }
 .workshop-theme.mo-page .mo-peek-n { flex: 0 0 auto; min-width: 44px; padding-right: 10px; text-align: right; opacity: 0.5; user-select: none; }
 .workshop-theme.mo-page .mo-peek-text { white-space: pre; }
-.workshop-theme.mo-page .mo-peek-mark { padding: 0 2px; border-radius: 3px; background: var(--wf-accent); color: #000; }
+.workshop-theme.mo-page .mo-peek-mark { padding: 0 2px; border-radius: 3px; color: #000; }
+.workshop-theme.mo-page .mo-peek-mark.k-write { background: #ffd54f; }
+.workshop-theme.mo-page .mo-peek-mark.k-read { background: #64b5f6; }
+.workshop-theme.mo-page .mo-peek-legend { display: inline-flex; gap: 10px; font-size: 12px; }
+.workshop-theme.mo-page .mo-peek-legend .mo-peek-mark { padding: 0 6px; }
+/* chips of usage: created and written keep their colors and carry the yellow of the viewer on their left edge */
+.workshop-theme.mo-page .mo-uline-chip.k-define, .workshop-theme.mo-page .mo-uline-chip.k-set { border-left: 2px solid #ffd54f; }
 .workshop-theme.mo-page .mo-gcard-full { margin: 2px 0 0; }
 .workshop-theme.mo-page .mo-gcard-edit { margin-top: 4px; }
 .workshop-theme.mo-page .mo-gcard-hint { font-size: 12px; opacity: 0.7; }
@@ -267,7 +272,7 @@
 .workshop-theme.mo-page .mo-flow-step.is-bad { color: var(--wf-err, #e53935); }
 .workshop-theme.mo-page .mo-flow-step.is-bad .v-icon { color: var(--wf-err, #e53935); }
 .workshop-theme.mo-page .mo-gcard-setter { margin-left: 4px; font-family: var(--tp-font-mono, monospace); font-size: 12px; text-decoration: underline; }
-.workshop-theme.mo-page .mo-density-compact .mo-gcard-menu { grid-area: menu; position: static; justify-self: end; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-watch { grid-area: menu; position: static; justify-self: end; }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-head { padding-right: 0; }
 .workshop-theme.mo-page .mo-gcard, .workshop-theme.mo-page .mo-gcard-head, .workshop-theme.mo-page .mo-gcard-body, .workshop-theme.mo-page .mo-gcard-marks { min-width: 0; }
 .workshop-theme.mo-page .mo-gcard-value { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
@@ -286,4 +291,4 @@
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-click .mo-gcard-marks { flex-wrap: nowrap; overflow: hidden; }
 .workshop-theme.mo-page .mo-gdetail-body { padding-top: 8px; }
 .workshop-theme.mo-page .mo-gcard-detail { display: flex; flex-direction: column; gap: 10px; border: 0; background: transparent; }
-.workshop-theme.mo-page .mo-gcard-detail .mo-gcard-menu { top: 0; right: 0; }
+.workshop-theme.mo-page .mo-gcard-detail .mo-gcard-watch { top: 0; right: 0; }

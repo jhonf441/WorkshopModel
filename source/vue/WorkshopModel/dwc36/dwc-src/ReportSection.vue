@@ -4,11 +4,10 @@
 			<div class="mo-head">
 				<span class="mo-head-icon"><v-icon>mdi-clipboard-text-outline</v-icon></span>
 				<div class="mo-head-text">
-					<h2 class="mo-head-title">{{ t('report_title') }}</h2>
+					<div class="wf-section-head"><h2 class="mo-head-title">{{ t('report_title') }}</h2><help-tip :title="t('report_title')"><p>{{ t('report_help') }}</p></help-tip></div>
 					<p class="mo-head-lead">{{ t('look_report_lead') }}</p>
 				</div>
 			</div>
-			<details class="wf-more mb-2"><summary>{{ t('help_what') }}</summary><div>{{ t('report_help') }}</div></details>
 			<div class="mo-part">{{ t('report_private') }}</div>
 			<div class="mo-report-includes">
 				<div v-for="c in REPORT_INCLUDES" :key="c.id" class="mo-report-inc">
@@ -44,6 +43,7 @@
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import InfoTip from './InfoTip.vue'
+import HelpTip from './HelpTip.vue' // vue/_shared36
 import { exchangeSaveBlob } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { copyText } from './copy-text.js'
@@ -51,7 +51,7 @@ import { buildReport, detectDwcVersion } from './machine-report.js'
 import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes, dwcVersionChoices } from './report-redact.js'
 
 export default {
-	components: { InfoTip },
+	components: { InfoTip, HelpTip },
 	props: {
 		tick: { type: Number, default: 0 }
 	},

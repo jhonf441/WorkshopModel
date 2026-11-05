@@ -2,8 +2,10 @@
 	<div class="mo-watch-events">
 		<div v-if="!rows.length" class="mo-faint">{{ t('watch_ev_none') }}</div>
 		<div v-else class="mo-chg-tools">
-			<v-switch :input-value="fold" dense color="primary" hide-details :label="t(foldChoice.label)" :title="t(foldChoice.what)" @change="fold = !!$event" />
-			<choice-help :choice="foldChoice" :title="t(foldChoice.label)" />
+			<div class="help-tip-row">
+				<v-switch :input-value="fold" dense color="primary" hide-details :label="t(foldChoice.label)" @change="fold = !!$event" />
+				<info-tip :choice="foldChoice" :title="t(foldChoice.label)" />
+			</div>
 		</div>
 		<table v-if="rows.length" class="mo-table">
 			<thead><tr><th>{{ t('when') }}</th><th>{{ t('before') }}</th><th>{{ t('after') }}</th><th>{{ t('watch_ev_lasted') }}</th></tr></thead>
@@ -32,7 +34,7 @@
 // The changes of one watched path, for every kind of value (watch-events.js eventTable): the time, the value before, the value after
 // and how long the value before lasted; for an array or an object, what changed inside it (added, removed, changed).
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import InfoTip from './InfoTip.vue'
 import { eventTable, foldEmptyPairs, cellKind, FOLD_CHOICE } from './watch-events.js'
 import { humanDuration } from './value-human.js'
 
@@ -45,7 +47,7 @@ function clock(ts) {
 }
 
 export default {
-	components: { ChoiceHelp },
+	components: { InfoTip },
 	props: {
 		events: { type: Array, default: () => [] },
 		tick: { type: Number, default: 0 }

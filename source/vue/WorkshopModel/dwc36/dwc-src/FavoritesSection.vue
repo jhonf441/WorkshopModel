@@ -9,7 +9,7 @@
 				</div>
 			</div>
 			<pinned-strip :pinned="pinned" :tick="tick" class="mb-2" @select="$emit('select', $event)" @open="$emit('select', $event)" @unpin="unpin" />
-			<choice-help :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
+			<choice-guide :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
 		</v-card-text>
 	</v-card>
 </template>
@@ -22,13 +22,13 @@
 // pins.js (kept in the browser); the stars stay on the rows of the other sections.
 import i18n from '../../i18n'
 import PinnedStrip from './PinnedStrip.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { loadPins, savePins, removePin, PINS_ROW } from './pins.js'
 
 const storage = () => (typeof localStorage === 'undefined' ? null : localStorage)
 
 export default {
-	components: { PinnedStrip, ChoiceHelp },
+	components: { PinnedStrip, ChoiceGuide },
 	props: {
 		tick: { type: Number, default: 0 }
 	},

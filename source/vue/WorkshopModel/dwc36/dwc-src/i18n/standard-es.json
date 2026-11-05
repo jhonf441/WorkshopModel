@@ -1,0 +1,14 @@
+{
+	"model": {
+		"peek_legend_write": "Crea o asigna",
+		"peek_legend_read": "Lee",
+		"edit_value_open": "Editar valor",
+		"globals_assigned": "Asignada en",
+		"globals_assigned_unknown": "sin buscar todavía",
+		"globals_assigned_none": "ningún archivo leído la asigna",
+		"globals_assigned_n": "{n} archivos",
+		"globals_assigned_scan": "Buscar dónde se asigna",
+		"macromap_global_toggle": "Ver las líneas donde {file} usa {name}",
+		"globals_assigned_open": "Abrir {file} en la línea {n}"
+	}
+}

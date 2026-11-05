@@ -3,6 +3,7 @@
 		<div class="mo-peek-head">
 			<code class="mo-peek-path" :title="path">{{ path }}</code>
 			<span v-if="line" class="mo-faint">{{ t('peek_at', { n: line }) }}</span>
+			<span class="mo-peek-legend" role="group"><span class="mo-peek-mark k-write">{{ t('peek_legend_write') }}</span><span class="mo-peek-mark k-read">{{ t('peek_legend_read') }}</span></span>
 			<span class="mo-peek-actions">
 				<v-btn x-small outlined @click="copy"><v-icon :size="14" class="mr-1">mdi-content-copy</v-icon>{{ t('peek_copy') }}</v-btn>
 				<v-btn x-small text @click="$emit('close')">{{ t('close') }}</v-btn>
@@ -14,9 +15,9 @@
 		<template v-else>
 			<div v-if="view.cut" class="mo-faint">{{ t('peek_window', { from: view.from, to: view.to, total: view.total }) }}</div>
 			<div ref="box" class="mo-peek-box" tabindex="0" :aria-label="t('peek_box')">
-				<div v-for="r in view.rows" :key="r.n" class="mo-peek-row" :class="{ hit: r.hit }" :ref="r.hit ? 'hit' : null">
+				<div v-for="r in view.rows" :key="r.n" class="mo-peek-row" :class="{ hit: r.hit, ['k-' + kind]: r.hit && kind }" :ref="r.hit ? 'hit' : null">
 					<span class="mo-peek-n">{{ r.n }}</span>
-					<span class="mo-peek-text"><template v-for="(p, i) in parts(r)"><mark v-if="p.mark" :key="i" class="mo-peek-mark">{{ p.text }}</mark><template v-else>{{ p.text }}</template></template></span>
+					<span class="mo-peek-text"><template v-for="(p, i) in parts(r)"><mark v-if="p.mark" :key="i" class="mo-peek-mark" :class="'k-' + p.mark">{{ p.text }}</mark><template v-else>{{ p.text }}</template></template></span>
 				</div>
 			</div>
 		</template>
@@ -32,13 +33,16 @@
 import i18n from '../../i18n'
 import { readText } from './model-host.js'
 import { copyText } from './copy-text.js'
-import { peekRows, splitMark } from './file-peek.js'
+import { peekRows } from './file-peek.js'
+import { markLine } from './peek-mark.js'
 
 export default {
 	props: {
 		path: { type: String, required: true },
 		line: { type: Number, default: 0 },
-		name: { type: String, default: '' } // the global to mark inside the line
+		name: { type: String, default: '' }, // the global to mark inside the line
+		kind: { type: String, default: '' }, // 'define' | 'set' | 'read': the chip that opened the viewer
+		all: { type: Boolean, default: true } // mark the global in every line (yellow where it is created or set, blue where it is read), not only in the line of the chip
 	},
 	data() {
 		return { state: 'loading', text: '', copied: '' }
@@ -59,7 +63,7 @@ export default {
 			return i18n.t('plugins.WorkshopModel.model.' + k, p)
 		},
 		parts(row) {
-			return row.hit ? splitMark(row.text, this.name) : [{ text: row.text, mark: false }]
+			return row.hit || this.all ? markLine(row.text, this.name) : [{ text: row.text, mark: '' }]
 		},
 		async load() {
 			this.state = 'loading'

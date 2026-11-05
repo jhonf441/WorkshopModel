@@ -5,11 +5,11 @@
 			<div class="mo-detail-head">
 				<favorite-star :path="path" :pinned="pinned" @pin="onPin" @unpin="onUnpin" />
 				<code class="mo-path">{{ path }}</code>
-				<v-btn x-small outlined :title="t('copy_path')" @click="copy(path, 'path')">{{ copied === 'path' ? t('copied') : t('copy') }}</v-btn>
-				<v-btn x-small outlined @click="watched ? $emit('unwatch', path) : $emit('watch', path)">
-					<v-icon x-small left>{{ watched ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>{{ watched ? t('watch_remove') : t('watch_add') }}
+				<v-btn icon small class="mo-ibtn" :title="copied === 'path' ? t('copied') : t('copy_path')" :aria-label="t('copy_path')" @click="copy(path, 'path')"><v-icon small>{{ copied === 'path' ? 'mdi-check' : 'mdi-content-copy' }}</v-icon></v-btn>
+				<v-btn icon small class="mo-ibtn" :title="watched ? t('watch_remove') : t('watch_add')" :aria-label="watched ? t('watch_remove') : t('watch_add')" @click="watched ? $emit('unwatch', path) : $emit('watch', path)">
+					<v-icon small>{{ watched ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>
 				</v-btn>
-				<v-btn x-small outlined :title="t('test_in_tester_help')" @click="$emit('test', path)"><v-icon x-small left>mdi-flask-outline</v-icon>{{ t('test_in_tester') }}</v-btn>
+				<v-btn icon small class="mo-ibtn" :title="t('test_in_tester') + ' - ' + t('test_in_tester_help')" :aria-label="t('test_in_tester')" @click="$emit('test', path)"><v-icon small>mdi-flask-outline</v-icon></v-btn>
 			</div>
 			<div class="mo-faint mo-detail-kind">{{ t('type') }}: <kind-chip :info="chip" /><template v-if="branch"> ({{ t('children_n', { n: count }) }})</template></div>
 			<value-table v-if="table" :table="table" @select="onSelect" />
@@ -36,9 +36,9 @@
 				<div v-for="s in snippets" :key="s.id" class="mo-snippet">
 					<span class="mo-faint mo-snippet-label">{{ t('snippet_' + s.id) }}</span>
 					<code class="mo-snippet-code">{{ s.code }}</code>
-					<v-btn x-small text :title="t('copy')" @click="copy(s.code, s.id)">{{ copied === s.id ? t('copied') : t('copy') }}</v-btn>
-					<v-btn v-if="s.send" x-small text color="primary" :title="t('send_here_title')" @click="sending = sending === s.id ? '' : s.id">{{ t('send_here') }}</v-btn>
-					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : readOnlyLine(t('look_globals_readonly'))" @sent="sending = ''" />
+					<v-btn icon small class="mo-ibtn" :title="copied === s.id ? t('copied') : t('copy')" :aria-label="t('copy')" @click="copy(s.code, s.id)"><v-icon small>{{ copied === s.id ? 'mdi-check' : 'mdi-content-copy' }}</v-icon></v-btn>
+					<v-btn v-if="s.send" icon small color="primary" class="mo-ibtn" :title="t('send_here') + ' - ' + t('send_here_title')" :aria-label="t('send_here')" @click="sending = sending === s.id ? '' : s.id"><v-icon small>mdi-send-outline</v-icon></v-btn>
+					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : readOnlyLine(readOnlyLine(t('read_only')))" @sent="sending = ''" />
 				</div>
 			</div>
 		</template>

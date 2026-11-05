@@ -21,11 +21,8 @@
 					<button v-if="live.has(u.name)" type="button" class="mo-link mo-key" :title="t('open_in_tree')" @click="$emit('select', 'global.' + u.name)">{{ u.name }}</button>
 					<span v-else class="mo-key" :title="t('usage_not_live')">{{ u.name }}</span>
 					<span v-if="u.state" class="wf-state" :class="u.state.tone">{{ t(u.state.key) }}</span>
-					<span class="mo-udetail-lines">
-						<button v-for="c in u.lines" :key="c.kind + c.n" type="button" class="mo-uline-chip" :class="['k-' + c.kind, { on: isOpen(u.name, c.n) }]" :aria-pressed="isOpen(u.name, c.n) ? 'true' : 'false'" :title="t('peek_open', { ref: file + ':' + c.n })" @click="toggle(u.name, c.n)">{{ t('usage_kind_' + c.kind) }} {{ t('usage_detail_line', { n: c.n }) }}</button>
-					</span>
+					<usage-lines :path="file" :lines="u.lines" :name="u.name" :open="openOf(u.name)" @open="onOpen(u.name, $event)" />
 				</div>
-				<file-peek v-if="peek" :path="file" :line="peek.line" :name="peek.name" @close="peek = null" />
 			</div>
 		</div>
 	</div>
@@ -39,12 +36,12 @@
 // there is one, so the right side never says "no problems": it says what the file uses. A click on a line opens the file in a small viewer
 // (FilePeek.vue) with that line selected; the viewer has its own button to copy "file:line".
 import i18n from '../../i18n'
-import FilePeek from './FilePeek.vue'
+import UsageLines from './UsageLines.vue'
 import { REF_KINDS, fileList, filterFiles, fileView } from './usage-view.js'
 import { usageState } from './usage-phrase.js'
 
 export default {
-	components: { FilePeek },
+	components: { UsageLines },
 	props: {
 		refs: { type: Array, default: () => [] },
 		rows: { type: Array, default: () => [] },
@@ -79,12 +76,12 @@ export default {
 		t(k, p) {
 			return i18n.t('plugins.WorkshopModel.model.' + k, p)
 		},
-		isOpen(name, line) {
-			return !!this.peek && this.peek.name === name && this.peek.line === line
+		// the viewer of the chips of one global of the file (one open at a time in the whole file)
+		openOf(name) {
+			return this.peek && this.peek.name === name ? { path: this.file, line: this.peek.line, kind: this.peek.kind } : null
 		},
-		// a second click on the same line closes the viewer
-		toggle(name, line) {
-			this.peek = this.isOpen(name, line) ? null : { name, line }
+		onOpen(name, open) {
+			this.peek = open ? { name, line: open.line, kind: open.kind } : null
 		}
 	}
 }

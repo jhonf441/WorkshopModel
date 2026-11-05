@@ -1,5 +1,25 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.28 -- 2026-11-05
+
+- Model: single i18n registration per language (plugin did not load)
+
+## 1.7.27 -- 2026-11-05
+
+- Session notices and help standard: one voice for sign-in and role refusals, shared help tips, identity change resets what the session showed
+
+## 1.7.26 -- 2026-11-05
+
+- Model: the Changed label no longer gets Vuetify's solid blue .info background
+
+## 1.7.25 -- 2026-11-05
+
+- Model: icon buttons that never wrap; Changes view calm order, fixed columns, Freeze
+
+## 1.7.24 -- 2026-11-05
+
+- Darker primary button hover, Workbench save label, generic RS485 notes
+
 ## 1.7.23 -- 2026-11-04
 
 - Sign out no longer reopens the PIN dialog

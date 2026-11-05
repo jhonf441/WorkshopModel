@@ -45,7 +45,7 @@
 								<v-icon small>mdi-sort</v-icon>{{ t('look_sort_chip', { by: t('globals_sort_' + sort) }) }}
 							</button>
 						</div>
-						<choice-help v-if="canEdit" :choice="S.quick" :title="t(S.quick.label)" class="mb-2" />
+						<choice-guide v-if="canEdit" :choice="S.quick" :title="t(S.quick.label)" class="mb-2" />
 						<div v-if="!shown.length" class="mo-empty mo-empty-small" role="status">
 							<div class="mo-empty-title">{{ t('look_globals_nomatch_title') }}</div>
 							<div class="mo-empty-text">{{ t('look_globals_nomatch_text') }}</div>
@@ -64,7 +64,7 @@
 							</div>
 						</section>
 					</template>
-					<div v-if="!canEdit" class="mo-note mt-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('look_globals_readonly')) }}</span></div>
+					<lock-reason min="technician" class="mt-2" />
 				</template>
 			</v-card-text>
 		</v-card>
@@ -81,7 +81,6 @@
 
 <script>
 'use strict'
-import { readOnlyNote } from './read-only-note.js'
 
 // The globals of the machine, friendly at first sight (2026-11-03): one head with the counts, one search and one New button, a row
 // of chips (all, the kinds, kept across reboots, watched, changed recently, and the order that cycles on a tap: globals-filter.js,
@@ -96,7 +95,8 @@ import GlobalCreator from './GlobalCreator.vue'
 import GlobalRow from './GlobalRow.vue'
 import GlobalDetail from './GlobalDetail.vue'
 import PersistPanel from './PersistPanel.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
+import LockReason from './LockReason.vue' // vue/_shared36
 import { KIND_GROUPS } from './flat-list.js'
 import { GLOBALS_SETTINGS, globalItems, filterGlobals, sortGlobals } from './globals-filter.js'
 import { OTHER, groupNames, readFolded, saveFolded, toggleFolded } from './globals-groups.js'
@@ -113,8 +113,7 @@ function storage() {
 }
 
 export default {
-	mixins: [readOnlyNote],
-	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, ChoiceHelp },
+	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, ChoiceGuide, LockReason },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },

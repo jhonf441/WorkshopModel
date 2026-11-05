@@ -13,12 +13,7 @@
 		<div v-if="!groups.length" class="mo-faint">{{ t('usage_detail_no_files') }}</div>
 		<div v-for="g in groups" :key="g.file" class="mo-udetail-file">
 			<div class="mo-files">{{ g.file }}</div>
-			<div class="mo-udetail-lines">
-				<button v-for="(x, i) in g.items" :key="i" type="button" class="mo-uline-chip" :class="['k-' + x.kind, { on: isOpen(g.file, x.line) }]" :aria-pressed="isOpen(g.file, x.line) ? 'true' : 'false'" :title="t('peek_open', { ref: g.file + ':' + x.line })" @click="toggle(g.file, x.line)">
-					{{ t('usage_kind_' + x.kind) }} {{ t('usage_detail_line', { n: x.line }) }}
-				</button>
-			</div>
-			<file-peek v-if="peek && peek.path === g.file" :path="peek.path" :line="peek.line" :name="row.name" @close="peek = null" />
+			<usage-lines :path="g.file" :lines="linesOf(g.items)" :name="row.name" :open="peek" @open="peek = $event" />
 		</div>
 		<div v-if="copied" class="mo-faint mt-1" role="status">{{ t('usage_detail_copied', { text: copied }) }}</div>
 	</div>
@@ -33,10 +28,11 @@
 import i18n from '../../i18n'
 import { copyText } from './copy-text.js'
 import { refsByFile } from './usage-view.js'
-import FilePeek from './FilePeek.vue'
+import UsageLines from './UsageLines.vue'
+import { linesOfItems } from './usage-lines.js'
 
 export default {
-	components: { FilePeek },
+	components: { UsageLines },
 	props: {
 		row: { type: Object, required: true }
 	},
@@ -55,12 +51,8 @@ export default {
 		async copy(text) {
 			if (await copyText(text)) this.copied = text
 		},
-		isOpen(path, line) {
-			return !!this.peek && this.peek.path === path && this.peek.line === line
-		},
-		// a second click on the same line closes the viewer
-		toggle(path, line) {
-			this.peek = this.isOpen(path, line) ? null : { path, line }
+		linesOf(items) {
+			return linesOfItems(items)
 		}
 	}
 }

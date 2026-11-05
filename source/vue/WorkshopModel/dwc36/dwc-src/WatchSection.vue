@@ -14,9 +14,11 @@
 					</div>
 				</div>
 				<div class="mo-actions">
-					<v-switch v-model="markers" dense inset color="success" hide-details :label="t(MARKERS_SETTING.label)" />
+					<div class="help-tip-row">
+						<v-switch v-model="markers" dense inset color="success" hide-details :label="t(MARKERS_SETTING.label)" />
+						<info-tip :choice="MARKERS_SETTING" :title="t(MARKERS_SETTING.label)" />
+					</div>
 				</div>
-				<choice-help :choice="MARKERS_SETTING" :title="t(MARKERS_SETTING.label)" class="mb-2" />
 				<div v-if="!rows.length" class="mo-empty mo-empty-small">
 					<v-icon class="mo-empty-icon">mdi-eye-plus-outline</v-icon>
 					<div class="mo-empty-title">{{ t('look_watch_empty_title') }}</div>
@@ -88,7 +90,7 @@ import Sparkline from './Sparkline.vue'
 import WatchBands from './WatchBands.vue'
 import WatchEvents from './WatchEvents.vue'
 import WatchExport from './WatchExport.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import InfoTip from './InfoTip.vue'
 import { seriesStats } from './watch-series.js'
 import { MARKERS_SETTING, rendererFor, jumpMarkers } from './watch-render.js'
 
@@ -97,7 +99,7 @@ function fmt(v) {
 }
 
 export default {
-	components: { Sparkline, WatchBands, WatchEvents, WatchExport, ChoiceHelp },
+	components: { Sparkline, WatchBands, WatchEvents, WatchExport, InfoTip },
 	props: {
 		tick: { type: Number, default: 0 },
 		entries: { type: Array, default: () => [] },

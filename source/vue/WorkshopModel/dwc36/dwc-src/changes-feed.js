@@ -158,6 +158,13 @@ export function changesSince(feed, momentId, now) {
 	return Array.from(byPath.values(), c => changeOut(c, m.base, feed.prev)).sort((a, b) => (b.last || 0) - (a.last || 0) || (a.path < b.path ? -1 : 1))
 }
 
+// A calm order for a list that is redrawn every second: a path keeps the place it first got (ranks = Map path -> place, kept by the view);
+// a path seen for the first time goes after the ones already placed, in the order the list brought it. Sorts `list` in place and returns it.
+export function stableOrder(list, ranks) {
+	for (const c of list) if (!ranks.has(c.path)) ranks.set(c.path, ranks.size)
+	return list.sort((a, b) => ranks.get(a.path) - ranks.get(b.path))
+}
+
 export function isFrequent(change, since, now) {
 	const secs = Math.max(1, (now - since) / 1000)
 	return change.count >= FREQUENT_MIN && change.count / secs >= FREQUENT_RATE

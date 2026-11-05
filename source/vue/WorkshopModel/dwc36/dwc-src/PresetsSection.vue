@@ -30,7 +30,7 @@
 						<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 					</div>
 					<div class="mo-faint mb-2">{{ liveCount ? t('preset_save_help', { n: liveCount }) : t('look_presets_no_globals') }}</div>
-					<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('read_only')) }}</span></div>
+					<lock-reason min="technician" class="mb-2" />
 					<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 						<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 						<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>
@@ -61,10 +61,7 @@
 						<span v-if="list.length" class="mo-faint">{{ t('look_export_as', { name: exportName }) }}</span>
 					</div>
 					<div v-if="notice" class="mo-note ok mt-1" role="status"><v-icon small>mdi-check-circle-outline</v-icon><span class="mo-note-text">{{ notice }}</span></div>
-					<details class="wf-more">
-						<summary>{{ t('look_presets_more') }}</summary>
-						<div>{{ t('presets_help') }} <code>{{ PRESETS_FILE }}</code></div>
-					</details>
+					<help-guide :title="t('look_presets_more')"><p>{{ t('presets_help') }} <code>{{ PRESETS_FILE }}</code></p></help-guide>
 				</template>
 			</v-card-text>
 		</v-card>
@@ -106,6 +103,8 @@ import i18n from '../../i18n'
 import { liveModel, readText, writeText } from './model-host.js'
 import ErrorNotice from './ErrorNotice.vue'
 import CommandPreview from './CommandPreview.vue'
+import HelpGuide from './HelpGuide.vue' // vue/_shared36
+import LockReason from './LockReason.vue' // vue/_shared36
 import { childCount } from './model-tree.js'
 import { PRESETS_FILE, PRESETS_FORMAT, PRESETS_VERSION, PRESET_NAME_RE, makePreset, parsePresetsText, presetsText, presetDiff, presetCommands, upsertPreset, removePreset, mergePresets } from './presets.js'
 import { resolveName, typedName, defaultPresetName } from './name-default.js'
@@ -115,7 +114,7 @@ import { ARM_MS, pressArmed } from './armed.js'
 
 export default {
 	mixins: [readOnlyNote],
-	components: { ErrorNotice, CommandPreview },
+	components: { ErrorNotice, CommandPreview, HelpGuide, LockReason },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },

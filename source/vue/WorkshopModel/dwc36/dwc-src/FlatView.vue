@@ -4,7 +4,7 @@
 			<span class="mo-faint">{{ t('vs_title') }}</span>
 			<button v-for="m in VALUE_MODES" :key="m" type="button" class="wf-cat" :aria-pressed="mode === m ? 'true' : 'false'" :title="t('vs_mode_help')" @click="mode = m">{{ t('vs_mode_' + m) }}</button>
 		</div>
-		<choice-help :choice="VALUE_SEARCH_HELP" :title="t('vs_title')" class="mb-1" />
+		<choice-guide :choice="VALUE_SEARCH_HELP" :title="t('vs_title')" class="mb-1" />
 		<div class="mo-toolbar">
 			<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="mode === 'values' ? t('vs_label') : t('flat_filter')" :placeholder="mode === 'values' ? t('vs_hint') : t('flat_filter_hint')" />
 		</div>
@@ -52,13 +52,13 @@ import { humanize } from './value-human.js'
 import { leafInfo } from './value-kind.js'
 import KindChip from './KindChip.vue'
 import FavoriteStar from './FavoriteStar.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { VALUE_MODES, VALUE_SEARCH_HELP, parseValueQuery, searchValues, describeQuery } from './value-search.js'
 
 const COLUMNS = [{ id: 'path', label: 'detail_path' }, { id: 'value', label: 'value' }, { id: 'type', label: 'type' }, { id: 'changed', label: 'flat_col_changed' }]
 
 export default {
-	components: { KindChip, FavoriteStar, ChoiceHelp },
+	components: { KindChip, FavoriteStar, ChoiceGuide },
 	props: {
 		tick: { type: Number, default: 0 },
 		model: { type: Object, default: null },

@@ -19,7 +19,7 @@
 					<v-btn small outlined @click="$emit('update:paused', !paused)"><v-icon small left>{{ paused ? 'mdi-play' : 'mdi-pause' }}</v-icon>{{ paused ? t('resume') : t('pause') }}</v-btn>
 				</div>
 			</div>
-			<choice-help :choice="choice" :title="t('view_how')" class="mb-2" />
+			<choice-guide :choice="choice" class="mb-2" />
 			<div :class="{ 'mo-split': choice.layout === 'split' }">
 				<div class="mo-view">
 					<component
@@ -49,7 +49,7 @@ import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import { scrollToPageTop } from './page-scroll.js'
 import ViewTabs from './ViewTabs.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import NodeDetail from './NodeDetail.vue'
 import TopicsView from './TopicsView.vue'
 import FlatView from './FlatView.vue'
@@ -71,7 +71,7 @@ function storage() {
 }
 
 export default {
-	components: { ViewTabs, ChoiceHelp, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch },
+	components: { ViewTabs, ChoiceGuide, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch },
 	props: {
 		tick: { type: Number, default: 0 },
 		paused: { type: Boolean, default: false },

@@ -1,6 +1,6 @@
 <template>
 	<div class="mo-xb-panel">
-		<choice-help :choice="CONTRIBUTE" :title="t('recipes_share_contribute')" class="mb-2" />
+		<choice-guide :choice="CONTRIBUTE" :title="t('recipes_share_contribute')" class="mb-2" />
 		<div class="mo-rs-tools mo-xb-head">
 			<view-tabs :choices="SOURCES" :current="source" :label="t('recipes_share_filter')" @pick="source = $event" />
 			<v-text-field v-model="query" dense outlined hide-details clearable class="mo-field" :label="t('recipes_share_search')" />
@@ -43,7 +43,7 @@
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import ViewTabs from './ViewTabs.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import ShareRecipeDialog from './ShareRecipeDialog.vue'
 import { recipesFor } from './expression-recipes.js'
 import { RECIPE_SOURCES, DEFAULT_SOURCE, recipeCards, newerCount } from './community-recipes.js'
@@ -56,7 +56,7 @@ const ICONS = { all: 'mdi-view-list-outline', builtin: 'mdi-chip', community: 'm
 const SOURCES = RECIPE_SOURCES.map(id => ({ id, label: 'recipes_share_source_' + id, icon: ICONS[id] }))
 
 export default {
-	components: { ViewTabs, ChoiceHelp, ShareRecipeDialog },
+	components: { ViewTabs, ChoiceGuide, ShareRecipeDialog },
 	props: { tick: { type: Number, default: 0 } },
 	data() {
 		return { source: DEFAULT_SOURCE, query: '', showNewer: false, sharing: null, CONTRIBUTE, SOURCES, RECIPES_GUIDE }

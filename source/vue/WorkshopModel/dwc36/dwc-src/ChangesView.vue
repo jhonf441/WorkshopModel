@@ -7,6 +7,7 @@
 		<div class="mo-changes-bar">
 			<span class="mo-changes-since" role="status">{{ sinceText }}</span>
 			<v-btn small depressed color="primary" :disabled="!sampled" :title="sampled ? t('changes_mark_help') : t('changes_waiting')" @click="mark"><v-icon small left>mdi-flag-variant-outline</v-icon>{{ t('changes_mark') }}</v-btn>
+			<v-btn small outlined :title="t(frozen ? 'changes_resume_help' : 'changes_freeze_help')" :aria-pressed="frozen ? 'true' : 'false'" @click="toggleFreeze"><v-icon small left>{{ frozen ? 'mdi-play' : 'mdi-pause' }}</v-icon>{{ t(frozen ? 'changes_resume' : 'changes_freeze') }}</v-btn>
 			<v-btn small text :title="t('changes_clear_help')" @click="clear">{{ t('changes_clear') }}</v-btn>
 		</div>
 		<div class="mo-changes-tools">
@@ -19,10 +20,11 @@
 		</div>
 		<div class="mo-changes-note" role="status">{{ countText }}</div>
 		<div v-if="paused" class="mo-changes-note">{{ t('changes_paused') }}</div>
+		<div v-if="frozen" class="mo-changes-note" role="status">{{ t('changes_frozen') }}</div>
 		<div v-if="!rows.length" class="mo-changes-note">{{ emptyText }}</div>
 		<div v-else class="mo-changes-scroll">
 			<table class="mo-changes-table">
-				<thead><tr><th>{{ t('when') }}</th><th>{{ t('detail_path') }}</th><th>{{ t('before') }}</th><th>{{ t('after') }}</th><th>{{ t('changes_col_trend') }}</th><th>{{ t('changes_col_actions') }}</th></tr></thead>
+				<thead><tr><th class="mo-col-when">{{ t('when') }}</th><th>{{ t('detail_path') }}</th><th>{{ t('before') }}</th><th>{{ t('after') }}</th><th class="mo-col-trend">{{ t('changes_col_trend') }}</th><th class="mo-col-actions">{{ t('changes_col_actions') }}</th></tr></thead>
 				<tbody>
 					<tr v-for="c in rows" :key="c.path">
 						<td class="mo-changes-mono">{{ c.last ? clockOf(c.last) : '-' }}</td>
@@ -62,7 +64,7 @@
 import i18n from '../../i18n'
 import FavoriteStar from './FavoriteStar.vue'
 import Sparkline from './Sparkline.vue'
-import { MOMENTS, STATUS_CHOICES, STATUSES, FREQUENT_CHOICE, NOISE_CHOICE, createFeed, feedTick, setMark, clearFeed, momentOf, changesSince, filterChanges, shortPath, clockOf, agoOf } from './changes-feed.js'
+import { MOMENTS, STATUS_CHOICES, STATUSES, FREQUENT_CHOICE, NOISE_CHOICE, createFeed, feedTick, setMark, clearFeed, momentOf, changesSince, stableOrder, filterChanges, shortPath, clockOf, agoOf } from './changes-feed.js'
 import { copyText } from './copy-text.js'
 import { densityClass } from './density.js'
 import { pageOf, FLAT_PAGE } from './flat-list.js'
@@ -75,7 +77,7 @@ export default {
 	components: { FavoriteStar, Sparkline },
 	props: { tick: { type: Number, default: 0 }, model: { type: Object, default: null }, leaves: { type: Array, default: () => [] }, truncated: { type: Boolean, default: false }, changes: { type: Array, default: () => [] }, changeTimes: { type: Map, default: () => new Map() }, selected: { type: String, default: '' }, watched: { type: Array, default: () => [] }, pinned: { type: Array, default: () => [] }, density: { type: String, default: 'comfortable' }, paused: { type: Boolean, default: false }, globalsOk: { type: Boolean, default: true }, tier: { type: Object, default: () => ({ sbc: false, extras: false }) } },
 	data() {
-		return { version: 0, moment: 'open', query: '', statuses: [], hideFrequent: true, hideNoise: true, pages: 1, moments: MOMENTS, statusChoices: STATUS_CHOICES, frequentChoice: FREQUENT_CHOICE, noiseChoice: NOISE_CHOICE, STATE_CLASS, FLAT_PAGE }
+		return { version: 0, frozen: null, moment: 'open', query: '', statuses: [], hideFrequent: true, hideNoise: true, pages: 1, moments: MOMENTS, statusChoices: STATUS_CHOICES, frequentChoice: FREQUENT_CHOICE, noiseChoice: NOISE_CHOICE, STATE_CLASS, FLAT_PAGE }
 	},
 	computed: {
 		sampled() {
@@ -84,15 +86,15 @@ export default {
 		span() {
 			void this.version
 			void this.tick
-			return momentOf(this.feedOf(), this.moment, Date.now())
+			return this.frozen ? this.frozen.span : momentOf(this.feedOf(), this.moment, Date.now())
 		},
 		all() {
 			void this.version
 			void this.tick
-			return changesSince(this.feedOf(), this.moment, Date.now())
+			return this.frozen ? this.frozen.list : stableOrder(changesSince(this.feedOf(), this.moment, Date.now()), this.ranksOf()) // a calm order: a path keeps its place; frozen: the list as it was
 		},
 		filtered() {
-			return filterChanges(this.all, { query: this.query, statuses: this.statuses, hideFrequent: this.hideFrequent, hideNoise: this.hideNoise, since: this.span.since, now: Date.now() })
+			return filterChanges(this.all, { query: this.query, statuses: this.statuses, hideFrequent: this.hideFrequent, hideNoise: this.hideNoise, since: this.span.since, now: this.frozen ? this.frozen.now : Date.now() })
 		},
 		counts() {
 			const out = {}
@@ -165,16 +167,29 @@ export default {
 			if (!this.feed) this.feed = createFeed(Date.now(), this.changes)
 			return this.feed
 		},
-		pickMoment(id) {
+		// the places of the rows (stable-order): made again when the set of changes is another one
+			ranksOf() {
+				if (!this.ranks) this.ranks = new Map()
+				return this.ranks
+			},
+			// stops the list so one row can be read; the changes keep being recorded and show when it goes on
+			toggleFreeze() {
+				this.frozen = this.frozen ? null : { list: this.all, span: this.span, now: Date.now() }
+			},
+			pickMoment(id) {
+				this.ranks = null
 			this.moment = id
 		},
 		mark() {
 			setMark(this.feedOf(), Date.now())
-			this.moment = 'mark'
+			this.ranks = null
+				this.moment = 'mark'
 			this.version++
 		},
 		clear() {
 			clearFeed(this.feedOf(), Date.now())
+				this.ranks = null
+				this.frozen = null
 			this.version++
 			this.$emit('clear-changes')
 		},
@@ -211,7 +226,12 @@ export default {
 .mo-page .mo-changes-cat-removed { --wf-cat: var(--wf-warn); }
 .mo-page .mo-changes-cat-back { --wf-cat: rgba(128, 128, 128, 0.8); }
 .mo-page .mo-changes-scroll { max-height: 65vh; overflow: auto; border: 1px solid var(--wf-line); border-radius: 8px; }
-.mo-page .mo-changes-table { width: 100%; border-collapse: collapse; font-size: var(--mo-changes-font); }
+/* fixed layout: the columns never change width when the values do (a list redrawn every second must not shift); the flexible ones share what is left */
+.mo-page .mo-changes-table { width: 100%; min-width: 820px; table-layout: fixed; border-collapse: collapse; font-size: var(--mo-changes-font); }
+.mo-page .mo-changes-table .mo-col-when { width: 84px; }
+.mo-page .mo-changes-table .mo-col-trend { width: 190px; }
+.mo-page .mo-changes-table .mo-col-actions { width: 96px; }
+.mo-page .mo-changes-table td { overflow-wrap: anywhere; }
 .mo-page .mo-changes-table th { position: sticky; top: 0; z-index: 1; background: var(--wf-surface); padding: 6px 10px; border-bottom: 1px solid var(--wf-line); text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; }
 .mo-page .mo-changes-table td { padding: var(--mo-changes-pad); border-bottom: 1px solid rgba(128, 128, 128, 0.15); vertical-align: middle; }
 .mo-page .mo-changes-mono { font-family: var(--tp-font-mono, monospace); font-size: 12px; word-break: break-all; }
@@ -225,4 +245,6 @@ export default {
 .mo-page .mo-changes-range { display: block; color: var(--tp-faint); font-size: 11px; }
 .mo-page .mo-changes-actions { white-space: nowrap; }
 .mo-page .mo-chg-faint { color: var(--tp-faint); font-style: italic; }
+/* a state is a dot and the word (DESIGN.md 3): Vuetify's own .info class (solid blue, !important) must not paint the label of "info", or its blue dot sits on blue and cannot be seen */
+.mo-page .wf-state.info { background-color: transparent !important; border-color: transparent !important; }
 </style>

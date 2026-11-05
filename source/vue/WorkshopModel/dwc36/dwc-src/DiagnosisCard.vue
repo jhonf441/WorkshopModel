@@ -5,7 +5,7 @@
 			<span id="mo-topic-diagnosis" class="mo-topic-title">{{ t(card.title) }}</span>
 			<span v-if="result.errors || result.warnings" :class="['wf-state', result.errors ? 'err' : 'warn']">{{ t('diag_summary', { errors: result.errors, warnings: result.warnings }) }}</span>
 		</div>
-		<choice-help :choice="helpChoice" :title="t('view_how')" class="mb-1" />
+		<choice-guide :choice="helpChoice" class="mb-1" />
 		<div v-if="result.noData" class="mo-faint" role="status">{{ t('diag_no_data') }}</div>
 		<div v-else-if="result.clear" role="status"><span class="wf-state ok">{{ t('diag_all_clear', { n: result.checked }) }}</span></div>
 		<div v-for="i in result.items" :key="i.id" class="mo-diag-item">
@@ -28,11 +28,11 @@
 // with a fold that says what it means and what to check, and Open to jump to the value. Nothing wrong shows an all-clear that says how
 // many checks ran. The card comes from topic-catalog.js diagnosisTopic().
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { DIAGNOSIS_HELP } from './diagnosis.js'
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceGuide },
 	props: {
 		card: { type: Object, required: true }
 	},

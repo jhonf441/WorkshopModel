@@ -4,7 +4,7 @@
 			<div class="mo-part"><v-icon :size="20" class="mr-1">mdi-flask-outline</v-icon>{{ t('tester_title') }}</div>
 			<div class="mo-faint mb-2">{{ t('tester_help') }}</div>
 			<view-tabs :choices="TESTER_MODES" :current="mode" :label="t('tester_mode')" class="mb-2" @pick="mode = $event" />
-			<choice-help :choice="modeChoice" :title="t(modeChoice.label)" class="mb-2" />
+			<choice-label :choice="modeChoice" class="mb-2" />
 			<div class="mo-xb-sticky">
 				<v-text-field ref="field" v-model="text" dense outlined hide-details spellcheck="false" class="mo-code-field" :label="t('tester_input')" :placeholder="t('tester_input_hint_' + mode)" @keydown.enter.prevent @keydown.tab="onTab" @keyup="remember" @click="remember" @blur="remember" />
 			</div>
@@ -27,12 +27,12 @@
 			<div v-if="!command.ok && text.trim() && command.error !== 'placeholder'" class="mo-error" role="alert">{{ t('tester_err_' + command.error) }}</div>
 			<template v-if="notes.length">
 				<div v-for="n in notes" :key="n.key" :class="n.level === 'error' ? 'mo-error' : 'mo-faint mo-xb-warn'" :role="n.level === 'error' ? 'alert' : 'status'"><span v-if="n.level !== 'error'" class="wf-state" :class="n.level === 'warn' ? 'warn' : 'info'"></span>{{ n.text }}</div>
-				<choice-help :choice="checksHelp" :title="t('guided_checks')" />
+				<choice-label :choice="checksHelp" :label="t('guided_checks')" />
 			</template>
 
 			<div class="mo-part mt-3">{{ t('tester_builder') }}</div>
 			<view-tabs :choices="BUILDER_TABS" :current="tab" :label="t('tester_builder')" class="mb-2" @pick="tab = $event" />
-			<choice-help :choice="tabChoice" :title="t(tabChoice.label)" class="mb-2" />
+			<choice-label :choice="tabChoice" class="mb-2" />
 			<path-picker v-if="tab === 'paths'" :tick="tick" :wanted="pathWanted" :hole-name="goal ? goal.text : ''" @insert="put" />
 			<catalog-panel v-else-if="tab === 'catalog'" :firmware="firmware" :context="catalogContext" @insert="putExpression" />
 			<recipes-panel v-else-if="tab === 'recipes'" :tick="tick" @load="loadRecipe" />
@@ -69,7 +69,7 @@
 import i18n from '../../i18n'
 import { liveModel, sendCode } from './model-host.js'
 import ViewTabs from './ViewTabs.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceLabel from './ChoiceLabel.vue'
 import CommandPreview from './CommandPreview.vue'
 import KindChip from './KindChip.vue'
 import PathPicker from './PathPicker.vue'
@@ -102,7 +102,7 @@ const EXAMPLES = { echo: ['state.status', '#move.axes', 'move.axes[0].userPositi
 const storage = () => (typeof localStorage === 'undefined' ? null : localStorage)
 
 export default {
-	components: { ViewTabs, ChoiceHelp, CommandPreview, KindChip, PathPicker, CatalogPanel, RecipesPanel, SavedPanel, LiveControl, ExpressionResult, HoleAssist, ExpressionFlow },
+	components: { ViewTabs, ChoiceLabel, CommandPreview, KindChip, PathPicker, CatalogPanel, RecipesPanel, SavedPanel, LiveControl, ExpressionResult, HoleAssist, ExpressionFlow },
 	props: {
 		tick: { type: Number, default: 0 },
 		connected: { type: Boolean, default: false },

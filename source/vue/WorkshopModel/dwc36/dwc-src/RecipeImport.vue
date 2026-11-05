@@ -1,7 +1,7 @@
 <template>
 	<div class="mo-rs-import">
 		<div class="mo-part">{{ t('recipes_share_import') }}</div>
-		<choice-help :choice="ROW" :title="t('help_how')" class="mb-2" />
+		<choice-guide :choice="ROW" class="mb-2" />
 		<v-textarea v-model="text" rows="3" auto-grow dense outlined hide-details spellcheck="false" :label="t('recipes_share_import_paste')" />
 		<div class="mo-actions">
 			<v-btn small outlined @click="pick">{{ t('recipes_share_import_pick') }}</v-btn>
@@ -24,7 +24,7 @@
 // checked with validateRecipe as it is typed, added with one tap. Emits `add` with the saved entry { mode, text, name }. `full`:
 // the saved list has no room.
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceGuide from './ChoiceGuide.vue'
 import { exchangePick } from './data-exchange-ui.js'
 import { helpChoice } from './view-choices.js'
 import { parseRecipeText } from './recipe-schema.js'
@@ -33,7 +33,7 @@ import { favoriteOfRecipe } from './recipe-share.js'
 const ROW = helpChoice('recipes_share', 'import')
 
 export default {
-	components: { ChoiceHelp },
+	components: { ChoiceGuide },
 	props: { full: { type: Boolean, default: false } },
 	data() {
 		return { text: '', note: null, ROW }

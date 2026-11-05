@@ -15,7 +15,7 @@
 			<div v-if="leadText" class="wf-lead">{{ leadText }}</div>
 		</div>
 		<div class="wf-bar-right">
-				<v-menu v-if="!loading && !signedOutNow" offset-y :close-on-content-click="false" :disabled="level === 'ok'">
+				<v-menu v-if="!loading && !signedOutNow && !resolvingNow" offset-y :close-on-content-click="false" :disabled="level === 'ok'">
 					<template v-slot:activator="{ on, attrs }">
 						<v-chip small outlined :color="ui.color" class="page-health" v-bind="attrs" v-on="on">
 							{{ ts(ui.key) }}<template v-if="all.length">: {{ all.length }}</template>
@@ -30,12 +30,12 @@
 				</v-menu>
 				<slot />
 				<slot name="right" />
-				<v-chip v-if="signedOutNow" small outlined color="info" class="wf-session-chip" :title="ts('header_sign_in_help')" @click="signIn">
-					<v-icon x-small left>mdi-account-lock-outline</v-icon>{{ ts('header_sign_in') }}
-				</v-chip>
-				<v-chip v-else-if="viewerNow" small outlined :title="ts('header_read_only_help')">
-					<v-icon x-small left>mdi-eye-outline</v-icon>{{ ts('header_read_only') }}
-				</v-chip>
+				<button v-if="signedOutNow" type="button" class="wf-session-chip" :aria-label="ts('notice_bar_chip_help')" :title="ts('notice_bar_chip_help')" @click="signIn">
+					<v-icon :size="16" class="wf-session-chip-icon">mdi-account-lock-outline</v-icon><span>{{ ts('notice_bar_chip') }}</span>
+				</button>
+				<span v-else-if="viewerNow" class="wf-session-chip is-role" :title="ts('header_read_only_help')">
+					<v-icon :size="16" class="wf-session-chip-icon">mdi-eye-outline</v-icon><span>{{ ts('header_read_only') }}</span>
+				</span>
 				<slot name="startup" />
 		</div>
 	</div>
@@ -47,7 +47,7 @@
 import { healthLevel, LEVEL_UI } from './page-health.js'
 import { serviceProblemKind, SERVICE_PROBLEM_KEYS } from './service-problem.js'
 import { roleMixin } from './role-mixin.js'
-import { signedOut, workshopRole } from './workshop-auth.js'
+import { sessionState, signedOut, workshopRole } from './workshop-auth.js'
 import { askLogin, currentIdentity, whoami } from './workshop-api.js'
 import { ts } from './shared-t.js'
 import i18n from '../../i18n'
@@ -76,9 +76,12 @@ export default {
 		// signed out: the page's errors come from the missing session, not from a failure
 		signedOutNow() {
 			void this.identityTick
-			const id = currentIdentity()
-			// no token, or a token the service no longer accepts (expired / another machine)
-			return signedOut() || !!(id && id.configured && id.login_required)
+			return signedOut()
+		},
+		// the service has not said who the person is yet: nothing is colored (a red chip that turns blue a moment later is a lie), no health chip
+		resolvingNow() {
+			void this.identityTick
+			return sessionState() === 'resolving'
 		},
 		viewerNow() {
 			void this.identityTick
@@ -89,7 +92,7 @@ export default {
 			return kind ? { level: 'error', text: ts(SERVICE_PROBLEM_KEYS[kind].title) } : null
 		},
 		all() {
-			const own = this.signedOutNow ? [] : this.reasons || []
+			const own = this.signedOutNow || this.resolvingNow ? [] : this.reasons || []
 			return (this.serviceReason ? [this.serviceReason] : []).concat(own.filter(Boolean))
 		},
 		level() {

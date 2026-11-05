@@ -15,7 +15,7 @@
 				</div>
 				<error-notice :error="problem" class="mb-2" />
 				<view-tabs :choices="SNAPSHOT_SCOPES" :current="scope" :label="t('snapshot_scope')" class="mb-2" @pick="scope = $event" />
-				<choice-help :choice="scopeChoice" :title="t(scopeChoice.label)" class="mb-2" />
+				<choice-label :choice="scopeChoice" class="mb-2" />
 				<branch-picker v-if="scope === 'branch'" :model="model" :path="part" :selected="selected" :pinned="pinned" :recent="recent" :tick="tick" class="mb-2" @pick="pickPart" />
 				<div class="mo-note mb-2" :class="scopeOk ? 'ok' : 'warn'" role="status" aria-live="polite">
 					<v-icon small>{{ scopeOk ? (scopePath ? 'mdi-source-branch' : 'mdi-earth') : 'mdi-alert-outline' }}</v-icon>
@@ -30,7 +30,7 @@
 					<span class="mo-will-save-name">{{ nameState.name }}</span>
 					<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 				</div>
-				<div v-if="!canEdit" class="mo-note mb-2" role="status"><v-icon small>mdi-eye-outline</v-icon><span class="mo-note-text">{{ readOnlyLine(t('read_only')) }}</span></div>
+				<lock-reason min="technician" class="mb-2" />
 				<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 					<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 					<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>
@@ -62,11 +62,10 @@
 					<span v-if="list.length" class="mo-faint">{{ t('look_export_as', { name: exportName }) }}</span>
 				</div>
 				<div v-if="notice" class="mo-note ok mt-1" role="status"><v-icon small>mdi-check-circle-outline</v-icon><span class="mo-note-text">{{ notice }}</span></div>
-				<details class="wf-more">
-					<summary>{{ t('look_snapshots_more') }}</summary>
-					<div>{{ t('snapshot_budget', { count: budget.count, leaves: budget.leaves }) }} <span v-if="!tier.extras">{{ t('snapshot_budget_standalone') }}</span></div>
-					<div>{{ t('snapshots_help') }} <code>{{ SNAPSHOTS_FILE }}</code></div>
-				</details>
+				<help-guide :title="t('look_snapshots_more')">
+					<p>{{ t('snapshot_budget', { count: budget.count, leaves: budget.leaves }) }} <span v-if="!tier.extras">{{ t('snapshot_budget_standalone') }}</span></p>
+					<p>{{ t('snapshots_help') }} <code>{{ SNAPSHOTS_FILE }}</code></p>
+				</help-guide>
 			</v-card-text>
 		</v-card>
 		<snapshot-compare :list="list" :from="from" :to="to" :tick="tick" :max-leaves="budget.leaves" @pick-from="from = $event" @pick-to="to = $event" @select="onSelect" />
@@ -75,7 +74,6 @@
 
 <script>
 'use strict'
-import { readOnlyNote } from './read-only-note.js'
 
 // Snapshots of the model (snapshots.js): save the whole model or the branch selected in the Model section under a name, in the
 // plugin's own file through DWC's machine file API (model-host.js; the same on a standalone Duet and in SBC mode), within the budget
@@ -89,7 +87,9 @@ import i18n from '../../i18n'
 import { liveModel, readText, writeText } from './model-host.js'
 import ErrorNotice from './ErrorNotice.vue'
 import ViewTabs from './ViewTabs.vue'
-import ChoiceHelp from './ChoiceHelp.vue'
+import ChoiceLabel from './ChoiceLabel.vue'
+import HelpGuide from './HelpGuide.vue' // vue/_shared36
+import LockReason from './LockReason.vue' // vue/_shared36
 import BranchPicker from './BranchPicker.vue'
 import SnapshotCompare from './SnapshotCompare.vue'
 import { SNAPSHOTS_FILE, SNAPSHOT_EXPORT_FORMAT, SNAPSHOTS_VERSION, SNAPSHOT_NAME_RE, SNAPSHOT_SCOPES, LIVE, makeSnapshot, defaultSnapshotName, parseSnapshotsText, snapshotsText, addSnapshot, removeSnapshot, importedSnapshot } from './snapshots.js'
@@ -107,8 +107,7 @@ function storage() {
 }
 
 export default {
-	mixins: [readOnlyNote],
-	components: { ErrorNotice, ViewTabs, ChoiceHelp, BranchPicker, SnapshotCompare },
+	components: { ErrorNotice, ViewTabs, ChoiceLabel, HelpGuide, LockReason, BranchPicker, SnapshotCompare },
 	props: {
 		tick: { type: Number, default: 0 },
 		tier: { type: Object, default: () => ({ extras: false }) },

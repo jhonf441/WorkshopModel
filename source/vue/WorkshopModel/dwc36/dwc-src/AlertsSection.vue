@@ -5,15 +5,16 @@
 				<div class="mo-head">
 					<span class="mo-head-icon"><v-icon>mdi-bell-outline</v-icon></span>
 					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('alerts_title') }}</h2>
+						<div class="wf-section-head"><h2 class="mo-head-title">{{ t('alerts_title') }}</h2><help-tip :title="t('alerts_title')"><p>{{ t('alerts_help') }}</p></help-tip></div>
 						<p class="mo-head-lead">{{ t('look_alerts_lead') }}</p>
 					</div>
 					<div v-if="monitor.rules.length" class="mo-head-right"><span class="mo-pill mo-pill-dot" :class="rules.some(r => r.firing) ? 'err' : 'ok'">{{ t('look_alerts_count', { n: monitor.rules.length }) }}</span></div>
 				</div>
 				<div class="mo-note warn mb-2" role="note"><v-icon small>mdi-web</v-icon><span class="mo-note-text">{{ t('alerts_scope') }}</span></div>
-				<details class="wf-more mb-2"><summary>{{ t('help_what') }}</summary><div>{{ t('alerts_help') }}</div></details>
-				<v-switch :input-value="monitor.sound" dense color="primary" hide-details :label="t(S.sound.label)" @change="$emit('update-sound', !!$event)" />
-				<choice-help :choice="S.sound" :title="t('help_how')" class="mb-2" />
+				<div class="help-tip-row mb-2">
+					<v-switch :input-value="monitor.sound" dense color="primary" hide-details :label="t(S.sound.label)" @change="$emit('update-sound', !!$event)" />
+					<info-tip :choice="S.sound" :title="t(S.sound.label)" />
+				</div>
 				<div class="mo-part">{{ t('alerts_rules') }}</div>
 				<div v-if="!monitor.rules.length" class="mo-empty mo-empty-small"><v-icon class="mo-empty-icon">mdi-bell-plus-outline</v-icon><div class="mo-empty-text">{{ t('alerts_none') }}</div></div>
 				<table v-else class="mo-table">
@@ -35,17 +36,34 @@
 					<div class="mo-head-text"><h2 class="mo-head-title">{{ t('alerts_add_title') }}</h2></div>
 				</div>
 				<div class="mo-form">
-					<v-text-field v-model="draft.path" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.path.label)"><template v-slot:append-outer><info-tip :choice="S.path" :title="t(S.path.label)" /></template></v-text-field>
-					<v-select v-if="watched.length" :value="null" :items="watched" dense outlined hide-details class="mo-field" :label="t('alerts_pick_watched')" @change="draft.path = $event" />
+					<wf-field id="al-path" class="mo-field" :label="t(S.path.label)">
+						<template #help><info-tip :choice="S.path" :title="t(S.path.label)" /></template>
+						<v-text-field id="al-path" v-model="draft.path" dense outlined hide-details spellcheck="false" :aria-label="t(S.path.label)" />
+					</wf-field>
+					<wf-field v-if="watched.length" id="al-watched" class="mo-field" :label="t('alerts_pick_watched')">
+						<v-select id="al-watched" :value="null" :items="watched" dense outlined hide-details :aria-label="t('alerts_pick_watched')" @change="draft.path = $event" />
+					</wf-field>
 					<v-btn small outlined class="mo-field-find" :title="t('alerts_find_path_help')" @click="pickOpen = true"><v-icon small left>mdi-magnify</v-icon>{{ t('alerts_find_path') }}</v-btn>
 				</div>
 				<div class="mo-form">
-					<v-select v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details class="mo-field-type" :label="t(S.op.label)"><template v-slot:append-outer><info-tip :choice="S.op" :title="t(S.op.label)" /></template></v-select>
-					<v-text-field v-model="draft.value" dense outlined hide-details class="mo-field" spellcheck="false" :label="t(S.value.label)"><template v-slot:append-outer><info-tip :choice="S.value" :title="t(S.value.label)" /></template></v-text-field>
+					<wf-field id="al-op" class="mo-field-type" :label="t(S.op.label)">
+						<template #help><info-tip :choice="S.op" :title="t(S.op.label)" /></template>
+						<v-select id="al-op" v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details :aria-label="t(S.op.label)" />
+					</wf-field>
+					<wf-field id="al-value" class="mo-field" :label="t(S.value.label)">
+						<template #help><info-tip :choice="S.value" :title="t(S.value.label)" /></template>
+						<v-text-field id="al-value" v-model="draft.value" dense outlined hide-details spellcheck="false" :aria-label="t(S.value.label)" />
+					</wf-field>
 				</div>
 				<div class="mo-form">
-					<v-text-field v-if="numeric" v-model="draft.hysteresis" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.hysteresis.label)"><template v-slot:append-outer><info-tip :choice="S.hysteresis" :title="t(S.hysteresis.label)" /></template></v-text-field>
-					<v-text-field v-model="draft.cooldown" type="number" min="0" dense outlined hide-details class="mo-field-type" :label="t(S.cooldown.label)"><template v-slot:append-outer><info-tip :choice="S.cooldown" :title="t(S.cooldown.label)" /></template></v-text-field>
+					<wf-field v-if="numeric" id="al-hysteresis" class="mo-field-type" :label="t(S.hysteresis.label)">
+						<template #help><info-tip :choice="S.hysteresis" :title="t(S.hysteresis.label)" /></template>
+						<v-text-field id="al-hysteresis" v-model="draft.hysteresis" type="number" min="0" dense outlined hide-details :aria-label="t(S.hysteresis.label)" />
+					</wf-field>
+					<wf-field id="al-cooldown" class="mo-field-type" :label="t(S.cooldown.label)">
+						<template #help><info-tip :choice="S.cooldown" :title="t(S.cooldown.label)" /></template>
+						<v-text-field id="al-cooldown" v-model="draft.cooldown" type="number" min="0" dense outlined hide-details :aria-label="t(S.cooldown.label)" />
+					</wf-field>
 				</div>
 				<div v-if="invalid" class="mo-error" role="alert">{{ t('alerts_invalid') }}</div>
 				<v-dialog v-model="pickOpen" max-width="760" scrollable content-class="workshop-theme mo-page">
@@ -86,14 +104,15 @@
 // page owns the monitor and evaluates it every sample, so the alerts keep running while another section is open; this section only
 // edits the rules. They work only while the page is open: nothing on the Pi, no notice to a phone.
 import i18n from '../../i18n'
-import ChoiceHelp from './ChoiceHelp.vue'
 import InfoTip from './InfoTip.vue'
+import HelpTip from './HelpTip.vue' // vue/_shared36
+import WfField from './WfField.vue' // vue/_shared36
 import PathPicker from './PathPicker.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp } from './alert-rules.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
 export default {
-	components: { ChoiceHelp, InfoTip, PathPicker },
+	components: { InfoTip, HelpTip, WfField, PathPicker },
 	props: {
 		monitor: { type: Object, required: true },
 		watched: { type: Array, default: () => [] },

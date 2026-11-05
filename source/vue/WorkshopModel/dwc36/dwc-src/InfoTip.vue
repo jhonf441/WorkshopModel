@@ -7,7 +7,7 @@
 
 // The "?" of one field of this plugin: the family button (HelpTip.vue, vue/_shared36) fed with the four lines of a choice object (what it is, what it
 // is for, what you lose without it, how to use it; DESIGN.md sections 7 and 7b). It replaces a fold of text under every input. The same choice
-// objects as choice-help.vue, so the texts and their tests are the same.
+// objects as ChoiceGuide.vue and ChoiceLabel.vue, so the texts and their tests are the same.
 import i18n from '../../i18n'
 import HelpTip from './HelpTip.vue' // vue/_shared36
 

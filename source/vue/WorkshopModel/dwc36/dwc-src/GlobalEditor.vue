@@ -2,7 +2,7 @@
 	<div class="mo-sub mo-editor">
 		<div class="mo-part">{{ exists ? t('edit_title', { name }) : t('globals_create') }}</div>
 		<div v-if="!globalsOk" class="mo-faint">{{ t('globals_off_short') }}</div>
-		<div v-else-if="!canEdit" class="mo-faint">{{ readOnlyLine(t('read_only')) }}</div>
+		<lock-reason v-else-if="!canEdit" min="technician" />
 		<template v-else>
 			<div class="mo-form">
 				<v-text-field v-if="!exists" :value="newName" dense outlined hide-details class="mo-field" :label="t('create_name')" :placeholder="t('create_name_hint')" @input="typeName($event)" />
@@ -24,7 +24,6 @@
 
 <script>
 'use strict'
-import { readOnlyNote } from './read-only-note.js'
 
 // Typed editor of ONE global (globals-typing.js): the person picks the type and writes the value, the plugin writes the RRF
 // literal and the command, CommandPreview shows and sends it. With exists=false it creates a new global (name field). The
@@ -32,13 +31,13 @@ import { readOnlyNote } from './read-only-note.js'
 // never red (globals-quick.js editFeedback): a global without a value gets a calm hint and the Send button simply waits.
 import i18n from '../../i18n'
 import CommandPreview from './CommandPreview.vue'
+import LockReason from './LockReason.vue' // vue/_shared36
 import { GLOBAL_TYPES, editCommand, editText, rrfLiteral, typeOfValue } from './globals-typing.js'
 import { toPlain } from './value-format.js'
 import { editFeedback, hasNoValue } from './globals-quick.js'
 
 export default {
-	mixins: [readOnlyNote],
-	components: { CommandPreview },
+	components: { CommandPreview, LockReason },
 	props: {
 		name: { type: String, default: '' },
 		exists: { type: Boolean, default: true },
