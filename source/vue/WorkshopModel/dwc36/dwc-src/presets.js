@@ -8,7 +8,7 @@ import { toPlain } from './value-format.js'
 import { rrfLiteral, globalCommand } from './globals-typing.js'
 import { isMap } from './model-path.js'
 
-export const PRESETS_FILE = '0:/sys/workshop-model-presets.json'
+export const PRESETS_FILE = '0:/sys/workshop/model/presets.json'
 export const PRESETS_FORMAT = 'workshop-model-presets'
 export const PRESETS_VERSION = 1
 export const PRESET_NAME_RE = /^\S[^\r\n]{0,39}$/

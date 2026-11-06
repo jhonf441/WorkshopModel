@@ -12,7 +12,7 @@ import { formatValue } from './value-format.js'
 import { getAtPath } from './model-path.js'
 import { helpChoice } from './view-choices.js'
 
-export const SNAPSHOTS_FILE = '0:/sys/workshop-model-snapshots.json'
+export const SNAPSHOTS_FILE = '0:/sys/workshop/model/snapshots.json'
 export const SNAPSHOTS_FORMAT = 'workshop-model-snapshots'
 export const SNAPSHOT_EXPORT_FORMAT = 'workshop-model-snapshot'
 export const SNAPSHOTS_VERSION = 1

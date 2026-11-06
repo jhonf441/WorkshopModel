@@ -11,7 +11,7 @@
 import { compareVersions, parseVersion } from './rrf-version.js'
 
 export const SBC_MIN_DSF = '3.4'
-export const WATCH_FILE = '0:/sys/workshop-model-watch.json'
+export const WATCH_FILE = '0:/sys/workshop/model/watch.json'
 export const COMPANION_ID = 'WorkshopModelAgent'
 
 // -> { sbc, dsfVersion, extras, reason, minimum, companion: { installed, running } }

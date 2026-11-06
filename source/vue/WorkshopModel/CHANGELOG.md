@@ -1,5 +1,21 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.34 -- 2026-11-06
+
+- Side bar and session: the bar follows the session, the real icon with a small lock, the needed role under the name; a page follows a sign-in made in another tab
+
+## 1.7.33 -- 2026-11-06
+
+- Roles y permisos: una razon por grupo, rechazos nunca en rojo, controles bloqueados visibles, secciones con candado, permisos con allow/deny
+
+## 1.7.32 -- 2026-11-06
+
+- Macros of sys/workshop/macros are now in folders (axis, zcal, focus, work, guard, laser, probe, system); install together with the service and the SD migration
+
+## 1.7.31 -- 2026-11-06
+
+- Presets, snapshots and watch history now live in 0:/sys/workshop/model/ instead of loose files in 0:/sys
+
 ## 1.7.30 -- 2026-11-05
 
 - QA batch: alert form validates per field, Changes view kept alive, search and tester

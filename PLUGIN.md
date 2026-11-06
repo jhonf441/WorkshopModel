@@ -1,5 +1,11 @@
 # WorkshopModel (Model Explorer)
 
+<!-- notice:start -->
+> **Read before installing.** This plugin runs with real permissions on your machine. Read [SECURITY.md](SECURITY.md) and the section **Permissions and what it changes** below: they say what it can do, which files it writes, and what it sends outside your network (nothing, unless you turn a feature on).
+
+> **The Workshop users and roles do not protect DWC itself.** Anyone who can open DWC on your network can send G-code, move the machine, edit `config.g` and upload files, whatever the Workshop roles say: Duet has no roles of its own. Set a DWC password (`M551`) and keep the machine on a network you trust.
+<!-- notice:end -->
+
 
 
 Page `/Plugins/Model` ("Model Explorer"). The object model of the board, live, seen in the way that suits the question: readable cards by topic, a flat sortable list, columns like a file browser, one level at a time, only what changed, or the technical tree. Around it: the global variables with a typed editor and quick edits, a watch list drawn by the kind of each value, snapshots of the model to compare two moments, an expression tester, presets, the persistence of globals across reboots and a usage finder over your macros. It needs no WorkshopService and no Raspberry Pi: everything goes through the machine API of DWC itself (`rr_` on a standalone Duet, DSF with a Pi), so it works on a standalone Duet. With a Pi in SBC mode it turns a few extras on by itself.
@@ -44,10 +50,10 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 
 ### 3.4 Watch
 - What: pin any path and see it drawn by its kind: a number as a line with min and max (and, if you ask, a mark on every sudden jump), a text or a state word (`state.status`, a mode) as coloured bands as long as each value lasted with a legend, a boolean as on and off, an array or an object as the count of what changed inside. Every row opens its changes: time, before, after and how long the value before lasted, with the changes inside an array or an object.
-- Watch out: the samples live in this browser; with a Pi in SBC mode they are also kept in `0:/sys/workshop-model-watch.json` (3.10).
+- Watch out: the samples live in this browser; with a Pi in SBC mode they are also kept in `0:/sys/workshop/model/watch.json` (3.10).
 
 ### 3.5 Presets and persistence
-- Presets: save the current set of globals under a name, compare it with the machine, apply it, export and import JSON (`0:/sys/workshop-model-presets.json`).
+- Presets: save the current set of globals under a name, compare it with the machine, apply it, export and import JSON (`0:/sys/workshop/model/presets.json`).
 - Persistence: mark the globals to keep; the plugin writes ONE generated macro, `0:/sys/workshop-globals.g`, and you add `M98 P"0:/sys/workshop-globals.g"` to `config.g` (the start-up card copies the line; the plugin never edits `config.g`). The panel opens by itself only when a saved value is not the live one or `config.g` does not call the macro.
 
 ### 3.6 Usage finder
@@ -57,7 +63,7 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 ### 3.7 Snapshots
 
 ![Snapshots: the name is shown before it is saved](https://raw.githubusercontent.com/jhonf441/WorkshopModel/main/img/05-snapshots-default-name.png)
-- What: save the whole model or the selected branch under a name (`0:/sys/workshop-model-snapshots.json`), compare two snapshots or one with the model now (changed, added, removed), export one as a JSON file and import one back.
+- What: save the whole model or the selected branch under a name (`0:/sys/workshop/model/snapshots.json`), compare two snapshots or one with the model now (changed, added, removed), export one as a JSON file and import one back.
 - Watch out: on a standalone Duet the plugin keeps 4 snapshots of up to 4000 values (the file goes through the board); in SBC mode 20 of up to 10000. The oldest goes when a new one does not fit.
 
 ### 3.8 Expression builder (and tester)
@@ -74,7 +80,7 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 - Rows: the connection, the firmware with global variables, the include line of the persistence macro (when you keep globals), the SBC mode extras (done from DWC, no plugin on the Pi). Every row says what it is, what it is for, what happens without it and how to do it.
 
 ### 3.10 With a Raspberry Pi (SBC mode)
-- What turns on by itself (DSF 3.4 or newer, plugin support): the watch history and the memory of the usage finder kept in `0:/sys/workshop-model-watch.json`, the wide budget of the usage finder and of the snapshots, and the process state of the plugins of the Pi in the Plugins card. The header says "SBC mode, extras on" (or off) or "Standalone".
+- What turns on by itself (DSF 3.4 or newer, plugin support): the watch history and the memory of the usage finder kept in `0:/sys/workshop/model/watch.json`, the wide budget of the usage finder and of the snapshots, and the process state of the plugins of the Pi in the Plugins card. The header says "SBC mode, extras on" (or off) or "Standalone".
 
 ### 3.11 Machine report
 - What: the Report section builds a markdown text, in English, ready to paste into the Duet forum or a GitHub issue: firmware and boards, DWC and DSF versions, SBC mode yes or no, plugins with their versions, sensors, drivers, network state, heaters, volumes and the active warnings (a halted machine, a heater in fault, a volume not mounted, little free memory, a hot processor, a firmware older than 3.4). Copy it to the clipboard or download it as a `.md` file.
@@ -95,7 +101,7 @@ The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, 
 
 ## 4. Settings
 
-No settings page. In this browser: the chosen view, the density, the favourites, the folded groups of globals, the scope of the usage finder, the watch list and the alert rules. On the SD card: `0:/sys/workshop-globals.g` (persistence macro), `0:/sys/workshop-model-presets.json` (presets), `0:/sys/workshop-model-snapshots.json` (snapshots) and, in SBC mode, `0:/sys/workshop-model-watch.json`. The include line for `config.g` is yours to add.
+No settings page. In this browser: the chosen view, the density, the favourites, the folded groups of globals, the scope of the usage finder, the watch list and the alert rules. On the SD card: `0:/sys/workshop-globals.g` (persistence macro), `0:/sys/workshop/model/presets.json` (presets), `0:/sys/workshop/model/snapshots.json` (snapshots) and, in SBC mode, `0:/sys/workshop/model/watch.json`. The include line for `config.g` is yours to add.
 
 ## 5. Roles
 
@@ -124,13 +130,12 @@ Risk: **Medium (it changes global variables that your macros read, and sends the
 
 **Files it writes:**
 - the persistence macro `0:/sys/workshop-globals.g` for the globals you mark as persistent (generated by the plugin; you include it from `config.g`)
-- its presets in `0:/sys/workshop-model-presets.json`, its snapshots of the model in `0:/sys/workshop-model-snapshots.json` and, in SBC mode, the watch history with the memory of the usage finder in `0:/sys/workshop-model-watch.json`
+- its presets in `0:/sys/workshop/model/presets.json`, its snapshots of the model in `0:/sys/workshop/model/snapshots.json` and, in SBC mode, the watch history with the memory of the usage finder in `0:/sys/workshop/model/watch.json`
 
 **Safety notes:**
 - It needs no backend and no DSF permissions: it talks to the board through the file and G-code API of DWC itself (`rr_` on a standalone Duet, DSF with a Raspberry Pi).
 - The functions that need a Raspberry Pi (history kept on the Pi, background usage index, persistence applied at boot) turn on by themselves in SBC mode and are hidden on a standalone Duet.
 - RRF cannot delete a global until a restart: the plugin says so instead of offering a delete button.
-- The live preview never queues calls (one at a time), keeps the floor and the run limit of the tier and stops by itself.
 - The expression tester only sends `echo` or `M409` through the command preview, one line, and refuses an expression that starts with `>` (a write to a file).
 
 Uninstalling removes the plugin folder; your data in `0:/sys/workshop/` and `/opt/dsf/conf/workshop-*.json` stays.
