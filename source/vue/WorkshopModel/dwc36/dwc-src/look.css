@@ -21,6 +21,9 @@
 .workshop-theme.mo-page .mo-pill-dot.ok::before { background: var(--wf-ok); }
 .workshop-theme.mo-page .mo-pill-dot.warn::before { background: var(--wf-warn); }
 .workshop-theme.mo-page .mo-pill-dot.info::before { background: var(--wf-info); }
+/* the class `info` is also Vuetify's solid blue color (.v-application .info, !important): it painted the whole pill blue and the blue dot vanished into it, so
+   the "watched" pill looked like a blue block next to the others. Same neutralization as design/family.css gives .wf-state.info. */
+.workshop-theme.mo-page .mo-pill.info { background-color: transparent !important; border-color: var(--mo-line2) !important; }
 .workshop-theme.mo-page .mo-pill-dot.err::before { background: var(--wf-err); }
 .workshop-theme.mo-page .mo-pill-quiet { opacity: 0.6; }
 .workshop-theme.mo-page .mo-note { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0; padding: 8px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); font-size: 13px; line-height: 1.45; }

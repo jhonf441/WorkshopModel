@@ -98,10 +98,10 @@
 				<span class="mo-rs-state" role="status" :class="problems.length ? 'mo-result-bad' : ''"><span class="wf-state" :class="problems.length ? 'err' : 'ok'"></span>{{ problems.length ? t('recipes_share_problems') : t('recipes_share_ready') }}</span>
 				<v-spacer />
 				<v-btn small text @click="$emit('close')">{{ t('recipes_share_close') }}</v-btn>
-				<v-btn v-if="fileLink" small outlined :href="fileLink" target="_blank" rel="noopener">{{ t('recipes_share_open_file') }}</v-btn>
-				<v-btn v-if="issue" small outlined :href="issue" target="_blank" rel="noopener">{{ t('recipes_share_open_issue') }}</v-btn>
-				<v-btn small outlined :disabled="problems.length > 0" @click="download">{{ t('recipes_share_download', { name: fileName }) }}</v-btn>
-				<v-btn small color="primary" depressed :disabled="problems.length > 0" @click="copy">{{ t('recipes_share_copy') }}</v-btn>
+				<v-btn v-if="fileLink" small outlined :href="fileLink" target="_blank" rel="noopener"><v-icon small left>mdi-open-in-new</v-icon>{{ t('recipes_share_open_file') }}</v-btn>
+				<v-btn v-if="issue" small outlined :href="issue" target="_blank" rel="noopener"><v-icon small left>mdi-open-in-new</v-icon>{{ t('recipes_share_open_issue') }}</v-btn>
+				<v-btn small outlined :disabled="problems.length > 0" @click="download"><v-icon small left>mdi-download</v-icon>{{ t('recipes_share_download', { name: fileName }) }}</v-btn>
+				<v-btn small color="primary" depressed :disabled="problems.length > 0" @click="copy"><v-icon small left>mdi-content-copy</v-icon>{{ t('recipes_share_copy') }}</v-btn>
 			</v-card-actions>
 		</v-card>
 	</v-dialog>

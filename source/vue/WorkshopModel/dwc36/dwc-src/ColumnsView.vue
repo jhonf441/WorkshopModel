@@ -10,7 +10,7 @@
 			</nav>
 			<div v-if="current" class="mo-columns-actions">
 				<favorite-star :path="current" :pinned="pinned" @pin="onPin" @unpin="onUnpin" />
-				<v-btn x-small outlined :title="t('copy_path')" @click="copyPath">{{ copied ? t('copied') : t('copy') }}</v-btn>
+				<v-btn x-small outlined :title="t('copy_path')" @click="copyPath"><v-icon x-small left>{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>{{ copied ? t('copied') : t('copy') }}</v-btn>
 				<v-btn x-small outlined @click="toggleWatch"><v-icon x-small left>{{ isWatched ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>{{ isWatched ? t('watch_remove') : t('watch_add') }}</v-btn>
 				<v-btn x-small text :title="t('topic_open_row', { path: current })" @click="$emit('open', current)">{{ t('open_in_tree') }}</v-btn>
 			</div>

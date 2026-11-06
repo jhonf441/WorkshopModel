@@ -1,5 +1,9 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.30 -- 2026-11-05
+
+- QA batch: alert form validates per field, Changes view kept alive, search and tester
+
 ## 1.7.29 -- 2026-11-05
 
 - Session state, refusals and notices unified; errors kept as objects; 403 names the action

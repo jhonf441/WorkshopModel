@@ -4,8 +4,8 @@
 		<choice-guide :choice="ROW" class="mb-2" />
 		<v-textarea v-model="text" rows="3" auto-grow dense outlined hide-details spellcheck="false" :label="t('recipes_share_import_paste')" />
 		<div class="mo-actions">
-			<v-btn small outlined @click="pick">{{ t('recipes_share_import_pick') }}</v-btn>
-			<v-btn small outlined :disabled="!parsed.recipe || full" @click="add">{{ t('recipes_share_import_add') }}</v-btn>
+			<v-btn small outlined @click="pick"><v-icon small left>mdi-folder-open-outline</v-icon>{{ t('recipes_share_import_pick') }}</v-btn>
+			<v-btn small outlined :disabled="!parsed.recipe || full" @click="add"><v-icon small left>mdi-plus</v-icon>{{ t('recipes_share_import_add') }}</v-btn>
 		</div>
 		<div v-if="parsed.recipe" class="mo-faint" role="status">{{ t('recipes_share_import_ok', { title: parsed.recipe.title.en, kind: t('recipes_share_kind_' + parsed.recipe.kind) }) }}</div>
 		<div v-else-if="text.trim()" class="mo-rs-problems" role="alert">

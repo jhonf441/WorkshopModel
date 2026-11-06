@@ -13,9 +13,9 @@
 				<span v-if="c.sample" class="mo-rs-chip">{{ t('recipes_share_chip_sample') }}</span>
 				<span v-if="c.author" class="mo-faint">{{ t('recipes_share_by', { author: c.author }) }}</span>
 				<span v-if="c.support.state === 'newer'" class="mo-faint">{{ t('recipes_share_needs', { since: c.since }) }}</span>
-				<v-btn x-small text @click="$emit('load', { id: c.id, mode: c.mode, code: c.code })">{{ t('recipe_load') }}</v-btn>
-				<v-btn v-if="c.holes.length" x-small text @click="$emit('load', { id: c.id, mode: c.mode, code: c.example })">{{ t('recipes_share_load_example') }}</v-btn>
-				<v-btn x-small text @click="share(c)">{{ t('recipes_share_share') }}</v-btn>
+				<v-btn x-small text @click="$emit('load', { id: c.id, mode: c.mode, code: c.code })"><v-icon x-small left>mdi-download</v-icon>{{ t('recipe_load') }}</v-btn>
+				<v-btn v-if="c.holes.length" x-small text @click="$emit('load', { id: c.id, mode: c.mode, code: c.example })"><v-icon x-small left>mdi-file-document-outline</v-icon>{{ t('recipes_share_load_example') }}</v-btn>
+				<v-btn x-small text @click="share(c)"><v-icon x-small left>mdi-share-variant</v-icon>{{ t('recipes_share_share') }}</v-btn>
 			</div>
 			<div>{{ c.description }}</div>
 			<code class="mo-key mo-xb-code">{{ c.code }}</code>

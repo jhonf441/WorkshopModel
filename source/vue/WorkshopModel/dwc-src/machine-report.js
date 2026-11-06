@@ -29,12 +29,30 @@ function bytesText(n) {
 	return num(n / 1024, 1) + ' KB'
 }
 
+// A driver as the model has it: DWC gives { board, driver } (0 and 1: "0.1"), older data a text "0.1". Never "[object Object]".
+export function driverText(d) {
+	return d && typeof d === 'object' && 'board' in d ? d.board + '.' + d.driver : String(d)
+}
+
+// A catalog name (firmware, board, plugin: what the firmware or the plugin calls itself): only the whitespace is tidied. The scrub is for what a person typed:
+// a machine called "Duet" must not turn "RepRapFirmware for Duet 3 MB6HC" or "DuetPiManagementPlugin" into "[redacted] 3 MB6HC".
+const catalog = v => String(v === null || v === undefined ? '' : v).replace(/\s+/g, ' ').trim()
+
+// The time of the report as the person's clock shows it, with its offset: "2026-11-02 13:02:14 -05:00". The file name has the same instant in local time
+// (data-exchange.js exchangeStamp), so the name and the body no longer disagree (13:02:14 in one, 18:01:45Z in the other).
+export function localStamp(d) {
+	const two = n => (n < 10 ? '0' : '') + n
+	const off = -d.getTimezoneOffset()
+	const abs = Math.abs(off)
+	return d.getFullYear() + '-' + two(d.getMonth() + 1) + '-' + two(d.getDate()) + ' ' + two(d.getHours()) + ':' + two(d.getMinutes()) + ':' + two(d.getSeconds()) + ' ' + (off < 0 ? '-' : '+') + two(Math.floor(abs / 60)) + ':' + two(abs % 60)
+}
+
 // the context of a build: the model, what to include, the secrets to scrub and the free-text helper
 function context(model, opts) {
 	const o = opts || {}
 	const include = cleanIncludes(o.include)
 	const secrets = secretsOf(model)
-	return { model, include, secrets, o, safe: v => scrub(v, secrets, include), ver: v => scrub(v, secrets, include, true) }
+	return { model, include, secrets, o, safe: v => scrub(v, secrets, include), ver: v => scrub(v, secrets, include, true), cat: catalog }
 }
 
 function firmwareSection(c) {
@@ -42,7 +60,8 @@ function firmwareSection(c) {
 	const rows = boards.map(b => {
 		const v = b.value
 		const main = b.key === '0' ? ' (main)' : (has(v.canAddress) ? ' (CAN ' + v.canAddress + ')' : '')
-		return [c.safe(v.shortName || v.name || 'unknown') + main, c.safe(v.firmwareName || '-'), c.ver(v.firmwareVersion || '-'), c.ver(v.firmwareDate || '-'), num(v.vIn && v.vIn.current, 1), bytesText(v.freeRam)]
+		// MO-9c: a version the board does not report (an expansion board on CAN) is "n/a", not a dash that looks like a broken cell
+		return [c.cat(v.shortName || v.name || 'unknown') + main, c.cat(v.firmwareName || '-'), c.ver(v.firmwareVersion || 'n/a'), c.ver(v.firmwareDate || '-'), num(v.vIn && v.vIn.current, 1), bytesText(v.freeRam)]
 	})
 	const out = ['## Firmware and boards', ''].concat(table(['Board', 'Firmware', 'Version', 'Date', 'Vin (V)', 'Free RAM'], rows))
 	if (c.include.serial) boards.forEach(b => { if (has(b.value.uniqueId)) out.push('- Board ' + b.key + ' unique ID: ' + b.value.uniqueId) })
@@ -52,7 +71,7 @@ function firmwareSection(c) {
 function softwareSection(c) {
 	const dsf = getAtPath(c.model, 'sbc.dsf')
 	const sbc = !!getAtPath(c.model, 'sbc')
-	const dwc = has(c.o.dwcVersion) ? c.ver(c.o.dwcVersion) : 'not detected'
+	const dwc = has(c.o.dwcVersion) ? c.ver(c.o.dwcVersion) : 'not stated'
 	const out = ['## Software', '', '- DWC: ' + dwc, '- SBC mode: ' + (sbc ? 'yes' : 'no')]
 	if (sbc) out.push('- DSF: ' + c.ver((dsf && dsf.version) || getAtPath(c.model, 'state.dsfVersion') || 'unknown'))
 	const status = getAtPath(c.model, 'state.status')
@@ -63,7 +82,7 @@ function softwareSection(c) {
 }
 
 function pluginsSection(c) {
-	const rows = list(c.model, 'plugins').map(p => [c.safe(p.key), c.ver(p.value.version || '-'), has(p.value.dwcVersion) ? c.ver(p.value.dwcVersion) : '-', p.value.sbcExecutable ? (p.value.pid > 0 ? 'running' : 'stopped') : 'browser only'])
+	const rows = list(c.model, 'plugins').map(p => [c.cat(p.key), c.ver(p.value.version || '-'), has(p.value.dwcVersion) ? c.ver(p.value.dwcVersion) : '-', p.value.sbcExecutable ? (p.value.pid > 0 ? 'running' : 'stopped') : 'browser only'])
 	return ['## Plugins', ''].concat(table(['Plugin', 'Version', 'Needs DWC', 'Process'], rows))
 }
 
@@ -82,15 +101,15 @@ function heatersSection(c) {
 }
 
 function driversSection(c) {
-	const axes = list(c.model, 'move.axes').map(a => ['axis ' + c.safe(a.value.letter || a.key), (a.value.drivers || []).map(d => c.safe(d)).join(', ') || '-', a.value.homed === true ? 'homed' : 'not homed', num(a.value.min, 1) + ' to ' + num(a.value.max, 1)])
-	const ext = list(c.model, 'move.extruders').map(e => ['extruder ' + e.key, c.safe(has(e.value.driver) ? e.value.driver : '-'), '-', '-'])
+	const axes = list(c.model, 'move.axes').map(a => ['axis ' + c.safe(a.value.letter || a.key), (a.value.drivers || []).map(d => c.cat(driverText(d))).join(', ') || '-', a.value.homed === true ? 'homed' : 'not homed', num(a.value.min, 1) + ' to ' + num(a.value.max, 1)])
+	const ext = list(c.model, 'move.extruders').map(e => ['extruder ' + e.key, c.cat(has(e.value.driver) ? driverText(e.value.driver) : '-'), '-', '-'])
 	return ['## Drivers', ''].concat(table(['Motor', 'Driver', 'State', 'Range (mm)'], axes.concat(ext)))
 }
 
 function interfaceRows(c) {
 	return list(c.model, 'network.interfaces').map(i => {
 		const v = i.value
-		return [i.key, c.safe(v.type || '-'), c.safe(v.state || '-'), has(v.speed) ? c.safe(v.speed) : '-', has(v.signal) ? v.signal + ' dBm' : '-', has(v.firmwareVersion) ? c.ver(v.firmwareVersion) : '-']
+		return [i.key, c.safe(v.type || '-'), c.safe(v.state || '-'), typeof v.speed === 'number' && v.speed > 0 ? v.speed + ' Mbit/s' : 'n/a', has(v.signal) ? v.signal + ' dBm' : '-', has(v.firmwareVersion) ? c.ver(v.firmwareVersion) : '-']
 	})
 }
 
@@ -136,7 +155,7 @@ function warningsSection(c) {
 export function buildReport(model, opts) {
 	const c = context(model, opts)
 	const at = c.o.now instanceof Date ? c.o.now : new Date()
-	const head = ['# Machine report', '', 'Generated ' + at.toISOString() + ' by Model Explorer. Private data (addresses, names, serial numbers, file paths) is left out unless ticked.', '']
+	const head = ['# Machine report', '', 'Generated ' + localStamp(at) + ' by Model Explorer. Private data (addresses, names, serial numbers, file paths) is left out unless ticked.', '']
 	const parts = [head, firmwareSection(c), softwareSection(c), pluginsSection(c), sensorsSection(c), driversSection(c), networkSection(c), heatersSection(c), volumesSection(c), pathsSection(c), warningsSection(c)]
 	return parts.reduce((a, p) => a.concat(p), []).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n'
 }

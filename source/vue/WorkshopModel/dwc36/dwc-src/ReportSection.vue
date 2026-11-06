@@ -20,7 +20,8 @@
 				<info-tip :choice="REPORT_DWC_SETTING" :title="t(REPORT_DWC_SETTING.label)" />
 			</div>
 			<div class="mo-actions">
-				<v-btn small depressed color="primary" @click="build">{{ text ? t('report_rebuild') : t('report_build') }}</v-btn>
+				<v-btn small depressed color="primary" :disabled="dwc === null" @click="build">{{ text ? t('report_rebuild') : t('report_build') }}</v-btn>
+				<span v-if="dwc === null" class="text-caption mo-faint">{{ t('report_dwc_required') }}</span>
 				<v-btn small outlined :disabled="!text" @click="copy">{{ t('report_copy') }}</v-btn>
 				<v-btn small outlined :disabled="!text" @click="download">{{ t('report_download') }}</v-btn>
 			</div>
@@ -57,7 +58,7 @@ export default {
 	},
 	data() {
 		const detected = typeof window === 'undefined' ? '' : detectDwcVersion(window)
-		return { include: cleanIncludes(), dwc: detected, detected, text: '', stale: false, note: null, REPORT_INCLUDES, REPORT_DWC_SETTING }
+		return { include: cleanIncludes(), dwc: detected || null, detected, text: '', stale: false, note: null, REPORT_INCLUDES, REPORT_DWC_SETTING }
 	},
 	computed: {
 		// the versions to choose from: what the page detected first when it is new, and "do not state it"

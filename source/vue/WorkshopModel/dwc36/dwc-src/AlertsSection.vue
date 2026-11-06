@@ -36,9 +36,9 @@
 					<div class="mo-head-text"><h2 class="mo-head-title">{{ t('alerts_add_title') }}</h2></div>
 				</div>
 				<div class="mo-form">
-					<wf-field id="al-path" class="mo-field" :label="t(S.path.label)">
+					<wf-field id="al-path" class="mo-field" :label="t(S.path.label)" :message="touched.path && problem === 'path' ? t('alerts_problem_path') : ''" level="error">
 						<template #help><info-tip :choice="S.path" :title="t(S.path.label)" /></template>
-						<v-text-field id="al-path" v-model="draft.path" dense outlined hide-details spellcheck="false" :aria-label="t(S.path.label)" />
+						<v-text-field id="al-path" v-model="draft.path" dense outlined hide-details spellcheck="false" :aria-label="t(S.path.label)" :error="touched.path && problem === 'path'" @blur="touched.path = true" />
 					</wf-field>
 					<wf-field v-if="watched.length" id="al-watched" class="mo-field" :label="t('alerts_pick_watched')">
 						<v-select id="al-watched" :value="null" :items="watched" dense outlined hide-details :aria-label="t('alerts_pick_watched')" @change="draft.path = $event" />
@@ -50,9 +50,9 @@
 						<template #help><info-tip :choice="S.op" :title="t(S.op.label)" /></template>
 						<v-select id="al-op" v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details :aria-label="t(S.op.label)" />
 					</wf-field>
-					<wf-field id="al-value" class="mo-field" :label="t(S.value.label)">
-						<template #help><info-tip :choice="S.value" :title="t(S.value.label)" /></template>
-						<v-text-field id="al-value" v-model="draft.value" dense outlined hide-details spellcheck="false" :aria-label="t(S.value.label)" />
+					<wf-field id="al-value" class="mo-field" :label="valueLabel" :message="touched.value && (problem === 'number' || problem === 'text') ? t('alerts_problem_' + problem) : ''" level="error">
+						<template #help><info-tip :choice="S.value" :title="valueLabel" /></template>
+						<v-text-field id="al-value" v-model="draft.value" :type="numeric ? 'number' : 'text'" :step="numeric ? 'any' : undefined" :suffix="unitText" dense outlined hide-details spellcheck="false" :aria-label="valueLabel" :error="touched.value && (problem === 'number' || problem === 'text')" @blur="touched.value = true" />
 					</wf-field>
 				</div>
 				<div class="mo-form">
@@ -65,14 +65,18 @@
 						<v-text-field id="al-cooldown" v-model="draft.cooldown" type="number" min="0" dense outlined hide-details :aria-label="t(S.cooldown.label)" />
 					</wf-field>
 				</div>
-				<div v-if="invalid" class="mo-error" role="alert">{{ t('alerts_invalid') }}</div>
 				<v-dialog v-model="pickOpen" max-width="760" scrollable content-class="workshop-theme mo-page">
 					<v-card class="workshop-theme mo-page">
 						<v-card-title class="d-flex align-center">{{ t('alerts_find_path_title') }}<v-spacer /><v-btn icon small :aria-label="t('close')" :title="t('close')" @click="pickOpen = false"><v-icon>mdi-close</v-icon></v-btn></v-card-title>
 						<v-card-text><path-picker :tick="tick" :wanted="numeric ? 'number' : ''" :hole-name="t(S.path.label)" @insert="usePath" /></v-card-text>
 					</v-card>
 				</v-dialog>
-				<v-btn small depressed color="primary" @click="add">{{ t('alerts_add') }}</v-btn>
+				<div class="d-flex align-center flex-wrap" style="gap:8px">
+					<v-btn small depressed color="primary" :disabled="!!problem" @click="add">{{ t('alerts_add') }}</v-btn>
+					<!-- the reason the button is grey is written next to it (a disabled button shows no tooltip on a touch screen) -->
+					<span v-if="problem" class="text-caption mo-faint">{{ t('alerts_problem_' + problem) }}</span>
+				</div>
+				<div v-if="added" class="mo-note ok mt-2" role="status"><v-icon small>mdi-check-circle-outline</v-icon><span class="mo-note-text">{{ added }}</span></div>
 			</v-card-text>
 		</v-card>
 		<v-card class="mb-3">
@@ -108,7 +112,8 @@ import InfoTip from './InfoTip.vue'
 import HelpTip from './HelpTip.vue' // vue/_shared36
 import WfField from './WfField.vue' // vue/_shared36
 import PathPicker from './PathPicker.vue'
-import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp } from './alert-rules.js'
+import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp, ruleProblem } from './alert-rules.js'
+import { describePath } from './path-dictionary.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
 export default {
@@ -119,11 +124,23 @@ export default {
 		tick: { type: Number, default: 0 } // the live model of the path finder
 	},
 	data() {
-		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, invalid: false, S: ALERT_SETTINGS, pickOpen: false }
+		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, pickOpen: false }
 	},
 	computed: {
 		numeric() {
 			return isNumericOp(this.draft.op)
+		},
+		// what is missing in the form now (alert-rules.js ruleProblem): the Add button is off while there is something
+		problem() {
+			return ruleProblem(this.draft)
+		},
+		// the field of the limit says what it is for each operator, and a number is a number input with the unit of the path when the dictionary knows it
+		valueLabel() {
+			return this.t('alerts_value_' + this.draft.op)
+		},
+		unitText() {
+			const d = this.numeric ? describePath(String(this.draft.path || '').trim()) : null
+			return d && d.unitKey && d.unitKey !== 'dict_unit_bool' ? this.t(d.unitKey) : undefined
 		},
 		opItems() {
 			return OPS.map(op => ({ title: this.t('alerts_op_' + op), value: op }))
@@ -153,10 +170,12 @@ export default {
 		},
 		add() {
 			const rule = cleanRule(Object.assign({}, this.draft))
-			this.invalid = !rule
-			if (!rule) return
+			if (!rule || this.problem) return
 			this.$emit('update-rules', this.monitor.rules.concat([rule]))
+			// say what was saved and where (A8): the rule line as the list shows it, and that it is kept in this browser
+			this.added = this.t('alerts_added', { rule: this.t('alerts_rule_line', { path: rule.path, op: this.t('alerts_op_' + rule.op), limit: rule.value }) })
 			this.draft.value = ''
+			this.touched = { path: false, value: false }
 		},
 		toggle(id, enabled) {
 			this.$emit('update-rules', this.monitor.rules.map(r => (r.id === id ? Object.assign({}, r, { enabled }) : r)))

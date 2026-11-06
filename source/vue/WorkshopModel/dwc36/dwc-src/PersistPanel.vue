@@ -24,7 +24,7 @@
 						<span class="mo-note-text">
 							{{ configIncludes === null ? t('persist_include_unknown') : (configIncludes ? t('persist_include_ok') : t('persist_include_missing')) }}
 							<code>{{ INCLUDE_LINE }}</code>
-							<v-btn x-small text @click="copyLine">{{ copied ? t('copied') : t('copy') }}</v-btn>
+							<v-btn x-small text @click="copyLine"><v-icon x-small left>{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>{{ copied ? t('copied') : t('copy') }}</v-btn>
 						</span>
 					</div>
 					<div class="mo-actions mt-2">

@@ -437,7 +437,7 @@ export default {
 /* the views of the Model section (TreeSection.vue, VIEW-CONTRACT.md) */
 .mo-page .mo-views-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin-bottom: 8px; }
 .mo-page .mo-view-tabs { flex: 1 1 auto; }
-.mo-page .mo-view { min-width: 0; }
+.mo-page .mo-view { min-width: 0; min-height: 260px; } /* a view that is still reading must not collapse the card and push everything under it up and down */
 .mo-page .mo-help-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 6px 0 0; font-size: 13px; }
 .mo-page .mo-help-list dt { font-weight: 600; }
 .mo-page .mo-help-list dd { margin: 0; }

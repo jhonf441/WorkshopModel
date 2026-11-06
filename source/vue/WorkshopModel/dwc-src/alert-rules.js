@@ -39,6 +39,18 @@ export function valueText(v) {
 	return typeof v === 'string' ? v : (typeof v === 'object' ? JSON.stringify(v) : String(v))
 }
 
+// What is wrong with a rule that is being written (MO-4, A9): 'path' | 'op' | 'number' (a limit that is not a number) | 'text' (no value to compare) | null.
+// The same conditions as cleanRule, so a draft with no problem is exactly one that cleanRule accepts: the form tells WHICH field is missing instead of one
+// sentence for four causes, and the Add button stays off until there is nothing to say.
+export function ruleProblem(o) {
+	if (!o || typeof o !== 'object') return 'path'
+	const path = typeof o.path === 'string' ? o.path.trim() : ''
+	if (!path) return 'path'
+	if (OPS.indexOf(o.op) < 0) return 'op'
+	if (isNumericOp(o.op)) return o.value === '' || o.value === null || o.value === undefined || !finite(Number(o.value)) ? 'number' : null
+	return valueText(o.value).trim() === '' ? 'text' : null
+}
+
 // a rule as the page stores it -> a clean rule, or null when it cannot work
 export function cleanRule(o) {
 	if (!o || typeof o !== 'object') return null
@@ -47,7 +59,7 @@ export function cleanRule(o) {
 	const numeric = isNumericOp(o.op)
 	const limit = numeric ? Number(o.value) : valueText(o.value)
 	if (numeric && (o.value === '' || o.value === null || o.value === undefined || !finite(limit))) return null
-	if (!numeric && limit === '') return null
+	if (!numeric && limit.trim() === '') return null // a text of only spaces compares with nothing
 	const hyst = numeric ? Math.max(0, Number(o.hysteresis) || 0) : 0
 	const cool = Math.min(COOLDOWN_MAX_S, Math.max(0, Number.isFinite(Number(o.cooldown)) && o.cooldown !== '' && o.cooldown !== null && o.cooldown !== undefined ? Number(o.cooldown) : COOLDOWN_DEFAULT_S))
 	return { id: typeof o.id === 'string' && o.id ? o.id : 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), path, op: o.op, value: limit, hysteresis: hyst, cooldown: Math.round(cool), enabled: o.enabled !== false }

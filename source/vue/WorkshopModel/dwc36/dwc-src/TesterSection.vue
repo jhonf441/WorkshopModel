@@ -22,6 +22,11 @@
 				</template>
 				<template v-else>{{ t('pick_cursor_none') }}</template>
 			</div>
+			<!-- MO-2: a path that is not in the model is completed with the ones that are (the live model of THIS board and firmware), never with a path nobody checked -->
+			<div v-if="pathSuggestions.length" class="mo-snippet mo-xb-suggest" role="group" :aria-label="t('pick_suggest')">
+				<span class="mo-faint">{{ t('pick_suggest') }}</span>
+				<v-btn v-for="s in pathSuggestions" :key="s.path" x-small text class="mo-code-btn" @click="applySuggestion(s.path)">{{ s.path }}</v-btn>
+			</div>
 			<expression-flow v-if="mode === 'echo'" :text="text" :cursor="cursor" @insert="put" />
 			<hole-assist v-if="holeList.length" :holes="holeList" :hole="goal" @fill="fill" @prev="goHole(prevHole(holeList, goal ? goal.start : text.length, true))" @next="goHole(nextHole(holeList, goal ? goal.end : 0, true))" @go="goHole" @pick="pickPath" />
 			<div v-if="!command.ok && text.trim() && command.error !== 'placeholder'" class="mo-error" role="alert">{{ t('tester_err_' + command.error) }}</div>
@@ -87,7 +92,7 @@ import { insertAt, holesOf, isPlaceholder, pathAtCursor } from './expression-ins
 import { lintExpression, lintBlocks } from './expression-lint.js'
 import { checkExpression } from './expression-types.js'
 import { describeHoles, holeAt, targetHole, nextHole, prevHole, insideString, GUIDED_HELP } from './expression-holes.js'
-import { valueAt } from './expression-paths.js'
+import { valueAt, pathChoices } from './expression-paths.js'
 import { describeReply, RESULT_TYPES } from './expression-result.js'
 import { newLive, startLive, stopLive, liveDue, liveSent, liveDone, liveStopReason } from './expression-live.js'
 import { loadFavorites, saveFavorites, addFavorite, removeFavorite, hasFavorite, isFavoritesFull } from './expression-favorites.js'
@@ -190,6 +195,12 @@ export default {
 			const path = pathAtCursor(this.text, this.cursor)
 			return Object.assign({ path }, valueAt(liveModel(), path))
 		},
+		// the paths of the live model that fit what is typed under the cursor, when that path does not exist (at most 6)
+		pathSuggestions() {
+			void this.tick
+			if (!this.under.path || this.under.found) return []
+			return pathChoices(liveModel(), this.under.path, 6).filter(c => c.path !== this.under.path)
+		},
 		kept() {
 			return hasFavorite(this.favorites, this.mode, this.text)
 		},
@@ -245,6 +256,15 @@ export default {
 			el.focus()
 			el.setSelectionRange(start, end)
 			this.remember()
+		},
+		// the path under the cursor is replaced by the chosen one (the word that was typed is the one nearest before the cursor)
+		async applySuggestion(path) {
+			const typed = this.under.path
+			let i = this.text.lastIndexOf(typed, this.cursor)
+			if (i < 0) i = this.text.indexOf(typed)
+			if (i < 0) return
+			this.text = this.text.slice(0, i) + path + this.text.slice(i + typed.length)
+			await this.select(i + path.length, i + path.length)
 		},
 		// the snippet goes where the cursor is; its first blank is selected, or else the next blank of the text, so filling goes on
 		async put(snippet) {

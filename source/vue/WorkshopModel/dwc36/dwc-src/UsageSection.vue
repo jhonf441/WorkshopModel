@@ -18,7 +18,8 @@
 			<v-card class="mb-3">
 				<v-card-text>
 					<div class="mo-toolbar">
-						<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('usage_search')" :placeholder="t('usage_search_hint')" />
+						<!-- MO-1: the box suggests what exists (the live globals, the ones the macros name, the files), and still searches any text typed -->
+						<v-combobox v-model="query" :search-input.sync="query" :items="suggestions" hide-no-data dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('usage_search')" :placeholder="t('usage_search_hint')" />
 					</div>
 					<usage-legend />
 					<view-tabs :choices="TABS" :current="tab" :label="t('usage_tabs_label')" @pick="tab = $event" />
@@ -106,6 +107,11 @@ export default {
 		},
 		files() {
 			return this.result ? filesOf(this.result.refs) : []
+		},
+		// what the search box offers: the globals of the live model, the ones the macros name (they may not exist now) and the files that name them
+		suggestions() {
+			const names = this.liveNames.concat(this.rows.map(r => r.name), this.files)
+			return Array.from(new Set(names.filter(n => typeof n === 'string' && n))).sort((a, b) => a.localeCompare(b))
 		}
 	},
 	watch: {

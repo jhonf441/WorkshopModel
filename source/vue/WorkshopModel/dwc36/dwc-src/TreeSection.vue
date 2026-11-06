@@ -22,10 +22,14 @@
 			<choice-guide :choice="choice" class="mb-2" />
 			<div :class="{ 'mo-split': choice.layout === 'split' }">
 				<div class="mo-view">
-					<component
-						:is="VIEW_COMPONENTS[view]" v-bind="viewProps"
-						@select="select" @open="openTechnical" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @clear-changes="$emit('clear-changes')"
-					/>
+					<!-- Changes keeps its state (its feed, the moment, the filters) while another view is open: it used to be built again at every visit, started empty
+					     ("no changes yet") and drew its table a moment later, which looked like a reload. Only this view is kept: the others would draw every second hidden. -->
+					<keep-alive include="changes-view">
+						<component
+							:is="VIEW_COMPONENTS[view]" v-bind="viewProps"
+							@select="select" @open="openTechnical" @watch="onWatch" @unwatch="onUnwatch" @pin="pin" @unpin="unpin" @clear-changes="$emit('clear-changes')"
+						/>
+					</keep-alive>
 				</div>
 				<node-detail
 					v-if="choice.layout === 'split'" :path="selected" :tick="tick" :globals-ok="globalsOk" :can-edit="canEdit" :watched="watched.indexOf(selected) >= 0" :persistent="!!globalName && persistent.indexOf(globalName) >= 0" :pinned="pinned"
