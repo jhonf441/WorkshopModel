@@ -6,6 +6,10 @@
 
 /* ================= tokens ================= */
 .workshop-theme.mo-page { --mo-r: 12px; --mo-r-s: 8px; --mo-soft: rgba(128, 128, 128, 0.07); --mo-soft2: rgba(128, 128, 128, 0.12); --mo-line: rgba(128, 128, 128, 0.22); --mo-line2: rgba(128, 128, 128, 0.4); --mo-glow: rgba(251, 140, 0, 0.35); }
+/* ONE colour per meaning (look-tokens.js, DESIGN.md section 2): how a file touches a global (created green, written amber, read blue: the chips of usage,
+   the legend dots, the selected row and the marks of the file viewer all read these) and the two states of a boolean (on = success, off = neutral: the
+   watch bands and their legend). No other rule of the plugin names a colour for these meanings. */
+.workshop-theme.mo-page { --mo-k-define: var(--wf-ok); --mo-k-set: var(--wf-warn); --mo-k-read: var(--wf-info); --mo-on: var(--wf-ok); --mo-off: rgba(128, 128, 128, 0.45); }
 
 /* ================= the head of a section: a soft icon box, a title, one lead line, pills on the right ================= */
 .workshop-theme.mo-page .mo-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 12px; }
@@ -106,8 +110,6 @@
 .workshop-theme.mo-page .mo-gfiles-list { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .workshop-theme.mo-page .mo-gfile { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 12px; }
 .workshop-theme.mo-page .mo-gfile-path { flex: 1 1 100%; overflow-wrap: anywhere; font-size: 12px; }
-.workshop-theme.mo-page .mo-gfile-use { display: inline-flex; gap: 4px; padding: 1px 8px; border-radius: 999px; background: var(--mo-soft2); }
-.workshop-theme.mo-page .mo-gfile-write { border: 1px solid var(--wf-accent); }
 .workshop-theme.mo-page .mo-gfile-lines { opacity: 0.75; }
 .workshop-theme.mo-page .mo-gfile-line { min-width: 28px; padding: 0 6px; border: 1px solid var(--mo-line2); border-radius: 6px; background: transparent; color: inherit; font-family: var(--tp-font-mono, monospace); font-size: 12px; line-height: 20px; cursor: pointer; }
 .workshop-theme.mo-page .mo-gfile-line:hover, .workshop-theme.mo-page .mo-gfile-line.on { background: var(--mo-soft2); border-color: var(--wf-accent); }
@@ -119,9 +121,9 @@
 .workshop-theme.mo-page .mo-ulegend-list { margin: 4px 0 8px; padding: 0; list-style: none; display: grid; gap: 4px; }
 .workshop-theme.mo-page .mo-ulegend-list li { display: flex; align-items: center; gap: 8px; }
 .workshop-theme.mo-page .mo-ulegend-dot { flex: 0 0 auto; width: 12px; height: 12px; border-radius: 3px; }
-.workshop-theme.mo-page .mo-ulegend-dot.k-define { background: rgba(46, 160, 67, 0.85); }
-.workshop-theme.mo-page .mo-ulegend-dot.k-set { background: color-mix(in srgb, var(--wf-warn) 85%, transparent); }
-.workshop-theme.mo-page .mo-ulegend-dot.k-read { background: rgba(25, 118, 210, 0.85); }
+.workshop-theme.mo-page .mo-ulegend-dot.k-define { background: color-mix(in srgb, var(--mo-k-define) 85%, transparent); }
+.workshop-theme.mo-page .mo-ulegend-dot.k-set { background: color-mix(in srgb, var(--mo-k-set) 85%, transparent); }
+.workshop-theme.mo-page .mo-ulegend-dot.k-read { background: color-mix(in srgb, var(--mo-k-read) 85%, transparent); }
 .workshop-theme.mo-page .mo-ulegend-chip { flex: 0 0 auto; }
 .workshop-theme.mo-page .mo-ulegend-p { margin: 4px 0 0; }
 .workshop-theme.mo-page .mo-snippet-send { flex: 1 1 100%; margin: 4px 0 2px; }
@@ -138,16 +140,21 @@
 .workshop-theme.mo-page .mo-peek-actions { display: inline-flex; gap: 6px; }
 .workshop-theme.mo-page .mo-peek-box { position: relative; max-height: 280px; overflow: auto; border-radius: 4px; padding: 4px 0; background: rgba(0, 0, 0, 0.18); font-family: var(--tp-font-mono, monospace); font-size: 12px; }
 .workshop-theme.mo-page .mo-peek-row { display: flex; min-width: max-content; padding-right: 10px; }
-.workshop-theme.mo-page .mo-peek-row.hit { background: rgba(251, 140, 0, 0.22); box-shadow: inset 3px 0 0 var(--wf-accent); }
+/* only the selected line is painted as a row, in the colour of what it does with the global (k-define / k-set / k-read from FilePeek.vue rowClass); the
+   other lines carry nothing but their marks */
+.workshop-theme.mo-page .mo-peek-row.hit { --mo-row: var(--wf-accent); background: color-mix(in srgb, var(--mo-row) 16%, transparent); box-shadow: inset 3px 0 0 var(--mo-row); }
+.workshop-theme.mo-page .mo-peek-row.hit.k-define { --mo-row: var(--mo-k-define); }
+.workshop-theme.mo-page .mo-peek-row.hit.k-set { --mo-row: var(--mo-k-set); }
+.workshop-theme.mo-page .mo-peek-row.hit.k-read { --mo-row: var(--mo-k-read); }
 .workshop-theme.mo-page .mo-peek-n { flex: 0 0 auto; min-width: 44px; padding-right: 10px; text-align: right; opacity: 0.5; user-select: none; }
 .workshop-theme.mo-page .mo-peek-text { white-space: pre; }
-.workshop-theme.mo-page .mo-peek-mark { padding: 0 2px; border-radius: 3px; color: #000; }
-.workshop-theme.mo-page .mo-peek-mark.k-write { background: #ffd54f; }
-.workshop-theme.mo-page .mo-peek-mark.k-read { background: #64b5f6; }
+/* a mark: a soft tint of its kind with a solid line under the word (readable on the light and the dark theme, the text keeps its colour) */
+.workshop-theme.mo-page .mo-peek-mark { --mo-mark: var(--wf-accent); padding: 0 2px; border-radius: 3px; background: color-mix(in srgb, var(--mo-mark) 28%, transparent); box-shadow: inset 0 -2px 0 var(--mo-mark); }
+.workshop-theme.mo-page .mo-peek-mark.k-define { --mo-mark: var(--mo-k-define); }
+.workshop-theme.mo-page .mo-peek-mark.k-set { --mo-mark: var(--mo-k-set); }
+.workshop-theme.mo-page .mo-peek-mark.k-read { --mo-mark: var(--mo-k-read); }
 .workshop-theme.mo-page .mo-peek-legend { display: inline-flex; gap: 10px; font-size: 12px; }
 .workshop-theme.mo-page .mo-peek-legend .mo-peek-mark { padding: 0 6px; }
-/* chips of usage: created and written keep their colors and carry the yellow of the viewer on their left edge */
-.workshop-theme.mo-page .mo-uline-chip.k-define, .workshop-theme.mo-page .mo-uline-chip.k-set { border-left: 2px solid #ffd54f; }
 .workshop-theme.mo-page .mo-gcard-full { margin: 2px 0 0; }
 .workshop-theme.mo-page .mo-gcard-edit { margin-top: 4px; }
 .workshop-theme.mo-page .mo-gcard-hint { font-size: 12px; opacity: 0.7; }
@@ -195,6 +202,8 @@
 /* ================= watch rows and recent changes ================= */
 .workshop-theme.mo-page .mo-wrows { display: flex; flex-direction: column; margin: 6px 0; }
 .workshop-theme.mo-page .mo-wrow { display: grid; grid-template-columns: minmax(150px, 1.1fr) minmax(150px, 1.5fr) minmax(220px, 1.6fr) auto; align-items: start; gap: 4px 16px; padding: 10px 6px; border-bottom: 1px solid var(--mo-line); }
+/* the graphs of every row have the same box (look-tokens.js WATCH_GRAPH): nothing stretches or shrinks them */
+.workshop-theme.mo-page .mo-wrow-graph > svg, .workshop-theme.mo-page .mo-wrow-graph .mo-bands > svg { flex: none; display: block; }
 .workshop-theme.mo-page .mo-wrow-path { min-width: 0; overflow-wrap: anywhere; }
 .workshop-theme.mo-page .mo-wrow-path .mo-link { font-family: var(--tp-font-mono, monospace); font-size: 13px; }
 .workshop-theme.mo-page .mo-wrow-valuebox { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -251,9 +260,19 @@
 
 /* the watch list on a narrow page: the name and the actions on one line, the value and the graph each on their own */
 @media (max-width: 1099px) {
-	.workshop-theme.mo-page .mo-wrow { grid-template-columns: minmax(0, 1fr) auto; }
+	.workshop-theme.mo-page .mo-wrows, .workshop-theme.mo-page .mo-wrow { grid-template-columns: minmax(0, 1fr) auto; }
 	.workshop-theme.mo-page .mo-wrow-valuebox, .workshop-theme.mo-page .mo-wrow-graph { grid-column: 1 / -1; }
 }
+/* one set of columns for the whole watch list: the value, the graph and the actions of every row sit on the same vertical lines (each row was its own grid, so
+   the graph of one row started a few pixels away from the next). A browser without subgrid keeps a grid per row. */
+@supports (grid-template-columns: subgrid) {
+	.workshop-theme.mo-page .mo-wrows { display: grid; grid-template-columns: minmax(150px, 1.1fr) minmax(150px, 1.5fr) minmax(220px, 1.6fr) auto; }
+	.workshop-theme.mo-page .mo-wrow { grid-template-columns: subgrid; grid-column: 1 / -1; }
+}
+
+/* a switch next to its "?" or a button: Vuetify gives every selection control a top margin and padding meant for a form, which pushed the switch and its
+   word below the centre of the row (the "?" looked raised) */
+.workshop-theme.mo-page :is(.help-tip-row, .mo-tip-row, .mo-actions, .mo-head-right, .mo-chg-tools, .mo-flat-filters) > .v-input--selection-controls { margin-top: 0; padding-top: 0; }
 
 /* a dialog of the plugin whose body comes first (no v-card-title): Vuetify drops the top padding of a dialog body, so the first line sat on the
    border; give it room. The share dialog has its own head, so its body gets the room under it. */

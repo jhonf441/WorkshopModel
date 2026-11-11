@@ -422,7 +422,7 @@ export default {
 .mo-page .mo-reply { font-size: 13px; margin-top: 4px; word-break: break-all; }
 .mo-page .mo-list { margin: 4px 0 4px 18px; font-size: 12px; }
 .mo-page .mo-link { border: 0; background: transparent; color: inherit; font: inherit; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(128, 128, 128, 0.5); text-align: left; word-break: break-all; }
-.mo-page .mo-spark { color: var(--tp-blue-bright, #1976d2); vertical-align: middle; }
+.mo-page .mo-spark { color: var(--wf-info); vertical-align: middle; } /* the one information blue of the family (ChangesView draws its trend with the same) */
 .mo-page .mo-spark-mark { fill: var(--tp-amber, #ffb74d); stroke: none; }
 .mo-page .mo-bands { display: inline-flex; flex-direction: column; gap: 2px; vertical-align: middle; }
 .mo-page .mo-bands svg { border-radius: 4px; overflow: hidden; }
@@ -511,9 +511,10 @@ export default {
 .mo-page .mo-uchip.zero { opacity: 0.45; }
 .mo-page .mo-uchip-track { display: block; height: 5px; border-radius: 3px; background: rgba(128, 128, 128, 0.2); overflow: hidden; }
 .mo-page .mo-uchip-bar { display: block; height: 100%; border-radius: 3px; transform-origin: left; animation: mo-ugrow 0.5s ease-out; }
-.mo-page .mo-uchip.k-define .mo-uchip-bar, .mo-page .mo-uline-chip.k-define { background: rgba(46, 160, 67, 0.75); }
-.mo-page .mo-uchip.k-set .mo-uchip-bar, .mo-page .mo-uline-chip.k-set { background: color-mix(in srgb, var(--wf-warn) 75%, transparent); }
-.mo-page .mo-uchip.k-read .mo-uchip-bar, .mo-page .mo-uline-chip.k-read { background: rgba(25, 118, 210, 0.75); }
+/* the colour of a kind of use is the token of look.css (look-tokens.js): the same green, amber and blue as the legend, the selected row and the marks of the viewer */
+.mo-page .mo-uchip.k-define .mo-uchip-bar, .mo-page .mo-uline-chip.k-define { background: color-mix(in srgb, var(--mo-k-define) 75%, transparent); }
+.mo-page .mo-uchip.k-set .mo-uchip-bar, .mo-page .mo-uline-chip.k-set { background: color-mix(in srgb, var(--mo-k-set) 75%, transparent); }
+.mo-page .mo-uchip.k-read .mo-uchip-bar, .mo-page .mo-uline-chip.k-read { background: color-mix(in srgb, var(--mo-k-read) 75%, transparent); }
 .mo-page .mo-usage-phrase { flex: 1 1 220px; }
 .mo-page .mo-udetail { margin: 2px 8px 10px 28px; }
 .mo-page .mo-udetail-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-bottom: 6px; }

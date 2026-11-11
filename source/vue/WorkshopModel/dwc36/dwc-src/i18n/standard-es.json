@@ -1,7 +1,5 @@
 {
 	"model": {
-		"peek_legend_write": "Crea o asigna",
-		"peek_legend_read": "Lee",
 		"edit_value_open": "Editar valor",
 		"globals_assigned": "Asignada en",
 		"globals_assigned_unknown": "sin buscar todavía",

@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "plugin": "WorkshopModel",
+  "namespace": "model",
+  "prefixes": [],
+  "ui": "ui:model:open",
+  "operations": [],
+  "shared": [],
+  "restricted": [],
+  "targets": [],
+  "profiles": {
+    "readonly": {
+      "title": "ModelReadOnly",
+      "capabilities": []
+    },
+    "operator": {
+      "title": "ModelOperator",
+      "capabilities": []
+    },
+    "admin": {
+      "title": "ModelAdmin",
+      "capabilities": []
+    }
+  }
+}

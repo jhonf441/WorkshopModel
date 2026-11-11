@@ -10,15 +10,17 @@
 'use strict'
 
 // The small line of a watched value: the whole series scaled to the box, newest sample on the right (watch-series.js), with a dot on
-// every sudden jump when the marks are asked (watch-render.js jumpMarkers / markerPoints).
+// every sudden jump when the marks are asked (watch-render.js jumpMarkers / markerPoints). The box is the one of every graph of the
+// watch list (look-tokens.js WATCH_GRAPH), so a number, a text and a boolean line up in the list.
 import { sparklinePath } from './watch-series.js'
 import { markerPoints } from './watch-render.js'
+import { WATCH_GRAPH } from './look-tokens.js'
 
 export default {
 	props: {
 		series: { type: Array, default: () => [] },
-		width: { type: Number, default: 120 },
-		height: { type: Number, default: 28 },
+		width: { type: Number, default: WATCH_GRAPH.width },
+		height: { type: Number, default: WATCH_GRAPH.height },
 		marks: { type: Array, default: () => [] }
 	},
 	computed: {

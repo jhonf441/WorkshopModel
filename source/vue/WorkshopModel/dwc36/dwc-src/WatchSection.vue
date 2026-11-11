@@ -32,8 +32,8 @@
 							<span v-if="r.mode === 'sparkline'" class="mo-wrow-range">{{ t('changes_range', { min: r.min, max: r.max }) }}</span>
 						</div>
 						<span class="mo-wrow-graph">
-							<sparkline v-if="r.mode === 'sparkline'" :series="r.series" :width="160" :height="28" :marks="r.marks" />
-							<watch-bands v-else-if="r.mode !== 'inner'" :events="r.events" :onoff="r.mode === 'onoff'" :tick="tick" />
+							<sparkline v-if="r.mode === 'sparkline'" :series="r.series" :width="GRAPH.width" :height="GRAPH.height" :marks="r.marks" />
+							<watch-bands v-else-if="r.mode !== 'inner'" :events="r.events" :onoff="r.mode === 'onoff'" :tick="tick" :width="GRAPH.width" :height="GRAPH.height" />
 							<span v-else class="mo-faint">{{ t('watch_inner_n', { n: r.changeCount }) }}</span>
 							<span v-if="r.marks.length" class="mo-faint">{{ t('watch_jumps', { n: r.marks.length }) }}</span>
 						</span>
@@ -82,9 +82,10 @@
 
 // The watch list (design item 2: live value, min and max of every pinned path) drawn by the kind of the value (watch-render.js): a
 // number as a sparkline (with a dot on each sudden jump when asked), a text as coloured bands, a boolean as on / off, an array or an
-// object as the count of its changes; every row opens the table of its changes (WatchEvents.vue). Rows wrap on a phone instead of
-// scrolling sideways. Then the recent changes with before and after (design item 3). The samples and the changes are collected by the
-// page every tick (watch-series.js, change-diff.js).
+// object as the count of its changes; every graph has the same box (look-tokens.js WATCH_GRAPH) and the rows share one set of columns
+// (look.css), so the graphs line up down the list. Every row opens the table of its changes (WatchEvents.vue). Rows wrap on a phone
+// instead of scrolling sideways. Then the recent changes with before and after (design item 3). The samples and the changes are
+// collected by the page every tick (watch-series.js, change-diff.js).
 import i18n from '../../i18n'
 import Sparkline from './Sparkline.vue'
 import WatchBands from './WatchBands.vue'
@@ -93,6 +94,7 @@ import WatchExport from './WatchExport.vue'
 import InfoTip from './InfoTip.vue'
 import { seriesStats } from './watch-series.js'
 import { MARKERS_SETTING, rendererFor, jumpMarkers } from './watch-render.js'
+import { WATCH_GRAPH } from './look-tokens.js'
 
 function fmt(v) {
 	return Number.isInteger(v) ? String(v) : String(Math.round(v * 1000) / 1000)
@@ -108,7 +110,7 @@ export default {
 		storage: { type: String, default: 'browser' }
 	},
 	data() {
-		return { markers: false, open: [], MARKERS_SETTING }
+		return { markers: false, open: [], MARKERS_SETTING, GRAPH: WATCH_GRAPH }
 	},
 	computed: {
 		rows() {
