@@ -38,7 +38,7 @@
 					<code class="mo-snippet-code">{{ s.code }}</code>
 					<v-btn icon small class="mo-ibtn" :title="copied === s.id ? t('copied') : t('copy')" :aria-label="t('copy')" @click="copy(s.code, s.id)"><v-icon small>{{ copied === s.id ? 'mdi-check' : 'mdi-content-copy' }}</v-icon></v-btn>
 					<v-btn v-if="s.send" icon small color="primary" class="mo-ibtn" :title="t('send_here') + ' - ' + t('send_here_title')" :aria-label="t('send_here')" @click="sending = sending === s.id ? '' : s.id"><v-icon small>mdi-send-outline</v-icon></v-btn>
-					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit" :editable="false" :disabled-reason="canEdit ? '' : readOnlyLine(readOnlyLine(t('read_only')))" @sent="sending = ''" />
+					<command-preview v-if="s.send && sending === s.id" class="mo-snippet-send" :code="s.code" :can-send="canEdit && !missingGlobal" :editable="false" :disabled-reason="missingGlobal ? t('snippet_missing_global') : (canEdit ? '' : readOnlyLine(readOnlyLine(t('read_only'))))" @sent="sending = ''" />
 				</div>
 			</div>
 		</template>
@@ -126,6 +126,10 @@ export default {
 		},
 		snippets() {
 			return pathSnippets(this.path, this.value)
+		},
+		// a global that is not on the board yet: reading or showing it would only answer "unknown variable"
+		missingGlobal() {
+			return !!this.globalName && (this.value === null || this.value === undefined)
 		}
 	},
 	beforeDestroy() {

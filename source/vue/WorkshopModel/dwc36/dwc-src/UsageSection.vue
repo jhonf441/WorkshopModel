@@ -58,6 +58,7 @@ import { childrenOf } from './model-tree.js'
 import { scanBudget } from './tier.js'
 import { readScope, saveScope, cleanScope, DEPTH_MAX } from './usage-scope.js'
 import { runScan } from './usage-runner.js'
+import { tolerantIo } from './host-errors.js'
 import { globalRows, cardCounts, cardAfterFilter, filesOf } from './usage-view.js'
 
 const TABS = [
@@ -163,7 +164,7 @@ export default {
 			this.total = 0
 			this.current = ''
 			try {
-				const r = await runScan({ listDir, readText }, {
+				const r = await runScan(tolerantIo({ listDir, readText }, (kind, path, e) => console.warn('[WorkshopModel] usage finder skipped a ' + kind + ' it could not open:', path, e && e.message)), {
 					scope: this.scope, budget: this.budget, pluginIds: this.pluginIds(), cache: this.cache, needMap: true,
 					onProgress: (d, n, path) => { this.done = d; this.total = n; this.current = path || '' },
 					cancelled: () => this.cancel

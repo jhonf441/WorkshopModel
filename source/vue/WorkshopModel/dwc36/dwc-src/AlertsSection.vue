@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="mo-alerts">
 		<v-card class="mb-3">
 			<v-card-text>
 				<div class="mo-head">
@@ -14,6 +14,10 @@
 				<div class="help-tip-row mb-2">
 					<v-switch :input-value="monitor.sound" dense color="primary" hide-details :label="t(S.sound.label)" @change="$emit('update-sound', !!$event)" />
 					<info-tip :choice="S.sound" :title="t(S.sound.label)" />
+				</div>
+				<div class="help-tip-row mb-2">
+					<v-switch :input-value="toast" dense color="primary" hide-details :label="t(TOAST.label)" @change="$emit('update-toast', !!$event)" />
+					<info-tip :choice="TOAST" :title="t(TOAST.label)" />
 				</div>
 				<div class="mo-part">{{ t('alerts_rules') }}</div>
 				<div v-if="!monitor.rules.length" class="mo-empty mo-empty-small"><v-icon class="mo-empty-icon">mdi-bell-plus-outline</v-icon><div class="mo-empty-text">{{ t('alerts_none') }}</div></div>
@@ -35,17 +39,14 @@
 					<span class="mo-head-icon"><v-icon>mdi-plus-circle-outline</v-icon></span>
 					<div class="mo-head-text"><h2 class="mo-head-title">{{ t('alerts_add_title') }}</h2></div>
 				</div>
-				<div class="mo-form">
+				<div class="mo-form mo-alert-form">
 					<wf-field id="al-path" class="mo-field" :label="t(S.path.label)" :message="touched.path && problem === 'path' ? t('alerts_problem_path') : ''" level="error">
 						<template #help><info-tip :choice="S.path" :title="t(S.path.label)" /></template>
-						<v-text-field id="al-path" v-model="draft.path" dense outlined hide-details spellcheck="false" :aria-label="t(S.path.label)" :error="touched.path && problem === 'path'" @blur="touched.path = true" />
+						<path-select id="al-path" :value="draft.path" :numeric="numeric" :watched="watched" :tick="tick" :aria-label="t(S.path.label)" :error="touched.path && problem === 'path'" @input="draft.path = $event" @blur="touched.path = true" />
 					</wf-field>
-					<wf-field v-if="watched.length" id="al-watched" class="mo-field" :label="t('alerts_pick_watched')">
-						<v-select id="al-watched" :value="null" :items="watched" dense outlined hide-details :aria-label="t('alerts_pick_watched')" @change="draft.path = $event" />
-					</wf-field>
-					<v-btn small outlined class="mo-field-find" :title="t('alerts_find_path_help')" @click="pickOpen = true"><v-icon small left>mdi-magnify</v-icon>{{ t('alerts_find_path') }}</v-btn>
+					<v-btn outlined class="mo-field-find" :title="t('alerts_find_path_help')" @click="pickOpen = true"><v-icon small left>mdi-magnify</v-icon>{{ t('alerts_find_path') }}</v-btn>
 				</div>
-				<div class="mo-form">
+				<div class="mo-form mo-alert-form">
 					<wf-field id="al-op" class="mo-field-type" :label="t(S.op.label)">
 						<template #help><info-tip :choice="S.op" :title="t(S.op.label)" /></template>
 						<v-select id="al-op" v-model="draft.op" :items="opItems" item-text="title" item-value="value" dense outlined hide-details :aria-label="t(S.op.label)" />
@@ -55,7 +56,7 @@
 						<v-text-field id="al-value" v-model="draft.value" :type="numeric ? 'number' : 'text'" :step="numeric ? 'any' : undefined" :suffix="unitText" dense outlined hide-details spellcheck="false" :aria-label="valueLabel" :error="touched.value && (problem === 'number' || problem === 'text')" @blur="touched.value = true" />
 					</wf-field>
 				</div>
-				<div class="mo-form">
+				<div class="mo-form mo-alert-form">
 					<wf-field v-if="numeric" id="al-hysteresis" class="mo-field-type" :label="t(S.hysteresis.label)">
 						<template #help><info-tip :choice="S.hysteresis" :title="t(S.hysteresis.label)" /></template>
 						<v-text-field id="al-hysteresis" v-model="draft.hysteresis" type="number" min="0" dense outlined hide-details :aria-label="t(S.hysteresis.label)" />
@@ -68,7 +69,7 @@
 				<v-dialog v-model="pickOpen" max-width="760" scrollable content-class="workshop-theme mo-page">
 					<v-card class="workshop-theme mo-page">
 						<v-card-title class="d-flex align-center">{{ t('alerts_find_path_title') }}<v-spacer /><v-btn icon small :aria-label="t('close')" :title="t('close')" @click="pickOpen = false"><v-icon>mdi-close</v-icon></v-btn></v-card-title>
-						<v-card-text><path-picker :tick="tick" :wanted="numeric ? 'number' : ''" :hole-name="t(S.path.label)" @insert="usePath" /></v-card-text>
+						<v-card-text><alert-path-finder :tick="tick" :numeric="numeric" @insert="usePath" /></v-card-text>
 					</v-card>
 				</v-dialog>
 				<div class="d-flex align-center flex-wrap" style="gap:8px">
@@ -104,27 +105,31 @@
 <script>
 'use strict'
 
-// The in-page alerts (alert-rules.js, alert-monitor.js): the rules, a form to add one, the recent events and the sound switch. The
+// The in-page alerts (alert-rules.js, alert-monitor.js): the rules, a form to add one, the recent events and the sound and pop-up switches. The
 // page owns the monitor and evaluates it every sample, so the alerts keep running while another section is open; this section only
-// edits the rules. They work only while the page is open: nothing on the Pi, no notice to a phone.
+// edits the rules. They work on every page of DWC while DWC is open (alert-watch.js): nothing on the Pi, no notice to a phone.
 import i18n from '../../i18n'
 import InfoTip from './InfoTip.vue'
 import HelpTip from './HelpTip.vue' // vue/_shared36
 import WfField from './WfField.vue' // vue/_shared36
 import PathPicker from './PathPicker.vue'
+import PathSelect from './PathSelect.vue'
+import AlertPathFinder from './AlertPathFinder.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp, ruleProblem } from './alert-rules.js'
+import { TOAST_SETTING } from './alert-toast.js'
 import { describePath } from './path-dictionary.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
 export default {
-	components: { InfoTip, HelpTip, WfField, PathPicker },
+	components: { InfoTip, HelpTip, WfField, PathPicker, PathSelect, AlertPathFinder },
 	props: {
 		monitor: { type: Object, required: true },
+		toast: { type: Boolean, default: true }, // the pop-up message of a fire is on
 		watched: { type: Array, default: () => [] },
 		tick: { type: Number, default: 0 } // the live model of the path finder
 	},
 	data() {
-		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, pickOpen: false }
+		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, TOAST: TOAST_SETTING, pickOpen: false }
 	},
 	computed: {
 		numeric() {

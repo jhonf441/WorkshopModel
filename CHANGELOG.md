@@ -1,5 +1,80 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.54 -- 2026-11-20
+
+- Alerts: the path finder of the rule form is now a guided one. It searches the whole model by name, whole path or value; lists "what people usually watch" that the board really has (heater and sensor temperatures, MCU and supply voltages, axis positions, fans, layer, uptime, state); and walks the model one level at a time where a branch opens and a value is used with one tap. Every row shows the kind, the value now and what the path is when the dictionary knows it; a rule on a number is offered numbers only, with a button to show every kind. Before, a rule on a number showed only branches with a disabled Insert, so nothing could be inserted.
+- Alerts: picking an option of the path select put "[object Object]" in the field; it now gives the path. With nothing typed the select opens on the usual values before the whole model. The "Find the path" button is 44 px tall, at least 150 px wide and does not wrap.
+- Usage finder ("Where your globals are used"): one folder that the listing named but the board could not open (here 0:/sys/workshop/data/path-migration/20261011-023309, deleted since) ended the whole read with "Network error: Directory ... not found". Such a folder or file is now skipped, noted in the browser console, and the rest is read; a message like that is also known as "missing" by the host.
+- Expression tester: the built-in recipe "bed temperature" (heat.heaters[heat.bedHeaters[0]].current) is offered only when the bed heater exists and reads a temperature. A bed heater without a working sensor shows -273.15 and the board answered "array index out of bounds".
+- Code: new 3.6-only modules alert-path-guide.js, alert-path-options.js, host-errors.js, recipe-guard.js and the components PathSelect.vue and AlertPathFinder.vue; the modules shared with the 3.7 line are unchanged. Tests: alert-path-select.test.js, usage-skip.test.js and cases in expression-builder.test.js.
+
+## 1.7.53 -- 2026-11-20
+
+- The path of a new alert is a select with a search: it opens on the paths you watch, then the values of the live model (never a branch, numbers only for "goes above" and "goes below"), each with its kind, its value now and what it means when the path dictionary knows it. Typing narrows the list by name, whole path or value; a path that is not in the list can still be typed. The old "Pick a watched path" select is gone (it is the first group of the new one); "Find the path" keeps its dialog for a walk through the model.
+- The form of a new alert lines up: every control is 44 px tall and starts on the line of its label, so the path, the test, the limit, the hysteresis, the cooldown and the Find button share lines whether a field shows a message under it or not.
+- Texts: `alerts_path_watched`, `alerts_path_model`, `alerts_path_none`, `alerts_path_more` (es and en); `alerts_pick_watched` removed.
+- Tests: `alert-path-select.test.js`; the component and module lists of the smoke and help tests know PathSelect.vue and alert-path-options.js (3.6 line only).
+
+## 1.7.52 -- 2026-11-20
+
+- Alerts now watch from every page of DWC, not only from the Model Explorer page: a watcher with its own one-second timer is started when DWC loads the plugin (`alert-watch.js`, `alert-host.js`), evaluates the same rules (limits, hysteresis, cooldown, recovery, event list, banner of the page, optional sound) and nothing is judged while the board is not connected. Close DWC and it stops; nothing runs on the Pi and nothing is sent outside the browser. The pause button of the tree no longer pauses the alerts.
+- When a limit is crossed a short message pops up at the bottom left of any page and goes away by itself (DWC's own notification, so its time is the one in DWC's notification settings); a recovery only writes the console. DWC's console always gets the fire and the recovery line, whether the message is on or not. Texts are escaped because DWC prints them as HTML.
+- New switch "Show a pop-up message" in the alerts section, on by default, kept in this browser apart from the rules, with its "?" help. The scope note, the section help and the sound help say the new truth: alerts watch from any page of DWC but only while DWC is open in a browser.
+- The switch of a boolean global lines up with the kind chip and the word next to it (Vuetify's own top margin of a switch lowered it).
+- Tests: `alert-watch.test.js`, `globals-switch-align.test.js`; render hooks know DWC's logging module; the i18n catalogs of both lines stay identical (parity test).
+
+## 1.7.51 -- 2026-11-18
+
+- accessRev: the page asks whoami at once when the service says the access changed
+
+## 1.7.50 -- 2026-11-18
+
+- Access changes (users or roles switched off or on, a role changed) reach the page: it asks whoami again while in view
+
+## 1.7.49 -- 2026-11-18
+
+- Watch file saves one write at a time and a failed save goes to the console, not a banner; session notice icons
+
+## 1.7.48 -- 2026-11-17
+
+- Back to the previous look: the family design pieces of the last rounds are removed (steppers, docks, big readings, token fills)
+
+## 1.7.47 -- 2026-11-13
+
+- Phase 6: family design pieces (docks, step numbers, fills and dark palette as shared tokens)
+
+## 1.7.46 -- 2026-11-13
+
+- Rebuilt with stable module ids: no local paths inside the bundle
+
+## 1.7.45 -- 2026-11-13
+
+- Access notices name what they lock (JS and Vue), locked covers say which section they cover
+
+## 1.7.44 -- 2026-11-13
+
+- File marks readable, sending a missing global blocked with the reason, short Tap again button, usage scope layout fixed, legacy copies left out of the scan
+
+## 1.7.43 -- 2026-11-13
+
+- Safe state and accent colors moved to family tokens; off-scale sizes and monospace fonts aligned
+
+## 1.7.42 -- 2026-11-12
+
+- Session reconcile, access notices name what they lock, kiosk native number keyboard
+
+## 1.7.41 -- 2026-11-12
+
+- Kiosk PIN: read-only field and number pad only, no full keyboard
+
+## 1.7.40 -- 2026-11-11
+
+- Owner report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
+
+## 1.7.39 -- 2026-11-11
+
+- permissions.json: the access manifest of the plugin (namespace model, interface operation ui:model:open, three profiles). No change to the page.
+
 ## 1.7.38 -- 2026-11-10
 
 - Recipes relative to the G-code (Printing), session role switch and UI fixes (26), SD layout manifest

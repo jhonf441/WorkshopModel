@@ -46,6 +46,7 @@ import ViewTabs from './ViewTabs.vue'
 import ChoiceGuide from './ChoiceGuide.vue'
 import ShareRecipeDialog from './ShareRecipeDialog.vue'
 import { recipesFor } from './expression-recipes.js'
+import { usableRecipes } from './recipe-guard.js'
 import { RECIPE_SOURCES, DEFAULT_SOURCE, recipeCards, newerCount } from './community-recipes.js'
 import { RECIPES_GUIDE } from './recipe-share.js'
 import { firmwareVersionOf } from './rrf-version.js'
@@ -68,7 +69,7 @@ export default {
 		},
 		cards() {
 			void this.tick
-			return recipeCards({ builtin: recipesFor(liveModel()), text: this.t, lang: i18n.locale, firmware: this.firmware, source: this.source, query: this.query || '', showNewer: this.showNewer })
+			return recipeCards({ builtin: usableRecipes(recipesFor(liveModel()), liveModel()), text: this.t, lang: i18n.locale, firmware: this.firmware, source: this.source, query: this.query || '', showNewer: this.showNewer })
 		},
 		newer() {
 			return this.source === 'builtin' ? 0 : newerCount(this.firmware)

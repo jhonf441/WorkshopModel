@@ -29,7 +29,7 @@
 					</div>
 					<div class="mo-actions mt-2">
 						<v-btn small outlined :disabled="!canEdit || !persist.length" @click="$emit('update-persist')">{{ t('persist_update') }}</v-btn>
-						<lock-reason min="technician" />
+						<lock-reason min="technician" :subject="$t('plugins.WorkshopModel.subjects.persist')" />
 					</div>
 					<div class="mo-faint mt-1">{{ t('persist_update_help') }}</div>
 					<div class="mo-faint mt-1">{{ t('cannot_delete_text') }}</div>

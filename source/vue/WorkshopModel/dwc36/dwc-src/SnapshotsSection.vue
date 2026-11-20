@@ -30,7 +30,7 @@
 					<span class="mo-will-save-name">{{ nameState.name }}</span>
 					<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 				</div>
-				<lock-reason min="technician" class="mb-2" />
+				<lock-reason min="technician" class="mb-2" :subject="$t('plugins.WorkshopModel.subjects.snapshots')" />
 				<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 					<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 					<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>

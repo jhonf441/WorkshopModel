@@ -2,7 +2,7 @@
 	<div class="mo-sub mo-editor">
 		<div class="mo-part">{{ exists ? t('edit_title', { name }) : t('globals_create') }}</div>
 		<div v-if="!globalsOk" class="mo-faint">{{ t('globals_off_short') }}</div>
-		<lock-reason v-else-if="!canEdit" min="technician" />
+		<lock-reason v-else-if="!canEdit" min="technician" :subject="$t('plugins.WorkshopModel.subjects.edit_global')" />
 		<template v-else>
 			<div class="mo-form">
 				<v-text-field v-if="!exists" :value="newName" dense outlined hide-details class="mo-field" :label="t('create_name')" :placeholder="t('create_name_hint')" @input="typeName($event)" />

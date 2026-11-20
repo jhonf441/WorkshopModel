@@ -13,7 +13,7 @@
 'use strict'
 
 // The banner of the in-page alerts: one line per rule that is firing and was not dismissed (alert-monitor.js visibleBanner). It leaves
-// by itself when the rule recovers. It exists only while the page is open.
+// by itself when the rule recovers. It is the banner of this page; the pop-up message of any page is alert-host.js.
 import i18n from '../../i18n'
 
 export default {

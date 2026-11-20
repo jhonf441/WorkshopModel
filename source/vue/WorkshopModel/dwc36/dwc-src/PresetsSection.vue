@@ -30,7 +30,7 @@
 						<span class="mo-faint">{{ nameState.valid ? t(nameState.custom ? 'look_name_custom_hint' : 'look_name_default_hint') : t('look_name_invalid') }}</span>
 					</div>
 					<div class="mo-faint mb-2">{{ liveCount ? t('preset_save_help', { n: liveCount }) : t('look_presets_no_globals') }}</div>
-					<lock-reason min="technician" class="mb-2" />
+					<lock-reason min="technician" class="mb-2" :subject="$t('plugins.WorkshopModel.subjects.presets')" />
 					<div v-if="loading" class="mo-skeleton" role="status" aria-live="polite">
 						<span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span><span class="mo-skeleton-bar"></span>
 						<span class="mo-skeleton-text">{{ t('look_loading_list') }}</span>

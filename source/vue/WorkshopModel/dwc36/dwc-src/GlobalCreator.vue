@@ -9,7 +9,7 @@
 				</div>
 			</div>
 			<div v-if="!globalsOk" class="mo-note warn" role="status"><v-icon small>mdi-alert-outline</v-icon><span class="mo-note-text">{{ t('globals_off_short') }}</span></div>
-			<lock-reason v-else-if="!canEdit" min="technician" />
+			<lock-reason v-else-if="!canEdit" min="technician" :subject="$t('plugins.WorkshopModel.subjects.create_global')" />
 			<template v-else-if="done">
 				<div class="mo-creator-done" role="status"><v-icon>mdi-check-circle-outline</v-icon>{{ t('look_creator_done', { name: done }) }}</div>
 				<div class="mo-faint">{{ t('look_creator_keep_hint') }}</div>

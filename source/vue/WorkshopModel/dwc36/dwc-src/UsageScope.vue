@@ -6,9 +6,11 @@
 			<info-tip :choice="S.chain" :title="t(S.chain.label)" />
 		</div>
 		<div class="mo-usage-set mo-tip-row">
-			<div class="mo-faint">{{ t(S.folder.label) }}</div>
-			<div class="mo-usage-folders">
-				<v-checkbox v-for="f in folderRows" :key="f.dir" :input-value="f.on" dense hide-details :label="f.label" @change="setDir(f.dir, !!$event)" />
+			<div>
+				<div class="mo-faint">{{ t(S.folder.label) }}</div>
+				<div class="mo-usage-folders">
+					<v-checkbox v-for="f in folderRows" :key="f.dir" :input-value="f.on" dense hide-details class="mt-0 pt-0" :label="f.label" @change="setDir(f.dir, !!$event)" />
+				</div>
 			</div>
 			<info-tip :choice="S.folder" :title="t(S.folder.label)" />
 		</div>

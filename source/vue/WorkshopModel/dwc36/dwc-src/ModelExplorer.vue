@@ -29,7 +29,7 @@
 				<presets-section v-if="section === 'presets'" :tick="tick" :support="globals" :can-edit="canEdit" />
 				<usage-section v-if="section === 'usage'" :tick="tick" :tier="tier" :support="globals" :can-edit="canEdit" :cache="usageCache" :auto-scan="autoScan" @select="openInTree" @update:cache="setUsageCache" />
 				<snapshots-section v-if="section === 'snapshots'" :tick="tick" :tier="tier" :can-edit="canEdit" :selected="selectedPath" @select="openInTree" />
-				<alerts-section v-if="section === 'alerts'" :tick="tick" :monitor="monitor" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @clear-events="clearAlertEvents" />
+				<alerts-section v-if="section === 'alerts'" :tick="tick" :monitor="monitor" :toast="toast" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @update-toast="setAlertToast" @clear-events="clearAlertEvents" />
 				<report-section v-if="section === 'report'" :tick="tick" />
 				<tester-section v-if="section === 'tester'" :tick="tick" :connected="connected" :prefill="testerPrefill" />
 			</div>
@@ -75,8 +75,8 @@ import { watchEntry, pushSample, serializeWatch, parseWatch, mergeWatch } from '
 import { watchFileText, readWatchFile } from './watch-file.js'
 import { diffTexts, recordChanges } from './change-diff.js'
 import { trackerState, trackTick, clearChanges } from './model-changes.js'
-import { readMonitor, saveMonitor, monitorTick, setRules, setSound, dismiss, clearEvents, visibleBanner } from './alert-monitor.js'
-import { shouldBeep, beep } from './alert-sound.js'
+import { visibleBanner } from './alert-monitor.js'
+import { alertWatch } from './alert-host.js'
 import AlertsSection from './AlertsSection.vue'
 import AlertBanner from './AlertBanner.vue'
 import ReportSection from './ReportSection.vue'
@@ -192,8 +192,16 @@ export default {
 		this.tracker = trackerState()
 		// what the usage finder already read (usage-runner.js); in the watch file with the SBC tier only; not reactive on purpose
 		this.usageCache = new Map()
-		// the in-page alerts (alert-monitor.js): only while the page is open; not reactive on purpose, the tick refreshes the views
-		this.monitor = readMonitor(typeof localStorage === 'undefined' ? null : localStorage)
+		// the alerts (alert-monitor.js) belong to the watcher that runs on every page of DWC (alert-host.js); this page shows its value and edits its
+		// rules. Not reactive on purpose: the watcher tells the page when the value changes and the tick refreshes the views
+		this.watcher = alertWatch()
+		this.monitor = this.watcher.monitor
+		this.toast = this.watcher.toast
+		this.stopListening = this.watcher.subscribe(m => {
+			this.monitor = m
+			this.toast = this.watcher.toast
+			this.$forceUpdate()
+		})
 		this.timer = null
 		this.fileLoaded = false
 	},
@@ -204,6 +212,7 @@ export default {
 		if (this.tier.extras) this.loadWatchFile()
 	},
 	beforeDestroy() {
+		if (this.stopListening) this.stopListening()
 		clearInterval(this.timer)
 		this.saveWatchLocal()
 	},
@@ -226,36 +235,27 @@ export default {
 			this.prevGlobals = g
 			if (this.trackChanges && found.length) this.changes = recordChanges(this.changes, found, now)
 			this.tracker = trackTick(this.tracker, model, now)
-			this.runAlerts(model, now)
 			if (this.tick % 5 === 0) this.saveWatchLocal()
 			if (this.tick % 30 === 0 && this.tier.extras && this.watchEntries.length) this.saveWatchFile()
 		},
-		// ---- the in-page alerts: evaluated every sample, whichever section is open ----
-		runAlerts(model, now) {
-			this.monitor = monitorTick(this.monitor, model, now)
-			if (shouldBeep(this.monitor) && typeof window !== 'undefined') beep(window)
-		},
+		// ---- the alerts: the watcher of every page of DWC (alert-watch.js) evaluates them; the page only reads and edits ----
 		alertBannerItems() {
 			return visibleBanner(this.monitor)
 		},
-		keepMonitor(next) {
-			this.monitor = next
-			saveMonitor(typeof localStorage === 'undefined' ? null : localStorage, next)
-			this.$forceUpdate()
-		},
 		setAlertRules(rules) {
-			this.keepMonitor(setRules(this.monitor, rules))
+			this.watcher.setRules(rules)
 		},
 		setAlertSound(on) {
-			this.keepMonitor(setSound(this.monitor, on))
+			this.watcher.setSound(on)
+		},
+		setAlertToast(on) {
+			this.watcher.setToast(on)
 		},
 		dismissAlert(id) {
-			this.monitor = dismiss(this.monitor, id)
-			this.$forceUpdate()
+			this.watcher.dismiss(id)
 		},
 		clearAlertEvents() {
-			this.monitor = clearEvents(this.monitor)
-			this.$forceUpdate()
+			this.watcher.clearEvents()
 		},
 		onTick() {
 			this.tick++
@@ -276,11 +276,25 @@ export default {
 				this.watchEntries = []
 			}
 		},
+		// The machine file is only a copy of the list (the browser keeps the real one), so it saves one write at a time and a failure goes to the
+		// console, never to a banner: two writes of the same file at once (a slow 30 s save plus the usage finder, or two screens open) make DSF lose
+		// its temporary ".part" file, and the next save fixes it.
 		async saveWatchFile() {
+			if (this.saving) {
+				this.saveAgain = true
+				return
+			}
+			this.saving = true
 			try {
 				await writeText(WATCH_FILE, watchFileText(this.watchEntries, this.usageCache))
 			} catch (e) {
-				this.problem = e
+				console.warn('[WorkshopModel] watch file not saved, it is tried again at the next save:', e)
+			} finally {
+				this.saving = false
+				if (this.saveAgain) {
+					this.saveAgain = false
+					this.saveWatchFile()
+				}
 			}
 		},
 		async loadWatchFile() {
@@ -416,6 +430,11 @@ export default {
 .mo-page .mo-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 8px; }
 .mo-page .mo-field { flex: 1 1 200px; min-width: 0; }
 .mo-page .mo-field-type { flex: 0 1 200px; min-width: 0; }
+/* the form of a new alert: every control is 44 px tall and starts on the line of its label, so the path, the test, the limit, the hysteresis and the
+   button sit on the same lines whether a field shows a message under it or not (the old form centred them on the bottom edge) */
+.mo-page .mo-alert-form { align-items: flex-start; }
+.mo-page .mo-alert-form .v-input--dense > .v-input__control > .v-input__slot { min-height: 44px; }
+.mo-page .mo-alert-form .mo-field-find { flex: none; margin-top: 28px; min-height: 44px; min-width: 150px; white-space: nowrap; }
 .mo-page .mo-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 6px 0; }
 .mo-page .mo-preview { margin-top: 8px; }
 .mo-page .mo-code textarea { font-family: var(--tp-font-mono, monospace); font-size: 13px; }

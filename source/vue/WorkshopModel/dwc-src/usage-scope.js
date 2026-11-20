@@ -62,7 +62,7 @@ export function saveScope(storage, scope) {
 const BACKUP_RE = /(^|[._\-\s])(bak|backups?|old|orig)([._\-\s]|$)|~$/i
 const EXAMPLE_RE = /(^|[._\-\s])examples?([._\-\s]|$)/i
 // copies left when files are moved (path-migration/<date>/..., leftover): never run
-const MIGRATION_RE = /^path-migration$/i
+const MIGRATION_RE = /^(path-migration|legacy)$/i
 
 // a backup, an example or a migration copy (a file or a folder anywhere in the path): never run, so never where a live global is defined
 export function isJunk(path) {

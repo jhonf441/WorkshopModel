@@ -9,6 +9,7 @@
 import './i18n-register.js'
 import { registerRoute } from '../../routes'
 import * as serviceProblem from './service-problem.js'
+import { startAlertWatch } from './alert-host.js'
 
 import page from './ModelExplorer.vue'
 import './theme.css'
@@ -18,6 +19,9 @@ import './look.css' // the friendlier look of this plugin (mo-* classes only, on
 // service, or a Duet without a Raspberry, as a fault. When vue/_shared36/service-problem.js exports markServiceOptional() -- a
 // per-bundle switch that makes serviceProblemKind() answer null -- it is called here; until then the bar shows the shared notice.
 if (typeof serviceProblem.markServiceOptional === 'function') serviceProblem.markServiceOptional()
+
+// The alerts keep watching on every page of DWC, not only on this one: DWC runs this file when it loads the plugin (alert-host.js).
+startAlertWatch()
 
 registerRoute(page, {
 	Plugins: {

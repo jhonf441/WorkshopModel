@@ -7,7 +7,7 @@
 		<div class="mo-actions">
 			<span :title="!canSend && disabledTitle ? disabledTitle : null">
 				<v-btn small depressed :color="armed ? 'amber darken-3' : 'primary'" :disabled="!canSend || !preview.count || sending" @click="press">
-					{{ sending ? t('preview_sending') : (armed ? t('preview_tap_again', { what: preview.lines[0] }) : t('preview_send')) }}
+					{{ sending ? t('preview_sending') : (armed ? t('preview_tap_again_short') : t('preview_send')) }}
 				</v-btn>
 			</span>
 		</div>

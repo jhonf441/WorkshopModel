@@ -64,7 +64,7 @@
 							</div>
 						</section>
 					</template>
-					<lock-reason min="technician" class="mt-2" />
+					<lock-reason min="technician" class="mt-2" :subject="$t('plugins.WorkshopModel.subjects.globals')" />
 				</template>
 			</v-card-text>
 		</v-card>

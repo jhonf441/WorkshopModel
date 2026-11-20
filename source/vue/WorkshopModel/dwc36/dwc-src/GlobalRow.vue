@@ -56,7 +56,7 @@
 				<v-btn small outlined @click="$emit('select', item.path)"><v-icon small left>mdi-file-tree</v-icon>{{ t('open_in_tree') }}</v-btn>
 				<v-btn small outlined @click="$emit(item.watched ? 'unwatch' : 'watch', item.path)"><v-icon small left>{{ item.watched ? 'mdi-eye-off-outline' : 'mdi-eye-outline' }}</v-icon>{{ item.watched ? t('watch_remove') : t('watch_add') }}</v-btn>
 			</div>
-			<lock-reason min="technician" />
+			<lock-reason min="technician" :subject="$t('plugins.WorkshopModel.subjects.global_row')" />
 		</div>
 	</article>
 </template>
