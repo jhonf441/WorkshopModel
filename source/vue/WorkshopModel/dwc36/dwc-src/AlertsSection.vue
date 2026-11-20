@@ -24,6 +24,17 @@
 						<v-switch :input-value="toastOptions.sticky" dense color="primary" hide-details :label="t(STICKY.label)" @change="$emit('update-toast-options', { sticky: !!$event })" />
 						<info-tip :choice="STICKY" :title="t(STICKY.label)" />
 					</div>
+					<div class="mo-form mo-alert-form">
+						<wf-field id="al-toast-style" class="mo-field-type" :label="t(STYLE.label)">
+							<template #help><info-tip :choice="STYLE" :title="t(STYLE.label)" /></template>
+							<v-select id="al-toast-style" :value="toastOptions.style" :items="styleItems" item-text="title" item-value="value" dense outlined hide-details :aria-label="t(STYLE.label)" @change="$emit('update-toast-options', { style: $event })" />
+						</wf-field>
+						<wf-field v-if="toastOptions.style === 'own'" id="al-toast-position" class="mo-field-type" :label="t(POSITION.label)">
+							<template #help><info-tip :choice="POSITION" :title="t(POSITION.label)" /></template>
+							<v-select id="al-toast-position" :value="toastOptions.position" :items="positionItems" item-text="title" item-value="value" dense outlined hide-details :aria-label="t(POSITION.label)" @change="$emit('update-toast-options', { position: $event })" />
+						</wf-field>
+						<v-btn outlined class="mo-field-find" :title="t('alerts_toast_preview_help')" @click="$emit('preview-toast')"><v-icon small left>mdi-bell-ring-outline</v-icon>{{ t('alerts_toast_preview') }}</v-btn>
+					</div>
 					<wf-field id="al-toast-max" class="mo-field-type mb-2" :label="t(MAX.label)">
 						<template #help><info-tip :choice="MAX" :title="t(MAX.label)" /></template>
 						<v-text-field id="al-toast-max" :value="toastOptions.max" type="number" :min="1" :max="10" dense outlined hide-details :aria-label="t(MAX.label)" @change="$emit('update-toast-options', { max: Number($event) })" />
@@ -126,7 +137,7 @@ import PathPicker from './PathPicker.vue'
 import PathSelect from './PathSelect.vue'
 import AlertPathFinder from './AlertPathFinder.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp, ruleProblem } from './alert-rules.js'
-import { TOAST_SETTING, TOAST_STICKY_SETTING, TOAST_MAX_SETTING, TOAST_DEFAULTS } from './alert-toast.js'
+import { TOAST_SETTING, TOAST_STICKY_SETTING, TOAST_MAX_SETTING, TOAST_STYLE_SETTING, TOAST_POSITION_SETTING, TOAST_STYLES, TOAST_POSITIONS, TOAST_DEFAULTS } from './alert-toast.js'
 import { describePath } from './path-dictionary.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
@@ -140,7 +151,7 @@ export default {
 		tick: { type: Number, default: 0 } // the live model of the path finder
 	},
 	data() {
-		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, TOAST: TOAST_SETTING, STICKY: TOAST_STICKY_SETTING, MAX: TOAST_MAX_SETTING, pickOpen: false }
+		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, TOAST: TOAST_SETTING, STICKY: TOAST_STICKY_SETTING, MAX: TOAST_MAX_SETTING, STYLE: TOAST_STYLE_SETTING, POSITION: TOAST_POSITION_SETTING, pickOpen: false }
 	},
 	computed: {
 		numeric() {
@@ -157,6 +168,12 @@ export default {
 		unitText() {
 			const d = this.numeric ? describePath(String(this.draft.path || '').trim()) : null
 			return d && d.unitKey && d.unitKey !== 'dict_unit_bool' ? this.t(d.unitKey) : undefined
+		},
+		styleItems() {
+			return TOAST_STYLES.map(v => ({ title: this.t('alerts_toast_style_' + v), value: v }))
+		},
+		positionItems() {
+			return TOAST_POSITIONS.map(v => ({ title: this.t('alerts_toast_position_' + v), value: v }))
 		},
 		opItems() {
 			return OPS.map(op => ({ title: this.t('alerts_op_' + op), value: op }))

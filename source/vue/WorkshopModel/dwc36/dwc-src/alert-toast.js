@@ -11,20 +11,26 @@ export const TOAST_KEY = 'workshopModelAlertToast'
 export const TOAST_SETTING = helpChoice('alerts_set', 'toast')
 export const TOAST_STICKY_SETTING = helpChoice('alerts_set', 'toast_sticky')
 export const TOAST_MAX_SETTING = helpChoice('alerts_set', 'toast_max')
+export const TOAST_STYLE_SETTING = helpChoice('alerts_set', 'toast_style')
+export const TOAST_POSITION_SETTING = helpChoice('alerts_set', 'toast_position')
 
 // How the message behaves: it waits for the person to close it (so an alert never passes unseen) and at most `max` wait at once (the rest are
 // folded into one "more alerts" message). Kept in this browser with the switch.
 export const TOAST_OPTIONS_KEY = 'workshopModelAlertToastOptions'
 export const TOAST_MAX_MIN = 1
 export const TOAST_MAX_MAX = 10
-export const TOAST_DEFAULTS = { sticky: true, max: 3 }
+export const TOAST_STYLES = ['own', 'dwc']
+export const TOAST_POSITIONS = ['left', 'center', 'right']
+export const TOAST_DEFAULTS = { sticky: true, max: 3, style: 'own', position: 'left' }
 
 export function cleanToastOptions(o) {
 	const raw = o ? o.max : undefined
 	const n = raw === null || raw === undefined || raw === '' ? NaN : Math.round(Number(raw))
 	return {
 		sticky: !(o && o.sticky === false),
-		max: Number.isFinite(n) ? Math.min(TOAST_MAX_MAX, Math.max(TOAST_MAX_MIN, n)) : TOAST_DEFAULTS.max
+		max: Number.isFinite(n) ? Math.min(TOAST_MAX_MAX, Math.max(TOAST_MAX_MIN, n)) : TOAST_DEFAULTS.max,
+		style: o && TOAST_STYLES.indexOf(o.style) >= 0 ? o.style : TOAST_DEFAULTS.style,
+		position: o && TOAST_POSITIONS.indexOf(o.position) >= 0 ? o.position : TOAST_DEFAULTS.position
 	}
 }
 

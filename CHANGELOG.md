@@ -1,5 +1,17 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.57 -- 2026-11-20
+
+- The own alert card keeps clear of the open side menu of DWC: when the left corner is chosen it starts at the edge of the menu, so a card never covers the last entries of the menu (seen on the real screen with 1.7.56). The other corners are not moved.
+- Test: alert-toast-view.test.js covers the inset.
+
+## 1.7.56 -- 2026-11-20
+
+- Alerts: the message of a fire can now be the own card of this plugin instead of DWC's notification, and the person chooses. The own card slides in at a corner of any DWC page, with an amber bar, a bell, the title, the time and the rule line; it is announced to a screen reader (alert for a fire, status for the "More alerts" summary), its Close button is 44 px and has a name, Escape closes it, it respects "reduce motion", follows the light or dark look of DWC and takes the texts as text, never as HTML. A message that does not wait shows a thin bar with the time left, leaves by itself after 10 s and stops while the pointer or the focus is on it.
+- New options under "Show a pop-up message": "Look of the message" (own card or DWC notification, own card by default), "Corner of the message" (bottom left by default, centre or right; only for the own card) and a "Try the message" button that shows a sample in the look and place chosen now. Each has its "?" help in Spanish and English and is kept in this browser. DWC's notification sits at the bottom centre and cannot be moved; that is why the own card exists.
+- The console, the list of events and the banner of the page are unchanged; "Keep the message until I close it" and "Messages waiting at once" work the same in both looks.
+- Code: alert-toast-view.js (plain DOM, 3.6 only) and alert-host.js choosing the look by the option. Tests: alert-toast-view.test.js over a small fake of the page (roles, text as text, Close, Escape, timer and pause, corners, dark look, fit with alert-popups.js).
+
 ## 1.7.55 -- 2026-11-20
 
 - Alerts: the pop-up message of a fire now waits until the person closes it, so an alert is never missed because nobody was looking. New switch "Keep the message until I close it", on by default; off, the message goes away by itself after DWC's notification time as before.

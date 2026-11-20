@@ -29,7 +29,7 @@
 				<presets-section v-if="section === 'presets'" :tick="tick" :support="globals" :can-edit="canEdit" />
 				<usage-section v-if="section === 'usage'" :tick="tick" :tier="tier" :support="globals" :can-edit="canEdit" :cache="usageCache" :auto-scan="autoScan" @select="openInTree" @update:cache="setUsageCache" />
 				<snapshots-section v-if="section === 'snapshots'" :tick="tick" :tier="tier" :can-edit="canEdit" :selected="selectedPath" @select="openInTree" />
-				<alerts-section v-if="section === 'alerts'" :tick="tick" :monitor="monitor" :toast="toast" :toast-options="toastOptions" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @update-toast="setAlertToast" @update-toast-options="setAlertToastOptions" @clear-events="clearAlertEvents" />
+				<alerts-section v-if="section === 'alerts'" :tick="tick" :monitor="monitor" :toast="toast" :toast-options="toastOptions" :watched="watchedPaths" @update-rules="setAlertRules" @update-sound="setAlertSound" @update-toast="setAlertToast" @update-toast-options="setAlertToastOptions" @preview-toast="previewAlertMessage" @clear-events="clearAlertEvents" />
 				<report-section v-if="section === 'report'" :tick="tick" />
 				<tester-section v-if="section === 'tester'" :tick="tick" :connected="connected" :prefill="testerPrefill" />
 			</div>
@@ -76,7 +76,7 @@ import { watchFileText, readWatchFile } from './watch-file.js'
 import { diffTexts, recordChanges } from './change-diff.js'
 import { trackerState, trackTick, clearChanges } from './model-changes.js'
 import { visibleBanner } from './alert-monitor.js'
-import { alertWatch } from './alert-host.js'
+import { alertWatch, previewAlertMessage } from './alert-host.js'
 import AlertsSection from './AlertsSection.vue'
 import AlertBanner from './AlertBanner.vue'
 import ReportSection from './ReportSection.vue'
@@ -252,6 +252,9 @@ export default {
 		},
 		setAlertToast(on) {
 			this.watcher.setToast(on)
+		},
+		previewAlertMessage() {
+			previewAlertMessage()
 		},
 		setAlertToastOptions(o) {
 			this.watcher.setToastOptions(o)
