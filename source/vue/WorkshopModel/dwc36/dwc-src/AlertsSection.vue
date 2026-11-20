@@ -19,6 +19,16 @@
 					<v-switch :input-value="toast" dense color="primary" hide-details :label="t(TOAST.label)" @change="$emit('update-toast', !!$event)" />
 					<info-tip :choice="TOAST" :title="t(TOAST.label)" />
 				</div>
+				<div v-if="toast" class="mo-toast-opts">
+					<div class="help-tip-row mb-2">
+						<v-switch :input-value="toastOptions.sticky" dense color="primary" hide-details :label="t(STICKY.label)" @change="$emit('update-toast-options', { sticky: !!$event })" />
+						<info-tip :choice="STICKY" :title="t(STICKY.label)" />
+					</div>
+					<wf-field id="al-toast-max" class="mo-field-type mb-2" :label="t(MAX.label)">
+						<template #help><info-tip :choice="MAX" :title="t(MAX.label)" /></template>
+						<v-text-field id="al-toast-max" :value="toastOptions.max" type="number" :min="1" :max="10" dense outlined hide-details :aria-label="t(MAX.label)" @change="$emit('update-toast-options', { max: Number($event) })" />
+					</wf-field>
+				</div>
 				<div class="mo-part">{{ t('alerts_rules') }}</div>
 				<div v-if="!monitor.rules.length" class="mo-empty mo-empty-small"><v-icon class="mo-empty-icon">mdi-bell-plus-outline</v-icon><div class="mo-empty-text">{{ t('alerts_none') }}</div></div>
 				<table v-else class="mo-table">
@@ -116,7 +126,7 @@ import PathPicker from './PathPicker.vue'
 import PathSelect from './PathSelect.vue'
 import AlertPathFinder from './AlertPathFinder.vue'
 import { ALERT_SETTINGS, OPS, COOLDOWN_DEFAULT_S, cleanRule, isNumericOp, ruleProblem } from './alert-rules.js'
-import { TOAST_SETTING } from './alert-toast.js'
+import { TOAST_SETTING, TOAST_STICKY_SETTING, TOAST_MAX_SETTING, TOAST_DEFAULTS } from './alert-toast.js'
 import { describePath } from './path-dictionary.js'
 import { isActive, EVENTS_KEPT } from './alert-monitor.js'
 
@@ -125,11 +135,12 @@ export default {
 	props: {
 		monitor: { type: Object, required: true },
 		toast: { type: Boolean, default: true }, // the pop-up message of a fire is on
+		toastOptions: { type: Object, default: () => Object.assign({}, TOAST_DEFAULTS) }, // { sticky, max } how the message waits
 		watched: { type: Array, default: () => [] },
 		tick: { type: Number, default: 0 } // the live model of the path finder
 	},
 	data() {
-		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, TOAST: TOAST_SETTING, pickOpen: false }
+		return { draft: { path: '', op: 'above', value: '', hysteresis: 0, cooldown: COOLDOWN_DEFAULT_S }, touched: { path: false, value: false }, added: '', S: ALERT_SETTINGS, TOAST: TOAST_SETTING, STICKY: TOAST_STICKY_SETTING, MAX: TOAST_MAX_SETTING, pickOpen: false }
 	},
 	computed: {
 		numeric() {

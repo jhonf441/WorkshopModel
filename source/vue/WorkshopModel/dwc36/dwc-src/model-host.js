@@ -6,7 +6,8 @@
 // application/octet-stream (a PUT with another type leaves a 0-byte file in DSF).
 
 import store from '@/store'
-import { log, logToConsole, LogType } from '@/utils/logging'
+import { logToConsole, LogType } from '@/utils/logging'
+import { makeNotification } from '@/utils/notifications'
 import { isMissing } from './host-errors.js'
 
 export function liveModel() {
@@ -23,13 +24,23 @@ export function sendCode(arg) {
 	return store.dispatch('machine/sendCode', { code: o.code, log: o.log !== false, noWait: o.noWait === true })
 }
 
-// a line for DWC's console, with the pop-up message at the bottom left too when `popup` is true (DWC's own log() does both, logToConsole() only the
-// console); `type` is 'warning' or 'success'. A failure here never stops the alerts.
-export function logAlert(type, title, message, popup) {
+// a line for DWC's console; `type` is 'warning' or 'success'. A failure here never stops the alerts.
+export function logAlertConsole(type, title, message) {
 	try {
-		;(popup ? log : logToConsole)(type === 'warning' ? LogType.warning : LogType.success, title, message)
+		logToConsole(type === 'warning' ? LogType.warning : LogType.success, title, message)
 	} catch (e) {
 		console.warn('[WorkshopModel] alert not written to the console:', e)
+	}
+}
+
+// the pop-up message at the bottom left (DWC's own notification); `sticky` keeps it until the person closes it (timeout 0), otherwise it goes by itself
+// after DWC's notification time. -> the notification (it has close()), or null when it could not be shown
+export function showAlertPopup(type, title, message, sticky) {
+	try {
+		return makeNotification(type === 'info' ? LogType.info : LogType.warning, title, message, sticky ? 0 : null)
+	} catch (e) {
+		console.warn('[WorkshopModel] alert message not shown:', e)
+		return null
 	}
 }
 

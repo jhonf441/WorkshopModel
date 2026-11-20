@@ -1,5 +1,13 @@
 # WorkshopModel -- historial de versiones
 
+## 1.7.55 -- 2026-11-20
+
+- Alerts: the pop-up message of a fire now waits until the person closes it, so an alert is never missed because nobody was looking. New switch "Keep the message until I close it", on by default; off, the message goes away by itself after DWC's notification time as before.
+- Alerts: the messages do not pile up. A rule keeps one message at most (a rule that fires again replaces its own), and at most N messages wait at once: new field "Messages waiting at once", 1 to 10, 3 by default. The oldest message that does not fit is folded into one "More alerts" message that counts the others and also waits to be closed. What is folded is still written in the console and listed in the events. DWC shows its messages one after the other, so a short queue is a short wait.
+- Both options show under "Show a pop-up message" (only while it is on), have their "?" help in Spanish and English and are kept in this browser. The console still gets every fire and recovery whatever the options say; a recovery never opens a message.
+- The help texts of the pop-up message no longer say it goes away by itself.
+- Code: alert-popups.js (3.6 only) keeps what waits on the screen; the message is made with DWC's own makeNotification with timeout 0 when it must wait (model-host.js showAlertPopup). Tests: alert-popups.test.js.
+
 ## 1.7.54 -- 2026-11-20
 
 - Alerts: the path finder of the rule form is now a guided one. It searches the whole model by name, whole path or value; lists "what people usually watch" that the board really has (heater and sensor temperatures, MCU and supply voltages, axis positions, fans, layer, uptime, state); and walks the model one level at a time where a branch opens and a value is used with one tap. Every row shows the kind, the value now and what the path is when the dictionary knows it; a rule on a number is offered numbers only, with a button to show every kind. Before, a rule on a number showed only branches with a disabled Insert, so nothing could be inserted.

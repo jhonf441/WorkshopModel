@@ -6,11 +6,12 @@
 // without a reload of DWC) stops the first timer through a key on `window`, so there are never two watchers.
 
 import i18n from '../../i18n'
-import { liveModel, isConnected, logAlert } from './model-host.js'
+import { liveModel, isConnected, logAlertConsole, showAlertPopup } from './model-host.js'
 import { readMonitor } from './alert-monitor.js'
 import { createAlertWatch } from './alert-watch.js'
 import { beep } from './alert-sound.js'
 import { escapeHtml } from './alert-toast.js'
+import { createPopups } from './alert-popups.js'
 
 const KEY = '__workshopModelAlertWatch'
 
@@ -21,8 +22,23 @@ export function eventLine(e) {
 	return t('alerts_event_' + e.type, { path: e.path, op: t('alerts_op_' + e.op), limit: e.limit, value: e.value })
 }
 
+const popups = createPopups({ show: showAlertPopup })
+
+// a line of the console always; a fire also leaves its message when the switch is on: it waits to be closed unless the person chose otherwise, and
+// a rule keeps one message at most, with a cap on how many wait (alert-popups.js)
 function notify(e, popup) {
-	logAlert(e.type === 'fire' ? 'warning' : 'success', escapeHtml(t(e.type === 'fire' ? 'alerts_toast_title' : 'alerts_toast_recovered')), escapeHtml(eventLine(e)), popup)
+	const fire = e.type === 'fire'
+	const title = escapeHtml(t(fire ? 'alerts_toast_title' : 'alerts_toast_recovered'))
+	const message = escapeHtml(eventLine(e))
+	logAlertConsole(fire ? 'warning' : 'success', title, message)
+	if (!popup) return
+	const o = watch ? watch.toastOptions : { sticky: true, max: 3 }
+	popups.fire(e.id, title, message, {
+		sticky: o.sticky,
+		max: o.max,
+		summaryTitle: escapeHtml(t('alerts_toast_more_title')),
+		summaryText: n => escapeHtml(t('alerts_toast_more_text', { n }))
+	})
 }
 
 let watch = null

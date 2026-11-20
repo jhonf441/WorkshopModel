@@ -9,6 +9,41 @@ import { helpChoice } from './view-choices.js'
 export const TOAST_KEY = 'workshopModelAlertToast'
 
 export const TOAST_SETTING = helpChoice('alerts_set', 'toast')
+export const TOAST_STICKY_SETTING = helpChoice('alerts_set', 'toast_sticky')
+export const TOAST_MAX_SETTING = helpChoice('alerts_set', 'toast_max')
+
+// How the message behaves: it waits for the person to close it (so an alert never passes unseen) and at most `max` wait at once (the rest are
+// folded into one "more alerts" message). Kept in this browser with the switch.
+export const TOAST_OPTIONS_KEY = 'workshopModelAlertToastOptions'
+export const TOAST_MAX_MIN = 1
+export const TOAST_MAX_MAX = 10
+export const TOAST_DEFAULTS = { sticky: true, max: 3 }
+
+export function cleanToastOptions(o) {
+	const raw = o ? o.max : undefined
+	const n = raw === null || raw === undefined || raw === '' ? NaN : Math.round(Number(raw))
+	return {
+		sticky: !(o && o.sticky === false),
+		max: Number.isFinite(n) ? Math.min(TOAST_MAX_MAX, Math.max(TOAST_MAX_MIN, n)) : TOAST_DEFAULTS.max
+	}
+}
+
+export function readToastOptions(storage) {
+	try {
+		return cleanToastOptions(JSON.parse((storage && storage.getItem(TOAST_OPTIONS_KEY)) || 'null'))
+	} catch (e) {
+		return Object.assign({}, TOAST_DEFAULTS)
+	}
+}
+
+export function saveToastOptions(storage, o) {
+	try {
+		storage.setItem(TOAST_OPTIONS_KEY, JSON.stringify(cleanToastOptions(o)))
+		return true
+	} catch (e) {
+		return false
+	}
+}
 
 // -> true unless the person turned it off
 export function readToast(storage) {

@@ -8,7 +8,7 @@
 
 import { monitorTick, setRules, setSound, dismiss, clearEvents, saveMonitor } from './alert-monitor.js'
 import { shouldBeep } from './alert-sound.js'
-import { readToast, saveToast, newEvents } from './alert-toast.js'
+import { readToast, saveToast, readToastOptions, saveToastOptions, cleanToastOptions, newEvents } from './alert-toast.js'
 
 export const WATCH_TICK_MS = 1000
 
@@ -17,6 +17,7 @@ export const WATCH_TICK_MS = 1000
 export function createAlertWatch(host) {
 	let mon = host.monitor
 	let toast = readToast(host.storage)
+	let toastOptions = readToastOptions(host.storage)
 	let timer = null
 	const listeners = new Set()
 
@@ -45,6 +46,7 @@ export function createAlertWatch(host) {
 	return {
 		get monitor() { return mon },
 		get toast() { return toast },
+		get toastOptions() { return toastOptions },
 		get running() { return timer !== null },
 		start() {
 			if (timer === null) timer = host.setTimer(tick, WATCH_TICK_MS)
@@ -61,6 +63,11 @@ export function createAlertWatch(host) {
 		},
 		setRules: rules => edit(setRules(mon, rules)),
 		setSound: on => edit(setSound(mon, on)),
+		setToastOptions(o) {
+			toastOptions = cleanToastOptions(Object.assign({}, toastOptions, o))
+			saveToastOptions(host.storage, toastOptions)
+			listeners.forEach(fn => { try { fn(mon) } catch (e) { /* see keep() */ } })
+		},
 		setToast(on) {
 			toast = on !== false
 			saveToast(host.storage, toast)
