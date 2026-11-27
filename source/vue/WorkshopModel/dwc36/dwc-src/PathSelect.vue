@@ -92,7 +92,7 @@ export default {
 </script>
 
 <style>
-.mo-page .mo-path-select .v-input__slot, .mo-path-menu .v-list-item { min-height: 44px; }
+.mo-page .mo-path-select .v-input__slot, .mo-path-menu .v-list-item { min-height: var(--wf-size-m); }
 .mo-path-menu .v-subheader { font-weight: 600; }
 .mo-path-menu .mo-path-item { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; padding: 4px 0; min-width: 0; }
 .mo-path-menu .mo-path-name { background: transparent; font-family: var(--tp-font-mono, monospace); font-size: 13px; font-weight: 600; word-break: break-all; }

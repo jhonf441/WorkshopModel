@@ -1,6 +1,5 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
+	<div class="wf-group mb-3">
 			<div class="mo-part"><v-icon :size="20" class="mr-1">mdi-flask-outline</v-icon>{{ t('tester_title') }}</div>
 			<div class="mo-faint mb-2">{{ t('tester_help') }}</div>
 			<view-tabs :choices="TESTER_MODES" :current="mode" :label="t('tester_mode')" class="mb-2" @pick="mode = $event" />
@@ -57,8 +56,7 @@
 					</tr>
 				</tbody>
 			</table>
-		</v-card-text>
-	</v-card>
+	</div>
 </template>
 
 <script>
@@ -378,7 +376,7 @@ export default {
 .mo-page .mo-xb-warn { margin: 2px 0; }
 .mo-page .mo-xb-live { margin-top: 12px; }
 .mo-page .mo-xb-live-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0; }
-.mo-page .mo-xb-select { border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 4px; padding: 4px 8px; min-height: 32px; background: transparent; color: inherit; }
+.mo-page .mo-xb-every { flex: 0 0 160px; min-width: 0; }
 /* what is being built stays in view: the expression field sticks under the DWC bar while the page scrolls, and the search and the groups of each
    list stick to the top of the list's own scroll (the groups and the search never scroll away) */
 .mo-page .mo-xb-sticky { position: sticky; top: 64px; z-index: 6; background: var(--wf-surface); padding: 6px 0 2px; }

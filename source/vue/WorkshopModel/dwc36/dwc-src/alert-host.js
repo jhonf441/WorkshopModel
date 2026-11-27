@@ -5,14 +5,21 @@
 // run on every page; the Model Explorer page takes the same object with alertWatch(). A second load of the bundle (the plugin started again
 // without a reload of DWC) stops the first timer through a key on `window`, so there are never two watchers.
 
+// The one watcher of this browser (alert-watch.js) wired to DWC 3.6: the live model, the connection, DWC's own console and the pop-up message (THE notices
+// center of the family, vue/_shared36/notices.js: where, how long and which look are the choice of THIS screen, NoticeOptions.vue; note 13, 2026-11-23), the
+// sound, and the one-second clock of the family (tick-scheduler.js). index.js starts it when DWC loads the plugin, so the alerts
+// run on every page; the Model Explorer page takes the same object with alertWatch(). A second load of the bundle (the plugin started again
+// without a reload of DWC) stops the first timer through a key on `window`, so there are never two watchers.
+
 import i18n from '../../i18n'
 import { liveModel, isConnected, logAlertConsole, showAlertPopup } from './model-host.js'
 import { readMonitor } from './alert-monitor.js'
+import { ruleName } from './alert-rules.js'
 import { createAlertWatch } from './alert-watch.js'
 import { beep } from './alert-sound.js'
 import { escapeHtml } from './alert-toast.js'
-import { createPopups } from './alert-popups.js'
-import { createToastView } from './alert-toast-view.js'
+import { installNotices } from './notices.js' // vue/_shared36: THE notices center
+import { sharedScheduler } from './tick-scheduler.js' // vue/_shared36
 
 const KEY = '__workshopModelAlertWatch'
 
@@ -20,61 +27,26 @@ const t = (k, p) => i18n.t('plugins.WorkshopModel.model.' + k, p)
 
 // the line of an event, as the banner and the list of events say it
 export function eventLine(e) {
-	return t('alerts_event_' + e.type, { path: e.path, op: t('alerts_op_' + e.op), limit: e.limit, value: e.value })
+	return t('alerts_event_' + e.type, { path: ruleName(e), op: t('alerts_op_' + e.op), limit: e.limit, value: e.value })
 }
 
-const DEFAULT_OPTIONS = { sticky: true, max: 3, style: 'own', position: 'left' }
-const optionsNow = () => (watch ? watch.toastOptions : DEFAULT_OPTIONS)
+const SOURCE = 'WorkshopModel'
+const DWC_TYPE = { info: 'info', success: 'info', warning: 'warning', error: 'warning', refusal: 'warning' }
 
-// the page is dark when Vuetify says so (the root of DWC carries theme--dark)
-function isDark() {
-	const root = typeof document === 'undefined' ? null : document.querySelector('.v-application')
-	return !!(root && root.classList.contains('theme--dark'))
-}
-
-// the side menu of DWC, when it is open on the left, is a place a card must not cover: the left corner starts at its edge
-function menuInset() {
-	const nav = typeof document === 'undefined' ? null : document.querySelector('.v-navigation-drawer--open')
-	if (!nav) return 0
-	const r = nav.getBoundingClientRect()
-	return r.width > 0 && r.left <= 0 ? Math.max(0, r.right) : 0
-}
-
-let view = null
-function ownView() {
-	if (!view) {
-		view = createToastView({
-			doc: document,
-			labels: () => ({ close: t('alerts_toast_close'), region: t('alerts_toast_region') }),
-			position: () => optionsNow().position,
-			dark: isDark,
-			inset: menuInset
-		})
+// THE notices center of this tab (the first plugin that asks installs it). This plugin can show DWC's own notification, so it opens that door once
+// for the "DWC notification" look of the screen (the center decides when to use it; a failed door falls back to the card). Texts are escaped: DWC prints HTML.
+function center() {
+	const c = installNotices()
+	if (c && typeof c._setDwcDoor === 'function' && !c._door) {
+		c._setDwcDoor(n => showAlertPopup(DWC_TYPE[n.level] || 'info', escapeHtml(n.title || ''), escapeHtml(n.text || ''), false) !== null)
 	}
-	return view
+	return c
 }
 
-// the message in the style the person chose: the own card (plain DOM, text as text) or DWC's notification (it prints HTML, so the texts are escaped)
-function show(type, title, message, sticky) {
-	if (optionsNow().style === 'dwc') return showAlertPopup(type, escapeHtml(title), escapeHtml(message), sticky)
-	try {
-		return ownView().show(type, title, message, sticky)
-	} catch (e) {
-		console.warn('[WorkshopModel] alert message not shown:', e)
-		return null
-	}
-}
-
-const popups = createPopups({ show })
-
-function fireMessage(id, title, message) {
-	const o = optionsNow()
-	popups.fire(id, title, message, {
-		sticky: o.sticky,
-		max: o.max,
-		summaryTitle: t('alerts_toast_more_title'),
-		summaryText: n => t('alerts_toast_more_text', { n })
-	})
+// one message per rule (the same id replaces the previous one); the center decides the place, the time and how many wait
+function fireMessage(id, title, message, level) {
+	const c = center()
+	if (c) c.post({ source: SOURCE, id: String(id), level: level || 'warning', title, text: message })
 }
 
 // a line of the console always (DWC prints it as HTML: escaped); a fire also leaves its message when the switch is on: it waits to be closed unless
@@ -84,12 +56,7 @@ function notify(e, popup) {
 	const title = t(fire ? 'alerts_toast_title' : 'alerts_toast_recovered')
 	const message = eventLine(e)
 	logAlertConsole(fire ? 'warning' : 'success', escapeHtml(title), escapeHtml(message))
-	if (popup) fireMessage(e.id, title, message)
-}
-
-// the "Try the message" button: a sample in the style and the place chosen now, so the person sees it before an alert needs it (no console line)
-export function previewAlertMessage() {
-	fireMessage('preview', t('alerts_toast_title'), t('alerts_toast_preview_text'))
+	if (popup) fireMessage(e.id, title, message, fire ? 'warning' : 'success')
 }
 
 let watch = null
@@ -106,8 +73,8 @@ export function alertWatch() {
 		now: () => Date.now(),
 		notify,
 		beep: () => beep(win),
-		setTimer: (fn, ms) => setInterval(fn, ms),
-		clearTimer: id => clearInterval(id)
+		setTimer: (fn, ms) => sharedScheduler().every(fn, ms),
+		clearTimer: id => sharedScheduler().remove(id)
 	})
 	if (win) win[KEY] = watch
 	return watch

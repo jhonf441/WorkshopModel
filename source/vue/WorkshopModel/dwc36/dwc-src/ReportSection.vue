@@ -1,13 +1,6 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-clipboard-text-outline</v-icon></span>
-				<div class="mo-head-text">
-					<div class="wf-section-head"><h2 class="mo-head-title">{{ t('report_title') }}</h2><help-tip :title="t('report_title')"><p>{{ t('report_help') }}</p></help-tip></div>
-					<p class="mo-head-lead">{{ t('look_report_lead') }}</p>
-				</div>
-			</div>
+	<div class="wf-group mb-3">
+			<card-head icon="mdi-clipboard-text-outline" :title="t('report_title')" />
 			<div class="mo-part">{{ t('report_private') }}</div>
 			<div class="mo-report-includes">
 				<div v-for="c in REPORT_INCLUDES" :key="c.id" class="mo-report-inc">
@@ -15,7 +8,7 @@
 					<info-tip :choice="c" :title="t(c.label)" />
 				</div>
 			</div>
-			<div class="mo-tip-row mt-2 mb-2">
+			<div class="help-tip-row mt-2 mb-2">
 				<v-select v-model="dwc" :items="dwcItems" dense outlined hide-details class="mo-field" :label="t(REPORT_DWC_SETTING.label)" />
 				<info-tip :choice="REPORT_DWC_SETTING" :title="t(REPORT_DWC_SETTING.label)" />
 			</div>
@@ -31,8 +24,8 @@
 			<div class="mo-part mt-2">{{ t('report_preview') }}</div>
 			<div v-if="!text" class="mo-faint">{{ t('report_empty') }}</div>
 			<pre v-else class="mo-result-text mo-sub">{{ text }}</pre>
-		</v-card-text>
-	</v-card>
+			<help-fold :what="t('look_report_lead')" :how="t('report_help')" />
+	</div>
 </template>
 
 <script>
@@ -44,7 +37,8 @@
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import InfoTip from './InfoTip.vue'
-import HelpTip from './HelpTip.vue' // vue/_shared36
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
 import { exchangeSaveBlob } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { copyText } from './copy-text.js'
@@ -52,7 +46,7 @@ import { buildReport, detectDwcVersion } from './machine-report.js'
 import { REPORT_INCLUDES, REPORT_DWC_SETTING, cleanIncludes, dwcVersionChoices } from './report-redact.js'
 
 export default {
-	components: { InfoTip, HelpTip },
+	components: { InfoTip, CardHead, HelpFold },
 	props: {
 		tick: { type: Number, default: 0 }
 	},

@@ -1,17 +1,9 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-star-outline</v-icon></span>
-				<div class="mo-head-text">
-					<h2 class="mo-head-title">{{ t('pins_title') }}</h2>
-					<p class="mo-head-lead">{{ t('look_favorites_lead') }}</p>
-				</div>
-			</div>
+	<div class="wf-group mb-3">
+			<card-head icon="mdi-star-outline" :title="t('pins_title')" />
 			<pinned-strip :pinned="pinned" :tick="tick" class="mb-2" @select="$emit('select', $event)" @open="$emit('select', $event)" @unpin="unpin" />
-			<choice-guide :choice="PINS_ROW" :title="t(PINS_ROW.label)" class="mb-2" />
-		</v-card-text>
-	</v-card>
+			<help-fold :what="t('look_favorites_lead')" :items="helpBlocks" />
+	</div>
 </template>
 
 <script>
@@ -22,18 +14,26 @@
 // pins.js (kept in the browser); the stars stay on the rows of the other sections.
 import i18n from '../../i18n'
 import PinnedStrip from './PinnedStrip.vue'
-import ChoiceGuide from './ChoiceGuide.vue'
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
+import { helpItems } from './section-help.js'
 import { loadPins, savePins, removePin, PINS_ROW } from './pins.js'
 
 const storage = () => (typeof localStorage === 'undefined' ? null : localStorage)
 
 export default {
-	components: { PinnedStrip, ChoiceGuide },
+	components: { PinnedStrip, CardHead, HelpFold },
 	props: {
 		tick: { type: Number, default: 0 }
 	},
 	data() {
 		return { pinned: loadPins(storage()), PINS_ROW }
+	},
+	computed: {
+		// the one fold at the foot of the card (redesign 2026-11-23): the lead that sat under the title and how the favourites work
+		helpBlocks() {
+			return helpItems(k => this.t(k), [[PINS_ROW, this.t(PINS_ROW.label)]])
+		}
 	},
 	methods: {
 		t(k, p) {

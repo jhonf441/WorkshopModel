@@ -5,7 +5,7 @@
 //  - the readers and writers the person asked for (the scope): the M98 chain from config.g (plus daemon.g and start.g), then the
 //    folders switched on down to the depth;
 //  - the definitions, whatever the scope: every .g file of 0:/sys down to DEFS_DEPTH (backups and examples left out), from which only
-//    the `global x = ...` lines are kept, so a global created in a macro the scope does not read is not reported as missing.
+//    the `global x = ...` lines are kept (all the lines for 0:/sys/workshop, FULL_REFS_ROOT), so a global created in a macro the scope does not read is not reported as missing.
 // Every .g file is read once, within the budget of the tier (one budget per job). A file whose size and last change are the ones of
 // the cache is not read again (incremental scan). The cache is a Map path -> { key, refs, targets }; the page keeps it in memory and,
 // with the SBC tier only, in the watch file (never a new file on a standalone Duet). The run also says which folders could still hold
@@ -20,6 +20,9 @@ export const REFS_PER_FILE = 300
 export const CACHE_FILES = 400
 export const DEFS_ROOT = '0:/sys'
 export const DEFS_DEPTH = 4
+// the files of the workshop's own macros keep EVERY reference (create, write, read), not only the definitions: they are macros that run, and a
+// global they write or read is not 'read by nobody' (a read behind exists() counts as a read). The rest of 0:/sys stays definitions only.
+export const FULL_REFS_ROOT = '0:/sys/workshop'
 
 // size and last change of a listed file: the key of the cache ('' when the board reports neither)
 export function metaKey(item) {
@@ -172,7 +175,7 @@ function unscannedFolders(ctx) {
 function collectRefs(ctx) {
 	const refs = []
 	ctx.next.forEach((e, path) => {
-		const own = ctx.defsOnly.has(path) ? e.refs.filter(r => r.kind === 'define') : e.refs
+		const own = ctx.defsOnly.has(path) && !under(path, FULL_REFS_ROOT) ? e.refs.filter(r => r.kind === 'define') : e.refs
 		refs.push(...own)
 	})
 	return refs

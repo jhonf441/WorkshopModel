@@ -1,6 +1,6 @@
 'use strict'
 
-// The sentence that says why the person cannot change things here, told by its cause (owner rule 2026-11-04): signed out ->
+// The sentence that says why the person cannot change things here, told by its cause (project rule 2026-11-04): signed out ->
 // "sign in", low role -> "the technician role is needed (your role: ...)". ModelExplorer provides it (provide/inject, so the
 // pieces between it and the note do not pass a prop); a piece used alone falls back to its own generic text.
 //

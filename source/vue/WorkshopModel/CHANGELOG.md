@@ -1,5 +1,37 @@
 # WorkshopModel -- historial de versiones
 
+## 1.9.0 -- 2026-11-24
+
+- Redesign on the family scale: one card per section with the family head, rows of 48, buttons 32/36, 40 px touch area, one help at the foot of each card (no more guides spread over it)
+
+## 1.8.2 -- 2026-11-23
+
+- optional files are never requested when absent
+
+## 1.8.1 -- 2026-11-22
+
+- select arrows, one focus ring per field, shared family stylesheet split
+
+## 1.8.0 -- 2026-11-22
+
+- Usage counters, to-review actions, alerts with tabs, editing and alias
+
+## 1.7.61 -- 2026-11-22
+
+- Rebuild with shared update: start-up card split into modules, neutral Spanish texts, service texts resynced, unused .wf-index rule dropped
+
+## 1.7.60 -- 2026-11-22
+
+- Tuteo in texts (no voseo in es.json). 44 px rows.
+
+## 1.7.59 -- 2026-11-22
+
+- Visual review round: single hover and focus for inputs and controls (family styles), 44 px switch and checkbox rows, range picker field 44 px.
+
+## 1.7.58 -- 2026-11-22
+
+- Same code; only shared pieces and texts change: family help fold and line, role tag with the 'Requires the X role' wording, compact header, updated shared family styles.
+
 ## 1.7.57 -- 2026-11-20
 
 - The own alert card keeps clear of the open side menu of DWC: when the left corner is chosen it starts at the edge of the menu, so a card never covers the last entries of the menu (seen on the real screen with 1.7.56). The other corners are not moved.
@@ -89,7 +121,7 @@
 
 ## 1.7.40 -- 2026-11-11
 
-- Owner report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
+- User report 2026-11-11: shutdown without session, kiosk PIN pad, hive confirm color, wheel release and Z keys, version in every page bar
 
 ## 1.7.39 -- 2026-11-11
 

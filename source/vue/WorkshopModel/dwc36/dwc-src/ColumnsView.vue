@@ -164,13 +164,12 @@ export default {
 /* ColumnsView: the density sets the row height, padding and font size; the strip scrolls sideways, each column on its own */
 .mo-page .mo-columns-view { --mo-columns-row: 40px; --mo-columns-pad: 6px 12px; --mo-columns-font: 13px; --mo-columns-width: 260px; display: flex; flex-direction: column; gap: 8px; }
 .mo-page .mo-columns-view.mo-density-compact { --mo-columns-row: 32px; --mo-columns-pad: 2px 8px; --mo-columns-font: 12px; --mo-columns-width: 220px; }
-@media (pointer: coarse) { .mo-page .mo-columns-view { --mo-columns-row: 48px; } .mo-page .mo-columns-view.mo-density-compact { --mo-columns-row: 40px; } }
 .mo-page .mo-columns-help, .mo-page .mo-columns-note { color: var(--tp-faint); font-size: 12px; }
 .mo-page .mo-columns-note { padding: 6px 12px; }
 .mo-page .mo-columns-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .mo-page .mo-columns-crumbs { display: flex; flex-wrap: wrap; align-items: center; min-width: 0; }
 .mo-page .mo-columns-crumb-step { display: inline-flex; align-items: center; }
-.mo-page .mo-columns-crumb { min-height: 32px; padding: 2px 6px; border: 0; border-radius: 4px; background: transparent; color: inherit; font-family: var(--tp-font-mono, monospace); font-size: 12px; cursor: pointer; }
+.mo-page .mo-columns-crumb { position: relative; min-height: var(--wf-size-s); padding: 2px 6px; border: 0; border-radius: 4px; background: transparent; color: inherit; font-family: var(--tp-font-mono, monospace); font-size: 12px; cursor: pointer; }
 .mo-page .mo-columns-crumb[aria-current] { font-weight: 600; }
 .mo-page .mo-columns-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .mo-page .mo-columns-strip { display: flex; align-items: stretch; overflow-x: auto; border: 1px solid var(--wf-line); border-radius: 8px; scroll-snap-type: x proximity; }

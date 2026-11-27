@@ -1,13 +1,6 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-download-outline</v-icon></span>
-				<div class="mo-head-text">
-					<div class="wf-section-head"><h2 class="mo-head-title">{{ t('export_title') }}</h2><help-tip :title="t('export_title')"><p>{{ t('export_help') }}</p></help-tip></div>
-					<p class="mo-head-lead">{{ t('look_export_lead') }}</p>
-				</div>
-			</div>
+	<div class="wf-group mb-3">
+			<card-head icon="mdi-download-outline" :title="t('export_title')" />
 			<div v-if="!entries.length" class="mo-faint">{{ t('export_none') }}</div>
 			<template v-else>
 				<wf-field id="we-range" class="mo-field mb-2" :label="t(EXPORT_RANGE_SETTING.label)">
@@ -22,8 +15,8 @@
 				<div class="mo-will-save" role="status"><span>{{ t('look_export_names') }}</span><span class="mo-will-save-name">{{ names.watch }}</span><span class="mo-faint">{{ t('look_export_names_hint') }}</span></div>
 				<div v-if="note" class="mo-note mt-1" :class="note.ok ? 'ok' : 'warn'" role="status"><v-icon small>{{ note.ok ? 'mdi-check-circle-outline' : 'mdi-alert-outline' }}</v-icon><span class="mo-note-text">{{ note.text }}</span></div>
 			</template>
-		</v-card-text>
-	</v-card>
+			<help-fold :what="t('look_export_lead')" :how="t('export_help')" />
+	</div>
 </template>
 
 <script>
@@ -35,14 +28,15 @@
 import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import InfoTip from './InfoTip.vue'
-import HelpTip from './HelpTip.vue' // vue/_shared36
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
 import WfField from './WfField.vue' // vue/_shared36
 import { exchangeExportJson, exchangeSave } from './data-exchange-ui.js'
 import { exchangeFileName } from './data-exchange.js'
 import { EXPORT_RANGES, EXPORT_RANGE_SETTING, EXPORT_FORMAT, EXPORT_VERSION, rangeBounds, watchTable, watchCsv, changesCsv, watchJson } from './watch-export.js'
 
 export default {
-	components: { InfoTip, HelpTip, WfField },
+	components: { InfoTip, CardHead, HelpFold, WfField },
 	props: {
 		entries: { type: Array, default: () => [] },
 		changes: { type: Array, default: () => [] },

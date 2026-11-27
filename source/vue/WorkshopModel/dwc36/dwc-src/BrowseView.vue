@@ -149,16 +149,15 @@ export default {
 /* BrowseView: the density sets the row height, padding and font size of the list */
 .mo-page .mo-browse-view { --mo-browse-row: 40px; --mo-browse-pad: 6px 10px; --mo-browse-font: 13px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .mo-page .mo-browse-view.mo-density-compact { --mo-browse-row: 32px; --mo-browse-pad: 2px 8px; --mo-browse-font: 12px; }
-@media (pointer: coarse) { .mo-page .mo-browse-view { --mo-browse-row: 48px; } .mo-page .mo-browse-view.mo-density-compact { --mo-browse-row: 40px; } }
 .mo-page .mo-browse-help, .mo-page .mo-browse-note { color: var(--tp-faint); font-size: 12px; }
 .mo-page .mo-browse-bar, .mo-page .mo-browse-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .mo-page .mo-browse-crumbs { display: flex; flex-wrap: wrap; align-items: center; min-width: 0; }
 .mo-page .mo-browse-crumb-step { display: inline-flex; align-items: center; }
-.mo-page .mo-browse-crumb { min-height: 32px; padding: 2px 6px; border: 0; border-radius: 4px; background: transparent; color: inherit; font-family: var(--tp-font-mono, monospace); font-size: 12px; cursor: pointer; }
+.mo-page .mo-browse-crumb { position: relative; min-height: var(--wf-size-s); padding: 2px 6px; border: 0; border-radius: 4px; background: transparent; color: inherit; font-family: var(--tp-font-mono, monospace); font-size: 12px; cursor: pointer; }
 .mo-page .mo-browse-crumb[aria-current] { font-weight: 600; }
 .mo-page .mo-browse-filter { flex: 1 1 200px; max-width: 360px; }
 .mo-page .mo-browse-sort { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--wf-line); border-radius: 6px; overflow: hidden; }
-.mo-page .mo-browse-sort-btn { min-height: 32px; padding: 4px 10px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.mo-page .mo-browse-sort-btn { position: relative; min-height: var(--wf-size-s); padding: 4px 10px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
 .mo-page .mo-browse-sort-btn + .mo-browse-sort-btn { border-left: 1px solid var(--wf-line); }
 .mo-page .mo-browse-sort-on { background: color-mix(in srgb, var(--wf-accent) 16%, transparent); font-weight: 600; }
 .mo-page .mo-browse-list { display: flex; flex-direction: column; max-height: 65vh; overflow-y: auto; padding: 4px 0; border: 1px solid var(--wf-line); border-radius: 8px; }

@@ -40,7 +40,7 @@ function bannerAfter(banner, events) {
 	let out = banner.slice()
 	for (const e of events) {
 		out = out.filter(b => b.id !== e.id)
-		if (e.type === 'fire') out.push({ id: e.id, path: e.path, op: e.op, limit: e.limit, value: e.value, t: e.t, dismissed: false })
+		if (e.type === 'fire') out.push({ id: e.id, path: e.path, alias: e.alias || '', op: e.op, limit: e.limit, value: e.value, t: e.t, dismissed: false })
 	}
 	return out
 }

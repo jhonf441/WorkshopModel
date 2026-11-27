@@ -73,10 +73,11 @@ export default {
 </script>
 
 <style>
-/* PinnedStrip: a soft strip with a head, readable pills (name over the value), 40 px targets, 44 on touch; a gone pin is faint */
-.mo-page .mo-pinned { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid rgba(128, 128, 128, 0.22); border-radius: 12px; background: rgba(128, 128, 128, 0.05); }
+/* PinnedStrip (redesign 2026-11-23): a group with a head and readable pills (name over the value) on the scale of the family (32 px buttons, a 40 px
+   touch area by ::after), no grey box around it; a gone pin is faint */
+.mo-page .mo-pinned { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 8px; border: 0; border-bottom: 1px solid var(--wf-line); border-radius: 0; background: transparent; }
 .mo-page .mo-pinned-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-.mo-page .mo-pinned-title { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
+.mo-page .mo-pinned-title { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
 .mo-page .mo-pinned-icon { color: var(--wf-icon); }
 .mo-page .mo-pinned:not(.mo-pinned-none) .mo-pinned-title .mo-pinned-icon { color: var(--tp-amber, #ffb74d); }
 .mo-page .mo-pinned-hint { font-size: 12px; opacity: 0.7; }
@@ -84,14 +85,14 @@ export default {
 .mo-page .mo-pinned-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .mo-page .mo-pinned-pin { display: inline-flex; align-items: center; max-width: 100%; border: 1px solid rgba(128, 128, 128, 0.35); border-radius: 12px; padding-right: 2px; background: var(--wf-surface); transition: border-color 0.15s ease; }
 .mo-page .mo-pinned-pin:hover { border-color: rgba(128, 128, 128, 0.6); }
-.mo-page .mo-pinned-go { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; max-width: 100%; padding: 4px 6px 4px 10px; border: 0; border-radius: 12px 0 0 12px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.mo-page .mo-pinned-go { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: var(--wf-size-s); max-width: 100%; padding: 4px 6px 4px 10px; border: 0; border-radius: 12px 0 0 12px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .mo-page .mo-pinned-go:hover, .mo-page .mo-pinned-btn:hover { background: rgba(128, 128, 128, 0.12); }
 .mo-page .mo-pinned-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
 .mo-page .mo-pinned-label { font-family: var(--tp-font-mono, monospace); font-size: 12px; opacity: 0.8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mo-page .mo-pinned-value { font-family: var(--tp-font-mono, monospace); font-size: 14px; font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mo-page .mo-pinned-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 40px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--wf-icon); cursor: pointer; }
+.mo-page .mo-pinned-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: var(--wf-size-s); min-height: var(--wf-size-s); padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--wf-icon); cursor: pointer; }
 .mo-page .mo-pinned-go:focus-visible, .mo-page .mo-pinned-btn:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
 .mo-page .mo-pinned-gone { opacity: 0.6; }
-@media (pointer: coarse) { .mo-page .mo-pinned-go { min-height: 44px; } .mo-page .mo-pinned-btn { min-height: 44px; min-width: 44px; } }
+.mo-page :is(.mo-pinned-go, .mo-pinned-btn)::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, var(--wf-hit)); height: max(100%, var(--wf-hit)); transform: translate(-50%, -50%); }
 @media (prefers-reduced-motion: reduce) { .mo-page .mo-pinned-pin { transition: none; } }
 </style>

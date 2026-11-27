@@ -2,7 +2,9 @@
    (design/family.css: bar, menu, cards, buttons, chips) and of the base rules in ModelExplorer.vue. The same file in both DWC lines.
    What it brings: one section head with a soft icon box and a lead, pills with a dot, empty and loading states, the cards of the
    Globals section (a big readable value, a switch or a stepper in place, marks in words), item rows for snapshots and presets, the
-   watch rows that wrap instead of scrolling sideways, and calm motion that stops with prefers-reduced-motion. Touch: 44 px targets. */
+   watch rows that wrap instead of scrolling sideways, and calm motion that stops with prefers-reduced-motion. Touch: the scale of the family since the
+   redesign of 2026-11-23 (FAMILIA-REDISENO.md 2: buttons and chips 32, fields 36, data chips 24, list rows 40 / 48, a 40 px touch area by ::after),
+   no grey sub-cards (a group is a title over a divider), the head of every card is the family's <card-head>. */
 
 /* ================= tokens ================= */
 .workshop-theme.mo-page { --mo-r: 12px; --mo-r-s: 8px; --mo-soft: rgba(128, 128, 128, 0.07); --mo-soft2: rgba(128, 128, 128, 0.12); --mo-line: rgba(128, 128, 128, 0.22); --mo-line2: rgba(128, 128, 128, 0.4); --mo-glow: rgba(251, 140, 0, 0.35); }
@@ -11,15 +13,21 @@
    watch bands and their legend). No other rule of the plugin names a colour for these meanings. */
 .workshop-theme.mo-page { --mo-k-define: var(--wf-ok); --mo-k-set: var(--wf-warn); --mo-k-read: var(--wf-info); --mo-on: var(--wf-ok); --mo-off: rgba(128, 128, 128, 0.45); }
 
-/* ================= the head of a section: a soft icon box, a title, one lead line, pills on the right ================= */
-.workshop-theme.mo-page .mo-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 12px; }
-.workshop-theme.mo-page .mo-head-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: var(--mo-soft2); color: var(--wf-icon); }
-.workshop-theme.mo-page .mo-head-icon .v-icon { color: var(--wf-icon); font-size: 22px; }
+/* ================= the head of a card (redesign 2026-11-23): the cards use <card-head> of the family (vue/_shared36/CardHead.vue, .wf-card-head: icon 20
+   in the colour of the section, title 16/600, state and actions at the right, a 4 % tint); a .mo-head still drawn by a dialog looks the same ================= */
+.workshop-theme.mo-page .mo-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 40px; margin: -4px -4px 8px; padding: 4px 8px; border-radius: 8px; background: color-mix(in srgb, var(--wf-sec-now, var(--wf-badge)) 4%, transparent); }
+.workshop-theme.mo-page .mo-head-icon { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: transparent; }
+.workshop-theme.mo-page .mo-head-icon .v-icon { color: var(--wf-sec-now, var(--wf-icon)); font-size: 20px; }
 .workshop-theme.mo-page .mo-head-text { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .workshop-theme.mo-page .mo-head-title { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
 .workshop-theme.mo-page .mo-head-lead { margin: 0; font-size: 13px; line-height: 1.4; opacity: 0.75; }
 .workshop-theme.mo-page .mo-head-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
-.workshop-theme.mo-page .mo-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 1px 10px; border: 1px solid var(--mo-line2); border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+/* a data chip of the plugin is the xs of the family (24, like .wf-chip) */
+.workshop-theme.mo-page .mo-pill { display: inline-flex; align-items: center; gap: 6px; min-height: var(--wf-size-xs); padding: 0 8px; box-sizing: border-box; border: 1px solid var(--mo-line2); border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+/* the touch area of the plugin's own small buttons: 40 px by an invisible ::after over the 32 px button (the .wf-hit of the family) */
+.workshop-theme.mo-page :is(.mo-gchip, .mo-gcard-step, .mo-gcard-more, .mo-ggroup-head, .mo-udone-head, .mo-gchips .wf-cat) { position: relative; }
+.workshop-theme.mo-page :is(.mo-gchip, .mo-gcard-step, .mo-gcard-more, .mo-udone-head, .mo-gchips .wf-cat, .mo-browse-crumb, .mo-browse-sort-btn, .mo-columns-crumb, .mo-apf-crumb)::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, var(--wf-hit)); height: max(100%, var(--wf-hit)); transform: translate(-50%, -50%); }
+.workshop-theme.mo-page .mo-ggroup-head::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: max(100%, var(--wf-hit)); transform: translateY(-50%); }
 .workshop-theme.mo-page .mo-pill .v-icon { color: var(--wf-icon); font-size: 14px; }
 .workshop-theme.mo-page .mo-pill-dot::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(128, 128, 128, 0.6); }
 .workshop-theme.mo-page .mo-pill-dot.ok::before { background: var(--wf-ok); }
@@ -60,7 +68,8 @@
 .workshop-theme.mo-page .mo-gtools .mo-search { flex: 1 1 220px; max-width: 520px; }
 .workshop-theme.mo-page .mo-gchips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-bottom: 10px; }
 .workshop-theme.mo-page .mo-gchips-label { font-size: 12px; opacity: 0.7; margin-right: 2px; }
-.workshop-theme.mo-page .mo-gchip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 2px 12px; border: 1px solid var(--mo-line2); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: background-color 0.12s ease, border-color 0.12s ease; }
+.workshop-theme.mo-page .mo-gchips .wf-cat { min-height: var(--wf-size-s); box-sizing: border-box; }
+.workshop-theme.mo-page .mo-gchip { display: inline-flex; align-items: center; gap: 6px; min-height: var(--wf-size-s); box-sizing: border-box; padding: 0 12px; border: 1px solid var(--mo-line2); border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: background-color 0.12s ease, border-color 0.12s ease; }
 .workshop-theme.mo-page .mo-gchip .v-icon { color: var(--wf-icon); font-size: 16px; }
 .workshop-theme.mo-page .mo-gchip:hover { background: var(--mo-soft2); }
 .workshop-theme.mo-page .mo-gchip:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
@@ -68,27 +77,28 @@
 .workshop-theme.mo-page .mo-gchip[aria-pressed='true'] .v-icon { color: var(--wf-accent); }
 .workshop-theme.mo-page .mo-gchip-sort { margin-left: auto; }
 .workshop-theme.mo-page .mo-gchip-clear { border-style: dashed; }
-.workshop-theme.mo-page .mo-ggroup { margin-bottom: 10px; }
-.workshop-theme.mo-page .mo-ggroup-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 4px 6px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: var(--mo-r-s) var(--mo-r-s) 0 0; background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; transition: background-color 0.12s ease; }
+.workshop-theme.mo-page .mo-ggroup { margin-bottom: 8px; }
+/* a group of globals: its title 13/600 over a divider (the .wf-group of the family), a 32 px button that folds it */
+.workshop-theme.mo-page .mo-ggroup-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: var(--wf-size-s); padding: 0 4px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: var(--wf-radius-control) var(--wf-radius-control) 0 0; background: transparent; color: inherit; font: inherit; font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; transition: background-color 0.12s ease; }
 .workshop-theme.mo-page .mo-ggroup-head:hover { background: var(--mo-soft); }
 .workshop-theme.mo-page .mo-ggroup-head:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: -2px; }
 .workshop-theme.mo-page .mo-ggroup-head .v-icon { color: var(--wf-icon); }
 .workshop-theme.mo-page .mo-ggroup-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workshop-theme.mo-page .mo-ggroup-count { font-size: 12px; font-weight: 500; opacity: 0.7; }
 .workshop-theme.mo-page .mo-ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 10px; padding: 10px 0 2px; align-items: start; }
-.workshop-theme.mo-page .mo-gcard { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 12px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r); background: var(--mo-soft); transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.4s ease; }
+.workshop-theme.mo-page .mo-gcard { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 10px 12px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r); background: transparent; transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.4s ease; }
 .workshop-theme.mo-page .mo-gcard:hover { border-color: var(--mo-line2); }
 .workshop-theme.mo-page .mo-gcard:focus-within { border-color: var(--wf-accent); }
 .workshop-theme.mo-page .mo-gcard-kept { border-left: 4px solid var(--wf-ok); }
 .workshop-theme.mo-page .mo-gcard-flash { animation: mo-glow 2.4s ease-out; }
-@keyframes mo-glow { 0% { background-color: var(--mo-glow); box-shadow: 0 0 0 3px var(--mo-glow); } 100% { background-color: var(--mo-soft); box-shadow: none; } }
+@keyframes mo-glow { 0% { background-color: var(--mo-glow); box-shadow: 0 0 0 3px var(--mo-glow); } 100% { background-color: transparent; box-shadow: none; } }
 .workshop-theme.mo-page .mo-gcard-head { padding-right: 36px; display: flex; align-items: center; gap: 6px; min-height: 32px; }
 .workshop-theme.mo-page .mo-gcard-name { flex: 1 1 auto; min-width: 0; font-family: var(--tp-font-mono, monospace); font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workshop-theme.mo-page .mo-gcard-watch { position: absolute; top: 6px; right: 6px; }
 .workshop-theme.mo-page .mo-gcard-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 36px; }
 .workshop-theme.mo-page .mo-gcard-value { font-family: var(--tp-font-mono, monospace); font-size: 20px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
 .workshop-theme.mo-page .mo-gcard-value-text { font-size: 16px; font-weight: 500; }
-.workshop-theme.mo-page .mo-gcard-more { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; opacity: 0.8; }
+.workshop-theme.mo-page .mo-gcard-more { display: inline-flex; align-items: center; gap: 4px; min-height: var(--wf-size-s); padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: inherit; font: inherit; font-size: 12px; cursor: pointer; opacity: 0.8; }
 .workshop-theme.mo-page .mo-gcard-more:hover { background: var(--mo-soft2); opacity: 1; }
 .workshop-theme.mo-page .mo-gcard-switch { display: inline-flex; align-items: center; gap: 8px; }
 .workshop-theme.mo-page .mo-gcard-switch .mo-gcard-value { font-size: 16px; }
@@ -97,7 +107,7 @@
 .workshop-theme.mo-page .mo-gcard-switch .v-input--selection-controls__input, .workshop-theme.mo-page .mo-gcard-switch .v-input__slot { margin-bottom: 0; }
 .workshop-theme.mo-page .mo-gcard-switch .mo-gcard-value { line-height: 1; }
 .workshop-theme.mo-page .mo-gcard-stepper { display: inline-flex; align-items: center; gap: 4px; }
-.workshop-theme.mo-page .mo-gcard-step { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 40px; height: 40px; border: 1px solid var(--mo-line2); border-radius: 10px; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background-color 0.12s ease; }
+.workshop-theme.mo-page .mo-gcard-step { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--wf-size-s); height: var(--wf-size-s); border: 1px solid var(--wf-control-line); border-radius: var(--wf-radius-control); background: transparent; color: inherit; font: inherit; cursor: pointer; transition: background-color 0.12s ease; }
 .workshop-theme.mo-page .mo-gcard-step .v-icon { color: var(--wf-icon); }
 .workshop-theme.mo-page .mo-gcard-step:hover { background: var(--mo-soft2); }
 .workshop-theme.mo-page .mo-gcard-step:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
@@ -110,7 +120,7 @@
 .workshop-theme.mo-page .mo-gcard-markbtn { padding: 2px 6px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .workshop-theme.mo-page .mo-gcard-markbtn:hover { background: var(--mo-soft2); border-color: var(--mo-line); }
 .workshop-theme.mo-page .mo-gcard-markbtn:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
-.workshop-theme.mo-page .mo-gfiles { flex: 1 1 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-gfiles { flex: 1 1 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: transparent; }
 .workshop-theme.mo-page .mo-gfiles-list { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .workshop-theme.mo-page .mo-gfile { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 12px; }
 .workshop-theme.mo-page .mo-gfile-path { flex: 1 1 100%; overflow-wrap: anywhere; font-size: 12px; }
@@ -119,7 +129,7 @@
 .workshop-theme.mo-page .mo-gfile-line:hover, .workshop-theme.mo-page .mo-gfile-line.on { background: var(--mo-soft2); border-color: var(--wf-accent); }
 .workshop-theme.mo-page .mo-gfile-line:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
 .workshop-theme.mo-page .mo-gfile-peek { flex: 1 1 100%; margin-top: 4px; }
-.workshop-theme.mo-page .mo-ulegend { margin: 8px 0; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-ulegend { margin: 8px 0; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: transparent; }
 .workshop-theme.mo-page .mo-ulegend-sum { display: flex; align-items: center; padding: 8px 10px; cursor: pointer; font-size: 13px; }
 .workshop-theme.mo-page .mo-ulegend-body { padding: 0 12px 10px; font-size: 13px; }
 .workshop-theme.mo-page .mo-ulegend-list { margin: 4px 0 8px; padding: 0; list-style: none; display: grid; gap: 4px; }
@@ -138,7 +148,7 @@
 .workshop-theme.mo-page .mo-bands-time { white-space: nowrap; }
 .workshop-theme.mo-page .mo-bands-more { justify-self: start; padding: 0; border: 0; background: transparent; font-size: 11px; cursor: pointer; text-decoration: underline; }
 .workshop-theme.mo-page .mo-uline-chip.on { outline: 2px solid var(--wf-accent); outline-offset: 1px; }
-.workshop-theme.mo-page .mo-peek { margin: 6px 0; padding: 8px 10px; border: 1px solid var(--mo-line2); border-radius: var(--mo-r-s); background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-peek { margin: 6px 0; padding: 8px 10px; border: 1px solid var(--mo-line2); border-radius: var(--mo-r-s); background: transparent; }
 .workshop-theme.mo-page .mo-peek-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 6px; }
 .workshop-theme.mo-page .mo-peek-path { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; font-size: 12px; }
 .workshop-theme.mo-page .mo-peek-actions { display: inline-flex; gap: 6px; }
@@ -164,12 +174,14 @@
 .workshop-theme.mo-page .mo-gcard-hint { font-size: 12px; opacity: 0.7; }
 /* compact density: the cards become tidy rows */
 .workshop-theme.mo-page .mo-density-compact .mo-ggrid { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; }
-.workshop-theme.mo-page .mo-density-compact .mo-gcard { display: grid; grid-template-columns: minmax(220px, 1.2fr) minmax(150px, 1fr) minmax(240px, 1.4fr) 36px; grid-template-areas: 'head body marks menu'; align-items: center; gap: 4px 16px; padding: 4px 8px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: 0; background: transparent; }
+/* a global is a row of the list (48, the --wf-row of the family): name | value or quick control | marks | watch */
+.workshop-theme.mo-page .mo-density-compact .mo-gcard { display: grid; grid-template-columns: minmax(220px, 1.2fr) minmax(150px, 1fr) minmax(240px, 1.4fr) auto; grid-template-areas: 'head body marks menu'; align-items: center; gap: 4px 16px; min-height: var(--wf-row); padding: 4px 8px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: 0; background: transparent; }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-kept { border-left: 3px solid var(--wf-ok); }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-head { grid-area: head; min-width: 0; }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-body { grid-area: body; min-width: 0; min-height: 32px; }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-value { font-size: 15px; }
-.workshop-theme.mo-page .mo-density-compact .mo-gcard-step { width: 32px; height: 32px; }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-step { width: var(--wf-size-s); height: var(--wf-size-s); }
+.workshop-theme.mo-page .mo-density-compact .mo-gcard-stepper { gap: var(--wf-gap-hit); }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-marks { grid-area: marks; justify-content: flex-start; }
 .workshop-theme.mo-page .mo-density-compact .mo-gcard-full, .workshop-theme.mo-page .mo-density-compact .mo-gcard-edit, .workshop-theme.mo-page .mo-density-compact .mo-gcard-preview, .workshop-theme.mo-page .mo-density-compact .mo-gfiles { grid-column: 1 / -1; }
 /* the guided creator */
@@ -193,12 +205,13 @@
 .workshop-theme.mo-page .mo-creator-done .v-icon { color: var(--wf-ok); animation: mo-upop 0.5s ease-out; }
 
 /* ================= item rows (snapshots, presets): no table, nothing scrolls sideways ================= */
-.workshop-theme.mo-page .mo-items { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
-.workshop-theme.mo-page .mo-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 10px 12px; border: 1px solid var(--mo-line); border-radius: var(--mo-r); background: var(--mo-soft); transition: border-color 0.15s ease, background-color 0.15s ease; }
-.workshop-theme.mo-page .mo-item:hover { border-color: var(--mo-line2); }
-.workshop-theme.mo-page .mo-item.on { border-color: var(--wf-accent); background: rgba(25, 118, 210, 0.1); }
+/* (redesign 2026-11-23) rows of the list with a divider (48 at least), no grey boxes; the chosen one has the accent line at its left */
+.workshop-theme.mo-page .mo-items { display: flex; flex-direction: column; gap: 0; margin: 8px 0; }
+.workshop-theme.mo-page .mo-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; min-height: var(--wf-row); padding: 6px 8px; border: 0; border-bottom: 1px solid var(--mo-line); border-radius: 0; background: transparent; transition: background-color 0.15s ease; }
+.workshop-theme.mo-page .mo-item:hover { background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-item.on { background: color-mix(in srgb, var(--wf-accent) 8%, transparent); box-shadow: inset 3px 0 0 var(--wf-accent); }
 .workshop-theme.mo-page .mo-item-main { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.workshop-theme.mo-page .mo-item-name { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.workshop-theme.mo-page .mo-item-name { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
 .workshop-theme.mo-page .mo-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 12px; font-size: 12px; opacity: 0.8; }
 .workshop-theme.mo-page .mo-item-meta .v-icon { color: var(--wf-icon); font-size: 14px; margin-right: 2px; }
 .workshop-theme.mo-page .mo-item-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-left: auto; }
@@ -221,7 +234,7 @@
 .workshop-theme.mo-page .mo-watch-events .mo-table th:nth-child(1), .workshop-theme.mo-page .mo-watch-events .mo-table th:nth-child(4) { width: 14%; }
 .workshop-theme.mo-page .mo-watch-events .mo-table td, .workshop-theme.mo-page .mo-watch-events .mo-table th { overflow-wrap: anywhere; word-break: break-word; vertical-align: top; text-align: left; }
 .workshop-theme.mo-page .mo-crows { display: flex; flex-direction: column; margin: 6px 0; }
-.workshop-theme.mo-page .mo-crow { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-height: 36px; padding: 4px 6px; border-bottom: 1px solid var(--mo-line); font-size: 13px; }
+.workshop-theme.mo-page .mo-crow { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; min-height: 40px; padding: 4px 6px; border-bottom: 1px solid var(--mo-line); font-size: 13px; }
 .workshop-theme.mo-page .mo-crow-time { font-family: var(--tp-font-mono, monospace); font-size: 12px; opacity: 0.7; }
 .workshop-theme.mo-page .mo-crow-path { flex: 1 1 180px; min-width: 0; }
 .workshop-theme.mo-page .mo-crow-vals { display: inline-flex; align-items: center; gap: 6px; font-family: var(--tp-font-mono, monospace); font-size: 12px; }
@@ -240,14 +253,7 @@
 .workshop-theme.mo-page .mo-flat-scroll, .workshop-theme.mo-page .mo-tree { border-radius: var(--mo-r-s); }
 .workshop-theme.mo-page .mo-fade-in { animation: mo-ufade 0.22s ease-out; }
 
-/* ================= touch screens and phones ================= */
-@media (pointer: coarse) {
-	.workshop-theme.mo-page .mo-gchip, .workshop-theme.mo-page .mo-gcard-more, .workshop-theme.mo-page .mo-pill-btn { min-height: 44px; }
-	.workshop-theme.mo-page .mo-gcard-step { width: 44px; height: 44px; }
-	.workshop-theme.mo-page .mo-density-compact .mo-gcard-step { width: 40px; height: 40px; }
-	.workshop-theme.mo-page .mo-ggroup-head { min-height: 44px; }
-	.workshop-theme.mo-page .mo-creator-type { min-height: 72px; }
-}
+/* ================= phones (no size depends on the pointer: the scale of the family is the same for a finger and a mouse) ================= */
 @media (max-width: 599px) {
 	.workshop-theme.mo-page .mo-head-right { margin-left: 0; }
 	.workshop-theme.mo-page .mo-gchip-sort { margin-left: 0; }
@@ -284,7 +290,7 @@
 .v-dialog.mo-page > .v-card > .v-card__text.mo-rs-body { padding-top: 16px !important; }
 
 /* the step by step panel of the expression builder (ExpressionFlow.vue) */
-.workshop-theme.mo-page .mo-flow { display: grid; gap: 6px; margin: 8px 0; padding: 8px 10px; border: 1px solid var(--mo-line); border-radius: var(--mo-r-s); background: var(--mo-soft); }
+.workshop-theme.mo-page .mo-flow { display: grid; gap: 6px; margin: 8px 0; padding: 4px 0 4px 12px; border: 0; border-left: 3px solid var(--mo-line2); border-radius: 0; background: transparent; }
 .workshop-theme.mo-page .mo-flow-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
 .workshop-theme.mo-page .mo-flow-label { min-width: 92px; font-size: 12px; font-weight: 600; opacity: 0.8; }
 .workshop-theme.mo-page .mo-flow-hint { font-size: 13px; }
@@ -318,3 +324,24 @@
 .workshop-theme.mo-page .mo-gdetail-body { padding-top: 8px; }
 .workshop-theme.mo-page .mo-gcard-detail { display: flex; flex-direction: column; gap: 10px; border: 0; background: transparent; }
 .workshop-theme.mo-page .mo-gcard-detail .mo-gcard-watch { top: 0; right: 0; }
+
+/* ================= redesign 2026-11-23 (FAMILIA-REDISENO.md, Model) ================= */
+/* the head of a card wraps on a narrow page: the state and the actions go under the title instead of cutting it */
+.workshop-theme.mo-page .wf-card-head { flex-wrap: wrap; }
+.workshop-theme.mo-page .wf-card-head-right { flex-wrap: wrap; margin-left: auto; }
+/* the head of a group inside a card: its title 13/600 and, at the right, its one small action (32) */
+.workshop-theme.mo-page .mo-group-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; min-height: var(--wf-size-s); margin-bottom: 4px; }
+.workshop-theme.mo-page .mo-group-head .wf-group-title { margin: 0; }
+.workshop-theme.mo-page .mo-alert-body { margin-top: 8px; }
+/* the search of a list with its counts beside it (data chips of 24) */
+.workshop-theme.mo-page .mo-gtools .wf-chip { flex: none; }
+
+/* ONE card per section (2026-11-23): the page body (.st-body) already is the card with the line of the section; the parts of a section are
+   wf-group (a divider between two), never a v-card inside it */
+/* the views: tabs in the kiosk, one selector on a phone */
+.workshop-theme.mo-page .mo-view-switch .mo-view-select { display: none; }
+@media (max-width: 599px) {
+	.workshop-theme.mo-page .mo-view-switch .mo-view-select { display: block; margin: 4px 0 8px; }
+	.workshop-theme.mo-page .mo-view-switch .mo-view-select ~ .mo-view-tabs { display: none; }
+}
+.workshop-theme.mo-page .mo-view-switch { flex: 1 1 auto; min-width: 0; }

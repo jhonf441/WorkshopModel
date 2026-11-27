@@ -1,18 +1,10 @@
 <template>
 	<div>
-		<v-card class="mb-3">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-camera-outline</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('snapshots_title') }}</h2>
-						<p class="mo-head-lead">{{ t('look_snapshots_lead') }}</p>
-					</div>
-					<div class="mo-head-right">
-						<span v-if="list.length" class="mo-pill"><v-icon x-small>mdi-camera-outline</v-icon>{{ t('look_snapshots_count', { n: list.length }) }}</span>
-						<span class="mo-pill mo-pill-quiet" :title="t('snapshot_budget', { count: budget.count, leaves: budget.leaves })">{{ t('look_budget_short', { count: budget.count, leaves: budget.leaves }) }}</span>
-					</div>
-				</div>
+		<div class="wf-group mb-3">
+				<card-head icon="mdi-camera-outline" :title="t('snapshots_title')">
+					<span v-if="list.length" class="wf-chip">{{ t('look_snapshots_count', { n: list.length }) }}</span>
+					<span class="wf-chip" :title="t('snapshot_budget', { count: budget.count, leaves: budget.leaves })">{{ t('look_budget_short', { count: budget.count, leaves: budget.leaves }) }}</span>
+				</card-head>
 				<error-notice :error="problem" class="mb-2" />
 				<view-tabs :choices="SNAPSHOT_SCOPES" :current="scope" :label="t('snapshot_scope')" class="mb-2" @pick="scope = $event" />
 				<choice-label :choice="scopeChoice" class="mb-2" />
@@ -62,12 +54,11 @@
 					<span v-if="list.length" class="mo-faint">{{ t('look_export_as', { name: exportName }) }}</span>
 				</div>
 				<div v-if="notice" class="mo-note ok mt-1" role="status"><v-icon small>mdi-check-circle-outline</v-icon><span class="mo-note-text">{{ notice }}</span></div>
-				<help-guide :title="t('look_snapshots_more')">
+				<help-fold :title="t('look_snapshots_more')" :what="t('look_snapshots_lead')">
 					<p>{{ t('snapshot_budget', { count: budget.count, leaves: budget.leaves }) }} <span v-if="!tier.extras">{{ t('snapshot_budget_standalone') }}</span></p>
 					<p>{{ t('snapshots_help') }} <code>{{ SNAPSHOTS_FILE }}</code></p>
-				</help-guide>
-			</v-card-text>
-		</v-card>
+				</help-fold>
+		</div>
 		<snapshot-compare :list="list" :from="from" :to="to" :tick="tick" :max-leaves="budget.leaves" @pick-from="from = $event" @pick-to="to = $event" @select="onSelect" />
 	</div>
 </template>
@@ -88,7 +79,8 @@ import { liveModel, readText, writeText } from './model-host.js'
 import ErrorNotice from './ErrorNotice.vue'
 import ViewTabs from './ViewTabs.vue'
 import ChoiceLabel from './ChoiceLabel.vue'
-import HelpGuide from './HelpGuide.vue' // vue/_shared36
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
 import LockReason from './LockReason.vue' // vue/_shared36
 import BranchPicker from './BranchPicker.vue'
 import SnapshotCompare from './SnapshotCompare.vue'
@@ -107,7 +99,7 @@ function storage() {
 }
 
 export default {
-	components: { ErrorNotice, ViewTabs, ChoiceLabel, HelpGuide, LockReason, BranchPicker, SnapshotCompare },
+	components: { ErrorNotice, ViewTabs, ChoiceLabel, CardHead, HelpFold, LockReason, BranchPicker, SnapshotCompare },
 	props: {
 		tick: { type: Number, default: 0 },
 		tier: { type: Object, default: () => ({ extras: false }) },

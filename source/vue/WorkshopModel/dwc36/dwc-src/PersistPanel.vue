@@ -1,6 +1,5 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
+	<div class="wf-group mb-3">
 			<details class="mo-persist" :open="isOpen" @toggle="onToggle">
 				<summary class="mo-persist-head">
 					<span class="mo-head-icon"><v-icon>mdi-content-save-outline</v-icon></span>
@@ -35,8 +34,7 @@
 					<div class="mo-faint mt-1">{{ t('cannot_delete_text') }}</div>
 				</template>
 			</details>
-		</v-card-text>
-	</v-card>
+	</div>
 </template>
 
 <script>
@@ -93,8 +91,9 @@ export default {
 </script>
 
 <style>
-/* PersistPanel: the summary line is the head of the card (icon box, title, state pill); the pill wraps under the title on a phone */
-.mo-page .mo-persist-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-height: 40px; cursor: pointer; list-style: none; }
+/* PersistPanel: the summary line is the head of the card, drawn like the family's (.wf-card-head: 40 px, icon 20 in the colour of the section, title
+   16/600, a 4 % tint; redesign 2026-11-23) with the state chip; the chip wraps under the title on a phone */
+.mo-page .mo-persist-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 40px; margin: -4px -4px 0; padding: 4px 8px; border-radius: 8px; background: color-mix(in srgb, var(--wf-sec-now, var(--wf-badge)) 4%, transparent); cursor: pointer; list-style: none; }
 .mo-page .mo-persist-head::-webkit-details-marker { display: none; }
 .mo-page .mo-persist-head::before { content: ''; flex: none; width: 0; height: 0; border: 5px solid transparent; border-left: 7px solid var(--wf-icon); margin-left: 4px; transition: transform 0.15s ease; }
 .mo-page .mo-persist[open] > .mo-persist-head::before { transform: rotate(90deg); }

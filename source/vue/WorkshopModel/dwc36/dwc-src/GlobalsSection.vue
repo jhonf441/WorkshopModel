@@ -1,19 +1,11 @@
 <template>
 	<div class="mo-density-compact">
-		<v-card class="mb-3">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-variable</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('globals_title') }}</h2>
-						<p class="mo-head-lead">{{ t('look_globals_lead') }}</p>
-					</div>
-					<div v-if="support.ok && total" class="mo-head-right">
-						<span class="mo-pill">{{ t('look_globals_count', { n: stats.total }) }}</span>
-						<span v-if="stats.kept" class="mo-pill mo-pill-dot ok" :title="t('persist_help')">{{ t('look_globals_kept_n', { n: stats.kept }) }}</span>
-						<span v-if="stats.watched" class="mo-pill mo-pill-dot info">{{ t('look_globals_watched_n', { n: stats.watched }) }}</span>
-					</div>
-				</div>
+		<div class="wf-group mb-3">
+				<!-- redesign 2026-11-23 (FAMILIA-REDISENO.md 3): the head of the family with the one main action (New global, 36), the search and the counts (data
+				     chips of 24) on one row, the filters as one row of 32, the groups as titles over a divider with rows of 48, ONE help at the foot -->
+				<card-head icon="mdi-variable" :title="t('globals_title')">
+					<v-btn v-if="support.ok && total && canEdit" small depressed color="primary" @click="creating = true"><v-icon small left>mdi-plus</v-icon>{{ t('look_globals_new') }}</v-btn>
+				</card-head>
 				<div v-if="!support.ok" class="mo-empty" role="status">
 					<v-icon class="mo-empty-icon">mdi-chip</v-icon>
 					<div class="mo-empty-title">{{ t('look_globals_off_title') }}</div>
@@ -32,7 +24,9 @@
 					<template v-else>
 						<div class="mo-gtools">
 							<v-text-field v-model="query" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('look_globals_search')" :placeholder="t('look_globals_search_hint')" />
-							<v-btn v-if="canEdit" small depressed color="primary" @click="creating = true"><v-icon small left>mdi-plus</v-icon>{{ t('look_globals_new') }}</v-btn>
+							<span class="wf-chip">{{ t('look_globals_count', { n: stats.total }) }}</span>
+							<span v-if="stats.kept" class="wf-chip" :title="t('persist_help')"><span class="wf-dot ok" aria-hidden="true"></span>{{ t('look_globals_kept_n', { n: stats.kept }) }}</span>
+							<span v-if="stats.watched" class="wf-chip"><span class="wf-dot info" aria-hidden="true"></span>{{ t('look_globals_watched_n', { n: stats.watched }) }}</span>
 						</div>
 						<div class="mo-gchips" role="group" :aria-label="t('look_globals_filter_label')">
 							<span class="mo-gchips-label">{{ t('look_globals_filter_label') }}</span>
@@ -45,7 +39,6 @@
 								<v-icon small>mdi-sort</v-icon>{{ t('look_sort_chip', { by: t('globals_sort_' + sort) }) }}
 							</button>
 						</div>
-						<choice-guide v-if="canEdit" :choice="S.quick" :title="t(S.quick.label)" class="mb-2" />
 						<div v-if="!shown.length" class="mo-empty mo-empty-small" role="status">
 							<div class="mo-empty-title">{{ t('look_globals_nomatch_title') }}</div>
 							<div class="mo-empty-text">{{ t('look_globals_nomatch_text') }}</div>
@@ -66,8 +59,8 @@
 					</template>
 					<lock-reason min="technician" class="mt-2" :subject="$t('plugins.WorkshopModel.subjects.globals')" />
 				</template>
-			</v-card-text>
-		</v-card>
+				<help-fold :what="t('look_globals_lead')" :items="helpBlocks" />
+		</div>
 		<persist-panel v-if="support.ok" :persist="persist" :config-includes="configIncludes" :attention="attention" :can-edit="canEdit" @update-persist="$emit('update-persist')" />
 		<v-dialog v-model="creating" max-width="720" scrollable content-class="workshop-theme mo-page">
 			<global-creator v-if="creating" :can-edit="canEdit" :globals-ok="support.ok" :existing="names" @close="creating = false" />
@@ -82,7 +75,8 @@
 <script>
 'use strict'
 
-// The globals of the machine, friendly at first sight (2026-11-03): one head with the counts, one search and one New button, a row
+// The globals of the machine, friendly at first sight (2026-11-03; the scale and the pieces of the family since 2026-11-23): the head of the family
+// with the New button, one search with the counts beside it, a row
 // of chips (all, the kinds, kept across reboots, watched, changed recently, and the order that cycles on a tap: globals-filter.js,
 // globals-quick.js), groups by the start of the name that fold and are remembered (globals-groups.js), one card per global with a
 // big value and the quick edit in place (GlobalRow.vue; tidy rows in the compact density), an empty state that says what a global is
@@ -95,8 +89,10 @@ import GlobalCreator from './GlobalCreator.vue'
 import GlobalRow from './GlobalRow.vue'
 import GlobalDetail from './GlobalDetail.vue'
 import PersistPanel from './PersistPanel.vue'
-import ChoiceGuide from './ChoiceGuide.vue'
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
 import LockReason from './LockReason.vue' // vue/_shared36
+import { helpItems } from './section-help.js'
 import { KIND_GROUPS } from './flat-list.js'
 import { GLOBALS_SETTINGS, globalItems, filterGlobals, sortGlobals } from './globals-filter.js'
 import { OTHER, groupNames, readFolded, saveFolded, toggleFolded } from './globals-groups.js'
@@ -113,7 +109,7 @@ function storage() {
 }
 
 export default {
-	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, ChoiceGuide, LockReason },
+	components: { GlobalCreator, GlobalRow, GlobalDetail, PersistPanel, CardHead, HelpFold, LockReason },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },
@@ -133,6 +129,10 @@ export default {
 	computed: {
 		offText() {
 			return this.support.known ? this.t('globals_off_rrf', { version: this.support.version, minimum: this.support.minimum }) : this.t('globals_off_unknown')
+		},
+		// the one fold at the foot of the card: the lead that used to sit under the title and, for who may change globals, how the quick edit works
+		helpBlocks() {
+			return this.canEdit && this.support.ok && this.total ? helpItems(k => this.t(k), [[this.S.quick, this.t(this.S.quick.label)]]) : []
 		},
 		// the global the detail dialog shows (it follows the live list: it closes by itself if the global goes away)
 		detailItem() {

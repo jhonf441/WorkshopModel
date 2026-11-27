@@ -1,13 +1,8 @@
 <template>
 	<v-card class="mo-creator">
 		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-plus-box-outline</v-icon></span>
-				<div class="mo-head-text">
-					<h2 class="mo-head-title">{{ t('look_creator_title') }}</h2>
-					<p class="mo-head-lead">{{ t('look_creator_lead') }}</p>
-				</div>
-			</div>
+			<card-head icon="mdi-plus-box-outline" :title="t('look_creator_title')" />
+			<help-line :text="t('look_creator_lead')" />
 			<div v-if="!globalsOk" class="mo-note warn" role="status"><v-icon small>mdi-alert-outline</v-icon><span class="mo-note-text">{{ t('globals_off_short') }}</span></div>
 			<lock-reason v-else-if="!canEdit" min="technician" :subject="$t('plugins.WorkshopModel.subjects.create_global')" />
 			<template v-else-if="done">
@@ -72,11 +67,13 @@ import i18n from '../../i18n'
 import CommandPreview from './CommandPreview.vue'
 import ChoiceLabel from './ChoiceLabel.vue'
 import LockReason from './LockReason.vue' // vue/_shared36
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpLine from './HelpLine.vue' // vue/_shared36
 import { editCommand, isValidGlobalName } from './globals-typing.js'
 import { CREATOR_TYPES, CREATOR_STEPS, creatorKind, editFeedback } from './globals-quick.js'
 
 export default {
-	components: { CommandPreview, ChoiceLabel, LockReason },
+	components: { CommandPreview, ChoiceLabel, LockReason, CardHead, HelpLine },
 	props: {
 		canEdit: { type: Boolean, default: true },
 		globalsOk: { type: Boolean, default: true },

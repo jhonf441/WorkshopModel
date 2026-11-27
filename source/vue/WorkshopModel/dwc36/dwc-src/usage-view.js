@@ -46,9 +46,13 @@ export function inCard(r, card) {
 }
 
 // the number on each card
+// check counts what is still to check: a row the person marked as reviewed or ignored (r.review, usage-review.js) is not counted again;
+// reviewed says how many were looked at; maybe how many of the pending ones may be a real problem
 export function cardCounts(rows) {
 	const list = rows || []
-	return { problems: list.filter(r => inCard(r, 'problems')).length, check: list.filter(r => inCard(r, 'check')).length, all: list.length }
+	const checked = list.filter(r => inCard(r, 'check'))
+	const pending = checked.filter(r => !r.review)
+	return { problems: list.filter(r => inCard(r, 'problems')).length, check: pending.length, all: list.length, reviewed: checked.length - pending.length, maybe: pending.filter(r => r.maybe).length }
 }
 
 // the card that opens first: the problems, else what is to check, else everything (the all-clear look)
@@ -58,11 +62,13 @@ export function defaultCard(counts) {
 }
 
 // how each card looks: its color (tone), icon and the key of its one plain sentence, which changes when there is nothing in it
+// the card to check is neutral (info) when all it holds is "nobody reads it from a file", which is often normal; it is a warning only when a file
+// reads something that no file creates and a folder was not read
 export function cardLooks(counts) {
 	const c = counts || { problems: 0, check: 0, all: 0 }
 	return [
 		{ id: 'problems', tone: c.problems ? 'err' : 'ok', icon: c.problems ? 'mdi-alert-circle-outline' : 'mdi-check-circle-outline', say: c.problems ? 'usage_card_problems_say' : 'usage_card_problems_none' },
-		{ id: 'check', tone: c.check ? 'warn' : 'ok', icon: 'mdi-help-circle-outline', say: c.check ? 'usage_card_check_say' : 'usage_card_check_none' },
+		{ id: 'check', tone: c.check ? (c.maybe ? 'warn' : 'info') : 'ok', icon: 'mdi-help-circle-outline', say: c.check ? (c.maybe ? 'usage2_card_check_maybe_say' : 'usage2_card_check_say') : 'usage_card_check_none' },
 		{ id: 'all', tone: 'info', icon: 'mdi-format-list-bulleted', say: 'usage_card_all_say' }
 	]
 }

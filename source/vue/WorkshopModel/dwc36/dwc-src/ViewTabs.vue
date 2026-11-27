@@ -1,4 +1,10 @@
 <template>
+	<div class="mo-view-switch">
+		<!-- on a phone (width under 600) six tabs filled three rows: one selector of the view instead (CSS shows one of the two); the kiosk keeps the tabs -->
+		<v-select
+			v-if="choices.length > 3" class="mo-view-select" :value="current" :items="selectItems" item-text="text" item-value="id" dense outlined hide-details :label="label || t('view_selector_label')"
+			@change="$emit('pick', $event)"
+		/>
 	<div class="wf-tabs mo-view-tabs" role="tablist" :aria-label="label || t('view_selector_label')">
 		<button
 			v-for="(c, i) in choices" :key="c.id" type="button" class="wf-tab" role="tab" :aria-selected="c.id === current ? 'true' : 'false'" :tabindex="c.id === current ? 0 : -1"
@@ -6,6 +12,7 @@
 		>
 			<v-icon :size="16">{{ c.icon }}</v-icon>{{ t(c.label) }}
 		</button>
+	</div>
 	</div>
 </template>
 
@@ -22,6 +29,11 @@ export default {
 		choices: { type: Array, default: () => [] },
 		current: { type: String, default: '' },
 		label: { type: String, default: '' }
+	},
+	computed: {
+		selectItems() {
+			return this.choices.map(c => ({ id: c.id, text: this.t(c.label) }))
+		}
 	},
 	methods: {
 		t(k, p) {

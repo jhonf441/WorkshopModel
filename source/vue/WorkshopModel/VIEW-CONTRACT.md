@@ -41,7 +41,7 @@ element as an attribute (Vue 3 prints `[object Object]`). Copy this block.
 | `pinned` | Array | [] | The favourite paths (pins.js, remembered in this browser; PinnedStrip.vue shows them on top). |
 | `density` | String | 'comfortable' | 'comfortable' or 'compact' (density.js, DensitySwitch.vue; the section root also carries the class `mo-density-<value>`). |
 | `paused` | Boolean | false | Sampling is paused: `leaves`, `changes` and `changeTimes` do not move. |
-| `globalsOk` | Boolean | true | RepRapFirmware 3.4 or newer (`rrf-version.js`, GLOBALS_MIN_RRF, an owner decision): the globals features may be offered. |
+| `globalsOk` | Boolean | true | RepRapFirmware 3.4 or newer (`rrf-version.js`, GLOBALS_MIN_RRF, an project decision): the globals features may be offered. |
 | `tier` | Object | `{ sbc: false, extras: false }` | `tier.js` `detectTier()`: SBC-only extras are offered only when `tier.extras`. |
 
 3.7: `defineProps({ tick: { type: Number, default: 0 }, model: { type: Object, default: null }, leaves: { type: Array, default: () => [] }, truncated: { type: Boolean, default: false }, changes: { type: Array, default: () => [] }, changeTimes: { type: Map, default: () => new Map() }, selected: { type: String, default: '' }, watched: { type: Array, default: () => [] }, pinned: { type: Array, default: () => [] }, density: { type: String, default: 'comfortable' }, paused: { type: Boolean, default: false }, globalsOk: { type: Boolean, default: true }, tier: { type: Object, default: () => ({ sbc: false, extras: false }) } })`.

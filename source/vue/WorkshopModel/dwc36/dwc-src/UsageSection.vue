@@ -1,7 +1,6 @@
 <template>
 	<div class="mo-usage">
-		<v-card class="mb-3">
-			<v-card-text>
+		<div class="wf-group mb-3">
 				<div class="mo-part"><v-icon :size="20" class="mr-1">mdi-file-search-outline</v-icon>{{ t('usage_title') }}</div>
 				<div class="mo-faint mb-2">{{ t('usage_help') }}</div>
 				<div v-if="!support.ok" class="mo-off" role="status">{{ offText }}</div>
@@ -10,13 +9,11 @@
 					<error-notice :error="problem" class="mt-2" />
 					<usage-options :kinds="kinds" :file="file" :scope="scope" :folders="folders" :files="files" :budget="budget" :tier="tier" @update:scope="setScope" @update:kinds="kinds = $event" @update:file="file = $event" />
 				</div>
-			</v-card-text>
-		</v-card>
+		</div>
 		<div v-if="support.ok && result">
 			<usage-banner :unscanned="result.unscanned" @scan-folders="scanFolders" />
 			<usage-cards :counts="counts" :card="card" @pick="card = $event" />
-			<v-card class="mb-3">
-				<v-card-text>
+			<div class="wf-group mb-3">
 					<div class="mo-toolbar">
 						<!-- MO-1: the box suggests what exists (the live globals, the ones the macros name, the files), and still searches any text typed -->
 						<v-combobox v-model="query" :search-input.sync="query" :items="suggestions" hide-no-data dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" class="mo-search" :label="t('usage_search')" :placeholder="t('usage_search_hint')" />
@@ -24,12 +21,11 @@
 					<usage-legend />
 					<view-tabs :choices="TABS" :current="tab" :label="t('usage_tabs_label')" @pick="tab = $event" />
 					<div :key="tab" class="mo-utab mo-ufade">
-						<usage-results v-if="tab === 'global'" :rows="rows" :card="card" :query="query || ''" :kinds="kinds" :file="file" @select="onSelect" @reset="resetFilters" />
+						<usage-results v-if="tab === 'global'" :rows="rows" :card="card" :query="query || ''" :kinds="kinds" :file="file" @select="onSelect" @reset="resetFilters" @review="onReview" @read-folders="readFolders" />
 						<usage-by-file v-else-if="tab === 'file'" :refs="result.refs" :rows="rows" :live-names="liveNames" :query="query || ''" @select="onSelect" />
 						<usage-macro-map v-else :files="result.cache" :query="query || ''" :can-edit="canEdit" />
 					</div>
-				</v-card-text>
-			</v-card>
+			</div>
 		</div>
 	</div>
 </template>
@@ -60,6 +56,7 @@ import { readScope, saveScope, cleanScope, DEPTH_MAX } from './usage-scope.js'
 import { runScan } from './usage-runner.js'
 import { tolerantIo } from './host-errors.js'
 import { globalRows, cardCounts, cardAfterFilter, filesOf } from './usage-view.js'
+import { readReview, saveReview, setReview, withReview } from './usage-review.js'
 
 const TABS = [
 	{ id: 'global', icon: 'mdi-variable', label: 'usage_tab_global' },
@@ -86,7 +83,7 @@ export default {
 	},
 	data() {
 		// result is kept out of Vue's observation (Object.freeze): it can hold thousands of references
-		return { TABS, scope: readScope(storage()), folders: [], scanning: false, cancel: false, done: 0, total: 0, current: '', result: null, problem: null, tab: 'global', card: 'all', query: '', kinds: [], file: '' }
+		return { TABS, scope: readScope(storage()), folders: [], scanning: false, cancel: false, done: 0, total: 0, current: '', result: null, problem: null, review: readReview(storage()), tab: 'global', card: 'all', query: '', kinds: [], file: '' }
 	},
 	computed: {
 		budget() {
@@ -101,7 +98,7 @@ export default {
 			return childrenOf(m && m.global).map(c => c.key)
 		},
 		rows() {
-			return this.result ? globalRows(this.result.refs, this.liveNames, { complete: this.result.defsComplete && !this.result.unscanned.length }) : []
+			return this.result ? withReview(globalRows(this.result.refs, this.liveNames, { complete: this.result.defsComplete && !this.result.unscanned.length }), this.review) : []
 		},
 		counts() {
 			return cardCounts(this.rows)
@@ -134,6 +131,14 @@ export default {
 		},
 		onSelect(path) {
 			this.$emit('select', path)
+		},
+		// mark a global as looked at (reviewed or ignored) or put it back (null): one state for the browser, nothing changes on the machine (usage-review.js)
+		onReview(name, state) {
+			this.review = setReview(this.review, name, state)
+			saveReview(storage(), this.review)
+		},
+		readFolders() {
+			if (this.result && this.result.unscanned.length) this.scanFolders(this.result.unscanned)
 		},
 		resetFilters() {
 			this.query = ''

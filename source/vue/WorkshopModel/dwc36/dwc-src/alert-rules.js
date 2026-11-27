@@ -8,6 +8,7 @@
 //   changes_to  fires once each time the value changes to the text (an event, nothing to recover)
 // Hysteresis keeps a value that wobbles around the limit from firing again and again; the cooldown is the shortest time between two
 // fires of the same rule (a limit still crossed when the cooldown ends fires then). The state of a rule is { active, lastFire, last }.
+// A rule may carry an alias (2026-11-22): a short name shown instead of its path; a rule saved before has none.
 // Pure: test/alert-rules.test.js.
 
 import { helpChoice } from './view-choices.js'
@@ -17,6 +18,7 @@ export const COOLDOWN_DEFAULT_S = 60
 export const COOLDOWN_MAX_S = 86400
 export const OPS = ['above', 'below', 'equals', 'changes_to']
 export const NUMERIC_OPS = ['above', 'below']
+export const ALIAS_MAX = 40
 
 export const ALERT_SETTINGS = {
 	path: helpChoice('alerts_set', 'path'),
@@ -28,6 +30,16 @@ export const ALERT_SETTINGS = {
 }
 
 const finite = n => typeof n === 'number' && Number.isFinite(n)
+
+// the optional name a person gives a rule (up to ALIAS_MAX characters, one line): shown instead of the path in the list, the banner, the message and the console
+export function cleanAlias(v) {
+	return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, ALIAS_MAX).trim() : ''
+}
+
+// what a rule, an event or a banner item is called on screen: its alias, else its path
+export function ruleName(x) {
+	return x && typeof x === 'object' ? cleanAlias(x.alias) || (typeof x.path === 'string' ? x.path : '') : ''
+}
 
 export function isNumericOp(op) {
 	return NUMERIC_OPS.indexOf(op) >= 0
@@ -62,7 +74,7 @@ export function cleanRule(o) {
 	if (!numeric && limit.trim() === '') return null // a text of only spaces compares with nothing
 	const hyst = numeric ? Math.max(0, Number(o.hysteresis) || 0) : 0
 	const cool = Math.min(COOLDOWN_MAX_S, Math.max(0, Number.isFinite(Number(o.cooldown)) && o.cooldown !== '' && o.cooldown !== null && o.cooldown !== undefined ? Number(o.cooldown) : COOLDOWN_DEFAULT_S))
-	return { id: typeof o.id === 'string' && o.id ? o.id : 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), path, op: o.op, value: limit, hysteresis: hyst, cooldown: Math.round(cool), enabled: o.enabled !== false }
+	return { id: typeof o.id === 'string' && o.id ? o.id : 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), path, alias: cleanAlias(o.alias), op: o.op, value: limit, hysteresis: hyst, cooldown: Math.round(cool), enabled: o.enabled !== false }
 }
 
 export function cleanRules(list) {
@@ -95,7 +107,7 @@ function recovered(rule, value) {
 	return value >= rule.value + rule.hysteresis
 }
 
-const event = (rule, type, value, now) => ({ t: now, id: rule.id, path: rule.path, op: rule.op, limit: rule.value, type, value: valueText(value) })
+const event = (rule, type, value, now) => ({ t: now, id: rule.id, path: rule.path, alias: rule.alias || '', op: rule.op, limit: rule.value, type, value: valueText(value) })
 const cooledDown = (rule, state, now) => state.lastFire === null || now - state.lastFire >= rule.cooldown * 1000
 
 // one sample of a state rule (above, below, equals)

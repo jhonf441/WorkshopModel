@@ -25,7 +25,3 @@ export default {
 }
 </script>
 
-<style>
-.mo-page .mo-tip-row { display: flex; align-items: center; gap: 4px; }
-.mo-page .mo-tip-row > :first-child { flex: 1; min-width: 0; }
-</style>

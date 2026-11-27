@@ -1,18 +1,12 @@
 <template>
 	<div>
-		<v-card class="mb-3">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-bookmark-multiple-outline</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('presets_title') }}</h2>
-						<p class="mo-head-lead">{{ t('look_presets_lead') }}</p>
-					</div>
-					<div v-if="support.ok" class="mo-head-right">
-						<span v-if="list.length" class="mo-pill"><v-icon x-small>mdi-bookmark-multiple-outline</v-icon>{{ t('look_presets_count', { n: list.length }) }}</span>
-						<span class="mo-pill mo-pill-quiet">{{ t('preset_values_n', { n: liveCount }) }}</span>
-					</div>
-				</div>
+		<div class="wf-group mb-3">
+				<card-head icon="mdi-bookmark-multiple-outline" :title="t('presets_title')">
+					<template v-if="support.ok">
+						<span v-if="list.length" class="wf-chip">{{ t('look_presets_count', { n: list.length }) }}</span>
+						<span class="wf-chip">{{ t('preset_values_n', { n: liveCount }) }}</span>
+					</template>
+				</card-head>
 				<div v-if="!support.ok" class="mo-empty" role="status">
 					<v-icon class="mo-empty-icon">mdi-chip</v-icon>
 					<div class="mo-empty-title">{{ t('look_globals_off_title') }}</div>
@@ -61,19 +55,12 @@
 						<span v-if="list.length" class="mo-faint">{{ t('look_export_as', { name: exportName }) }}</span>
 					</div>
 					<div v-if="notice" class="mo-note ok mt-1" role="status"><v-icon small>mdi-check-circle-outline</v-icon><span class="mo-note-text">{{ notice }}</span></div>
-					<help-guide :title="t('look_presets_more')"><p>{{ t('presets_help') }} <code>{{ PRESETS_FILE }}</code></p></help-guide>
+					<help-fold :title="t('look_presets_more')" :what="t('look_presets_lead')"><p>{{ t('presets_help') }} <code>{{ PRESETS_FILE }}</code></p></help-fold>
 				</template>
-			</v-card-text>
-		</v-card>
-		<v-card v-if="support.ok && chosenPreset" class="mb-3 mo-fade-in">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-compare-horizontal</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('preset_compare_title', { name: chosenPreset.name }) }}</h2>
-						<p class="mo-head-lead">{{ t('look_preset_compare_lead') }}</p>
-					</div>
-				</div>
+		</div>
+		<div v-if="support.ok && chosenPreset" class="wf-group mb-3 mo-fade-in">
+				<card-head icon="mdi-compare-horizontal" :title="t('preset_compare_title', { name: chosenPreset.name })" />
+				<help-line :text="t('look_preset_compare_lead')" />
 				<table class="mo-table">
 					<thead><tr><th>{{ t('key') }}</th><th>{{ t('preset_value') }}</th><th>{{ t('current_value') }}</th><th>{{ t('preset_state') }}</th></tr></thead>
 					<tbody>
@@ -86,8 +73,7 @@
 					</tbody>
 				</table>
 				<command-preview class="mt-2" :code="applyCode" :can-send="canEdit && !!applyCode" :disabled-reason="applyCode ? (canEdit ? '' : readOnlyLine(t('read_only'))) : t('preset_nothing_to_apply')" />
-			</v-card-text>
-		</v-card>
+		</div>
 	</div>
 </template>
 
@@ -103,7 +89,9 @@ import i18n from '../../i18n'
 import { liveModel, readText, writeText } from './model-host.js'
 import ErrorNotice from './ErrorNotice.vue'
 import CommandPreview from './CommandPreview.vue'
-import HelpGuide from './HelpGuide.vue' // vue/_shared36
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
+import HelpLine from './HelpLine.vue' // vue/_shared36
 import LockReason from './LockReason.vue' // vue/_shared36
 import { childCount } from './model-tree.js'
 import { PRESETS_FILE, PRESETS_FORMAT, PRESETS_VERSION, PRESET_NAME_RE, makePreset, parsePresetsText, presetsText, presetDiff, presetCommands, upsertPreset, removePreset, mergePresets } from './presets.js'
@@ -114,7 +102,7 @@ import { ARM_MS, pressArmed } from './armed.js'
 
 export default {
 	mixins: [readOnlyNote],
-	components: { ErrorNotice, CommandPreview, HelpGuide, LockReason },
+	components: { ErrorNotice, CommandPreview, CardHead, HelpFold, HelpLine, LockReason },
 	props: {
 		tick: { type: Number, default: 0 },
 		support: { type: Object, default: () => ({ ok: false, known: false }) },

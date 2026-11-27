@@ -70,5 +70,4 @@ export default {
 .mo-page .mo-bpick-row[aria-selected='true'] { background: rgba(25, 118, 210, 0.14); }
 .mo-page .mo-bpick-row .v-icon { color: var(--wf-icon); }
 .mo-page .mo-bpick-row:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: -2px; }
-@media (pointer: coarse) { .mo-page .mo-bpick-row { min-height: 44px; } }
 </style>

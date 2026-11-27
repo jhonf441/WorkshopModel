@@ -10,7 +10,7 @@
 
 Page `/Plugins/Model` ("Model Explorer"). The object model of the board, live, seen in the way that suits the question: readable cards by topic, a flat sortable list, columns like a file browser, one level at a time, only what changed, or the technical tree. Around it: the global variables with a typed editor and quick edits, a watch list drawn by the kind of each value, snapshots of the model to compare two moments, an expression tester, presets, the persistence of globals across reboots and a usage finder over your macros. It needs no WorkshopService and no Raspberry Pi: everything goes through the machine API of DWC itself (`rr_` on a standalone Duet, DSF with a Pi), so it works on a standalone Duet. With a Pi in SBC mode it turns a few extras on by itself.
 
-Version documented: 1.7 (see the CHANGELOG of the plugin).
+Version documented: 1.9 (see the CHANGELOG of the plugin).
 
 ## 1. Requirements
 
@@ -23,14 +23,14 @@ Version documented: 1.7 (see the CHANGELOG of the plugin).
 
 ## 3. Functions
 
-The side bar has the sections Model, Globals, Watch, Presets, Usage, Snapshots, Expression tester, Alerts and Report. The start-up card lives in the header.
+The side bar groups the sections as See (Model, Favourites, Watch), Change (Globals, Presets), Keep (Snapshots) and Check (Usage, Expression tester, Alerts, Report). The start-up card lives in the header.
 
 ### 3.1 Model: the views of the live model
 
 ![Topics view with the quick diagnosis](img/01-topics-and-quick-diagnosis.png)
 
 ![Technical tree with the meaning of a path](img/02-technical-tree-and-path-dictionary.png)
-- What: one selector of tabs over the same live model, remembered in this browser. Each view has a fold "How this view works" (what it is, what it is for, what you lose without it, how to use it).
+- What: one selector of tabs over the same live model, remembered in this browser. Each view has a short help (what it is, what it is for, what you lose without it, how to use it).
   - Topics (the default): one card per area (machine state, temperatures, motion and axes, job, tools, fans, sensors, boards and drivers, network, plugins, globals) with readable names, units and live values. The cards come from what your model has: nothing of the workshop is assumed, and every top-level key no card covers is in Other. A row or "See all" opens that path in the technical tree. In the Plugins card a plugin without a process on the Pi reads "browser only", never "stopped". On top sits Quick diagnosis: one look at everything abnormal, errors first, each line with a fold that says what it means and what to check and an Open button. It checks the stepper drivers (stall, overtemperature, open load, short; RRF 3.5 and newer report them), the supply and 12 V voltages, the processor temperature, heaters in fault, offline or over their limit, temperature sensors that fail, filament monitors, cards that are not mounted, network interfaces that are down, a halted or powered-off machine, start-up errors, error messages and plugins that have lost their process. With nothing wrong it says how many checks ran; a check whose branch your model does not have is skipped and not counted.
   - Flat list: every value in one sortable table (path, value, type, last change) with filters by text, type, changed in the last minute and watched; bytes and durations are shown in words beside the raw value. A switch Names / Values changes what the box looks at: Names searches paths and values as before; Values searches only the values over the whole model: a word (contains), `=idle` or `"idle"` (equals), `!=0` (different), `>30`, `>=30`, `<5`, `<=5` (numbers), `10..20` (between), `true`, `false`, `null` and `empty`. A line under the box says how the text was read; sort, filters and the page size work on the matches.
   - Columns: like a file browser, a column per level.

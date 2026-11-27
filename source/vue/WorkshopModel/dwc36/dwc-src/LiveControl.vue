@@ -4,11 +4,9 @@
 		<div class="mo-faint">{{ t('live_help') }}</div>
 		<div class="mo-xb-live-row">
 			<label class="mo-faint" for="mo-xb-every">{{ t('live_interval') }}</label>
-			<select id="mo-xb-every" v-model.number="seconds" class="mo-xb-select" :disabled="live.on">
-				<option v-for="s in budget.seconds" :key="s" :value="s">{{ t('live_every', { n: s }) }}</option>
-			</select>
-			<span v-if="!live.on" :title="!canStart && disabledTitle ? disabledTitle : null"><v-btn small depressed color="primary" :disabled="!canStart" @click="$emit('start', seconds)">{{ t('live_start') }}</v-btn></span>
-			<v-btn v-else small depressed @click="$emit('stop')">{{ t('live_stop') }}</v-btn>
+			<v-select id="mo-xb-every" v-model="seconds" :items="secondItems" dense outlined hide-details class="mo-xb-every" :disabled="live.on" :aria-label="t('live_interval')" />
+			<span v-if="!live.on" :title="!canStart && disabledTitle ? disabledTitle : null"><v-btn depressed color="primary" :disabled="!canStart" @click="$emit('start', seconds)">{{ t('live_start') }}</v-btn></span>
+			<v-btn v-else depressed @click="$emit('stop')">{{ t('live_stop') }}</v-btn>
 		</div>
 		<div v-if="live.on" class="mo-faint" role="status">{{ live.runs ? t('live_running', { runs: live.runs, max: budget.runs, n: live.every }) : t('live_waiting') }}</div>
 		<div v-else-if="live.stopped" class="mo-faint" role="status">{{ t('live_stopped_' + live.stopped, { max: budget.runs }) }}</div>
@@ -38,6 +36,10 @@ export default {
 	computed: {
 		budget() {
 			return liveBudget(this.tier)
+		},
+		// a field of the family (not a bare <select>): the same height, radius and line as the fields around it
+		secondItems() {
+			return this.budget.seconds.map((s) => ({ text: this.t('live_every', { n: s }), value: s }))
 		}
 	},
 	methods: {

@@ -1,13 +1,15 @@
 <template>
-	<section class="mo-topic mo-diag" aria-labelledby="mo-topic-diagnosis">
-		<div class="mo-topic-head">
-			<v-icon :size="20">{{ card.icon }}</v-icon>
-			<span id="mo-topic-diagnosis" class="mo-topic-title">{{ t(card.title) }}</span>
-			<span v-if="result.errors || result.warnings" :class="['wf-state', result.errors ? 'err' : 'warn']">{{ t('diag_summary', { errors: result.errors, warnings: result.warnings }) }}</span>
+	<!-- redesign 2026-11-23 (FAMILIA-REDISENO.md, Model: "diagnosis as a status line, not a sub-card"): ONE line with the name and the state (a dot and the
+	     words); a finding is a row of 40 under it with its level, its text, "What it means" and Open. What the diagnosis is lives in the one help of the
+	     Model card (TreeSection.vue), not in a fold of its own. -->
+	<section class="mo-diag" aria-labelledby="mo-topic-diagnosis">
+		<div class="mo-diag-head">
+			<v-icon :size="16" class="mo-diag-icon" aria-hidden="true">{{ card.icon }}</v-icon>
+			<span id="mo-topic-diagnosis" class="mo-topic-title mo-diag-title">{{ t(card.title) }}</span>
+			<span v-if="result.noData" class="wf-state mo-diag-state" role="status">{{ t('diag_no_data') }}</span>
+			<span v-else-if="result.clear" class="wf-state ok mo-diag-state" role="status">{{ t('diag_all_clear', { n: result.checked }) }}</span>
+			<span v-else :class="['wf-state', 'mo-diag-state', result.errors ? 'err' : 'warn']" role="status">{{ t('diag_summary', { errors: result.errors, warnings: result.warnings }) }}</span>
 		</div>
-		<choice-guide :choice="helpChoice" class="mb-1" />
-		<div v-if="result.noData" class="mo-faint" role="status">{{ t('diag_no_data') }}</div>
-		<div v-else-if="result.clear" role="status"><span class="wf-state ok">{{ t('diag_all_clear', { n: result.checked }) }}</span></div>
 		<div v-for="i in result.items" :key="i.id" class="mo-diag-item">
 			<div class="mo-diag-line">
 				<span :class="['wf-state', i.level]">{{ t('diag_level_' + i.level) }}</span>
@@ -17,27 +19,24 @@
 			</div>
 			<div v-if="openId === i.id" class="mo-faint mo-diag-help">{{ t(i.helpKey) }}</div>
 		</div>
-		<div v-if="result.more" class="mo-faint mt-1">{{ t('diag_more', { n: result.more }) }}</div>
+		<div v-if="result.more" class="mo-faint mo-diag-more">{{ t('diag_more', { n: result.more }) }}</div>
 	</section>
 </template>
 
 <script>
 'use strict'
 
-// The quick diagnosis card of the Topics view (diagnosis.js): everything abnormal in the model in one look, errors first, each line
-// with a fold that says what it means and what to check, and Open to jump to the value. Nothing wrong shows an all-clear that says how
-// many checks ran. The card comes from topic-catalog.js diagnosisTopic().
+// The quick diagnosis of the Topics view (diagnosis.js): everything abnormal in the model in one look, errors first, each finding with what it means
+// and what to check, and Open to jump to the value. Nothing wrong is one calm line that says how many checks ran. The card comes from
+// topic-catalog.js diagnosisTopic(); what the diagnosis is (DIAGNOSIS_HELP) is told by the one help of the Model card.
 import i18n from '../../i18n'
-import ChoiceGuide from './ChoiceGuide.vue'
-import { DIAGNOSIS_HELP } from './diagnosis.js'
 
 export default {
-	components: { ChoiceGuide },
 	props: {
 		card: { type: Object, required: true }
 	},
 	data() {
-		return { openId: '', helpChoice: DIAGNOSIS_HELP }
+		return { openId: '' }
 	},
 	computed: {
 		result() {
@@ -56,9 +55,14 @@ export default {
 </script>
 
 <style>
-/* DiagnosisCard: the card spans the whole row of the Topics grid; one line per finding, a thin rule between lines */
-.mo-page .mo-diag { grid-column: 1 / -1; }
-.mo-page .mo-diag-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 4px 0; border-top: 1px solid rgba(128, 128, 128, 0.2); }
-.mo-page .mo-diag-text { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; }
-.mo-page .mo-diag-help { padding: 2px 0 6px; }
+/* DiagnosisCard: a status line over the whole width of the Topics grid (no frame, no grey fill), a divider under it; one row of 40 per finding */
+.mo-page .mo-diag { grid-column: 1 / -1; padding-bottom: 4px; border-bottom: 1px solid var(--wf-line); }
+.mo-page .mo-diag-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 40px; }
+.mo-page .mo-diag-icon { flex: none; color: var(--wf-icon); }
+.mo-page .mo-diag-title { font-size: 13px; font-weight: 600; }
+.mo-page .mo-diag-state { font-size: 13px; }
+.mo-page .mo-diag-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 40px; border-top: 1px solid var(--wf-line); }
+.mo-page .mo-diag-text { flex: 1 1 220px; min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.mo-page .mo-diag-help { padding: 2px 0 8px; }
+.mo-page .mo-diag-more { padding: 4px 0; }
 </style>

@@ -5,6 +5,7 @@
 				<span class="mo-ucard-top"><v-icon :size="22">{{ c.icon }}</v-icon><span class="mo-ucard-title">{{ t('usage_card_' + c.id) }}</span></span>
 				<span class="mo-ucard-n">{{ counts[c.id] }}</span>
 				<span class="mo-ucard-say">{{ t(c.say) }}</span>
+				<span v-if="c.id === 'check' && counts.reviewed" class="mo-ucard-done">{{ t('usage2_card_check_done', { n: counts.reviewed }) }}</span>
 			</button>
 		</div>
 		<choice-guide :choice="S.cards" class="mb-2" />

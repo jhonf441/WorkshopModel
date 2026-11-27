@@ -1,13 +1,7 @@
 <template>
-	<v-card class="mb-3">
-		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-compare-horizontal</v-icon></span>
-				<div class="mo-head-text">
-					<h2 class="mo-head-title">{{ t('compare_title') }}</h2>
-					<p class="mo-head-lead">{{ t('compare_help') }}</p>
-				</div>
-			</div>
+	<div class="wf-group mb-3">
+			<card-head icon="mdi-compare-horizontal" :title="t('compare_title')" />
+			<help-line :text="t('compare_help')" />
 			<div class="mo-form">
 				<v-select :value="from" :items="items" item-text="title" item-value="value" dense outlined hide-details class="mo-field" :label="t('compare_from')" @change="$emit('pick-from', $event)" />
 				<v-select :value="to" :items="items" item-text="title" item-value="value" dense outlined hide-details class="mo-field" :label="t('compare_to')" @change="$emit('pick-to', $event)" />
@@ -35,8 +29,7 @@
 				</div>
 				<v-btn v-if="page.more" small outlined class="mt-2" @click="pages++">{{ t('flat_more', { n: Math.min(page.more, FLAT_PAGE) }) }}</v-btn>
 			</template>
-		</v-card-text>
-	</v-card>
+	</div>
 </template>
 
 <script>
@@ -49,10 +42,13 @@ import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import { LIVE, makeSnapshot, snapshotDiff, diffSummary } from './snapshots.js'
 import { FLAT_PAGE, pageOf } from './flat-list.js'
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpLine from './HelpLine.vue' // vue/_shared36
 
 const STATES = ['changed', 'added', 'removed']
 
 export default {
+	components: { CardHead, HelpLine },
 	props: {
 		list: { type: Array, default: () => [] },
 		from: { type: String, default: '' },

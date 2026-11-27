@@ -15,6 +15,7 @@
 // The banner of the in-page alerts: one line per rule that is firing and was not dismissed (alert-monitor.js visibleBanner). It leaves
 // by itself when the rule recovers. It is the banner of this page; the pop-up message of any page is alert-host.js.
 import i18n from '../../i18n'
+import { ruleName } from './alert-rules.js'
 
 export default {
 	props: {
@@ -24,7 +25,7 @@ export default {
 		rows() {
 			return this.items.map(b => ({
 				id: b.id,
-				text: this.t('alerts_event_fire', { path: b.path, op: this.t('alerts_op_' + b.op), limit: b.limit, value: b.value })
+				text: this.t('alerts_event_fire', { path: ruleName(b), op: this.t('alerts_op_' + b.op), limit: b.limit, value: b.value })
 			}))
 		}
 	},

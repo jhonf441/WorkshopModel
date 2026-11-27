@@ -8,8 +8,19 @@
 			</span>
 		</div>
 		<div v-if="!row.live" class="mo-faint mb-1">{{ t('usage_not_live') }}</div>
-		<div v-if="row.maybe" class="mo-faint mb-1">{{ t('usage_maybe_help') }}</div>
-		<div v-else-if="row.hint" class="mo-faint mb-1">{{ t('usage_hint_help') }}</div>
+		<div v-if="cause" class="mo-ureview">
+			<div class="mo-ureview-cause"><span v-if="row.review" class="wf-state mr-1">{{ t('usage2_state_' + row.review) }}</span>{{ t('usage2_cause_' + cause) }}</div>
+			<div class="mo-faint mb-1">{{ t('usage2_cause_' + cause + '_do') }}</div>
+			<div class="mo-ureview-actions">
+				<template v-if="!row.review">
+					<v-btn small depressed color="primary" @click="$emit('review', row.name, 'reviewed')">{{ t('usage2_mark_reviewed') }}</v-btn>
+					<v-btn small outlined @click="$emit('review', row.name, 'ignored')">{{ t('usage2_mark_ignored') }}</v-btn>
+					<v-btn v-if="cause === 'read_unread_folder'" small outlined @click="$emit('read-folders')"><v-icon :size="16" class="mr-1">mdi-folder-search-outline</v-icon>{{ t('usage2_read_folder') }}</v-btn>
+				</template>
+				<v-btn v-else small outlined @click="$emit('review', row.name, null)"><v-icon :size="16" class="mr-1">mdi-undo</v-icon>{{ t('usage2_undo') }}</v-btn>
+			</div>
+			<div class="mo-faint mt-1">{{ t('usage2_reviewed_note') }}</div>
+		</div>
 		<div v-if="!groups.length" class="mo-faint">{{ t('usage_detail_no_files') }}</div>
 		<div v-for="g in groups" :key="g.file" class="mo-udetail-file">
 			<div class="mo-files">{{ g.file }}</div>
@@ -30,6 +41,7 @@ import { copyText } from './copy-text.js'
 import { refsByFile } from './usage-view.js'
 import UsageLines from './UsageLines.vue'
 import { linesOfItems } from './usage-lines.js'
+import { causeOf } from './usage-review.js'
 
 export default {
 	components: { UsageLines },
@@ -42,6 +54,10 @@ export default {
 	computed: {
 		groups() {
 			return refsByFile(this.row.refs)
+		},
+		// why this global is to check, with what to do about it and the buttons to mark it (usage-review.js); '' when it is not to check
+		cause() {
+			return causeOf(this.row)
 		}
 	},
 	methods: {

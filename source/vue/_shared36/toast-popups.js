@@ -1,11 +1,11 @@
 'use strict'
 
-// The pop-up messages of the alerts (3.6 line): what waits on the screen and how many. A fire of a rule replaces the message that rule left (one
+// The pop-up messages of the family (3.6 line, vue/_shared36: the alerts of Model and the notices of Activity share it): what waits on the screen and how many. A fire of a rule replaces the message that rule left (one
 // message per rule, not one per crossing); at most `max` messages wait at once, and the oldest one that does not fit is folded into ONE summary message
 // ("N more alerts") that counts up, so a burst never piles up a long queue (DWC shows its notifications one after the other). With `sticky` a message
 // waits until the person closes it, so an alert is never missed because nobody was looking; without it DWC removes it by itself. Closing a message,
 // from DWC's button or from here, frees its place. The messages come from `host.show(type, title, message, sticky)` -> a notification with close()
-// or null. Nothing is written to the console here (alert-host.js does). Pure: test/alert-popups.test.js.
+// or null. Nothing is written to the console here (the host does). Pure: WorkshopModel/dwc36/test/alert-popups.test.js.
 
 export function createPopups(host) {
 	const open = new Map() // rule id -> notification, oldest first
@@ -39,11 +39,11 @@ export function createPopups(host) {
 		get count() { return open.size },
 		get overflow() { return overflow },
 		get hasSummary() { return summary !== null },
-		// opts: { sticky, max, summaryTitle, summaryText(n) }
+		// opts: { sticky, max, summaryTitle, summaryText(n), type: 'warning' (default) | 'info' }
 		fire(id, title, message, opts) {
 			const max = Math.max(1, Number(opts.max) || 1)
 			if (open.has(id)) open.get(id).close()
-			const note = track(host.show('warning', title, message, opts.sticky), n => {
+			const note = track(host.show(opts.type === 'info' ? 'info' : 'warning', title, message, opts.sticky), n => {
 				if (open.get(id) === n) open.delete(id)
 			})
 			if (!note) return false

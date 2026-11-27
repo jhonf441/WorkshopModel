@@ -1,25 +1,14 @@
 <template>
-	<v-card class="mb-3 mo-views" :class="'mo-density-' + density">
-		<v-card-text>
-			<div class="mo-head">
-				<span class="mo-head-icon"><v-icon>mdi-view-dashboard-outline</v-icon></span>
-				<div class="mo-head-text">
-					<h2 class="mo-head-title">{{ t('tree_title') }}</h2>
-					<p class="mo-head-lead">{{ t('tree_help') }}</p>
-				</div>
-				<div class="mo-head-right">
-					<span v-if="paused" class="mo-pill mo-pill-dot warn">{{ t('look_paused') }}</span>
-					<span v-else class="mo-pill mo-pill-dot ok">{{ t('look_live') }}</span>
-				</div>
-			</div>
+	<div class="wf-group mb-3 mo-views" :class="'mo-density-' + density">
+			<!-- redesign 2026-11-23 (FAMILIA-REDISENO.md, Model): the head of the family (icon, title, the state as a dot and a word, Pause at the right), the
+			     tabs of the views and the density segments on ONE row of 32, the view, and ONE help at the foot (the lead, the open view, the diagnosis) -->
+			<card-head icon="mdi-view-dashboard-outline" :title="t('tree_title')" :state="paused ? t('look_paused') : t('look_live')" :state-kind="paused ? 'warn' : 'ok'">
+				<v-btn small outlined :aria-pressed="paused ? 'true' : 'false'" @click="$emit('update:paused', !paused)"><v-icon small left>{{ paused ? 'mdi-play' : 'mdi-pause' }}</v-icon>{{ paused ? t('resume') : t('pause') }}</v-btn>
+			</card-head>
 			<div class="mo-views-head">
 				<view-tabs :choices="VIEW_CHOICES" :current="view" @pick="pickView" />
-				<div class="mo-views-tools">
-					<density-switch :current="density" @pick="pickDensity" />
-					<v-btn small outlined @click="$emit('update:paused', !paused)"><v-icon small left>{{ paused ? 'mdi-play' : 'mdi-pause' }}</v-icon>{{ paused ? t('resume') : t('pause') }}</v-btn>
-				</div>
+				<density-switch :current="density" @pick="pickDensity" />
 			</div>
-			<choice-guide :choice="choice" class="mb-2" />
 			<div :class="{ 'mo-split': choice.layout === 'split' }">
 				<div class="mo-view">
 					<!-- Changes keeps its state (its feed, the moment, the filters) while another view is open: it used to be built again at every visit, started empty
@@ -36,8 +25,8 @@
 					@watch="onWatch" @unwatch="onUnwatch" @persist="onPersist" @select="select" @test="onTest" @pin="pin" @unpin="unpin"
 				/>
 			</div>
-		</v-card-text>
-	</v-card>
+			<help-fold :what="t('tree_help')" :items="helpBlocks" />
+	</div>
 </template>
 
 <script>
@@ -53,7 +42,8 @@ import i18n from '../../i18n'
 import { liveModel } from './model-host.js'
 import { scrollToPageTop } from './page-scroll.js'
 import ViewTabs from './ViewTabs.vue'
-import ChoiceGuide from './ChoiceGuide.vue'
+import CardHead from './CardHead.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
 import NodeDetail from './NodeDetail.vue'
 import TopicsView from './TopicsView.vue'
 import FlatView from './FlatView.vue'
@@ -66,6 +56,8 @@ import { VIEW_CHOICES, TECHNICAL_VIEW, choiceOf, readView, saveView } from './vi
 import { loadDensity, saveDensity, normalizeDensity } from './density.js'
 import { PINS_ROW, loadPins, savePins, addPin, removePin } from './pins.js'
 import { globalNameOf } from './model-path.js'
+import { DIAGNOSIS_HELP } from './diagnosis.js'
+import { helpItems } from './section-help.js'
 
 // view id -> registered component name (the registration of VIEW-CONTRACT.md)
 const VIEW_COMPONENTS = { topics: 'topics-view', flat: 'flat-view', columns: 'columns-view', browse: 'browse-view', changes: 'changes-view', tree: 'tree-view' }
@@ -75,7 +67,7 @@ function storage() {
 }
 
 export default {
-	components: { ViewTabs, ChoiceGuide, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch },
+	components: { ViewTabs, CardHead, HelpFold, NodeDetail, TopicsView, FlatView, TreeView, ColumnsView, BrowseView, ChangesView, DensitySwitch },
 	props: {
 		tick: { type: Number, default: 0 },
 		paused: { type: Boolean, default: false },
@@ -97,6 +89,11 @@ export default {
 		},
 		globalName() {
 			return globalNameOf(this.selected)
+		},
+		// the one fold of the card: the open view (titled with its tab) and, in Topics, what the quick diagnosis is (it lost its own fold)
+		helpBlocks() {
+			const t = k => this.t(k)
+			return helpItems(t, [this.choice].concat(this.view === 'topics' ? [DIAGNOSIS_HELP] : []))
 		},
 		viewProps() {
 			void this.tick

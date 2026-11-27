@@ -18,7 +18,7 @@ export function usagePhrase(t, r) {
 	const rd = filesWord(t, r.readIn)
 	if (r.problem) return t('usage_say_missing', { files: rd })
 	if (r.maybe) return t('usage_say_maybe', { files: rd })
-	if (r.hint && r.definedIn) return t('usage_say_nobody_reads', { files: d })
+	if (r.hint && r.definedIn) return t('usage2_say_nobody_reads', { files: d })
 	if (r.hint) return r.writtenIn ? t('usage_say_live_written', { files: w }) : t('usage_say_live')
 	const parts = []
 	if (r.definedIn) parts.push(t('usage_part_define', { files: d }))
@@ -29,6 +29,7 @@ export function usagePhrase(t, r) {
 
 // the state word of a row: which chip it wears (tone is the wf-state class) or null when all is well
 export function usageState(r) {
+	if (r.review) return { tone: '', key: 'usage2_state_' + r.review }
 	if (r.problem) return { tone: 'err', key: 'usage_state_problem' }
 	if (r.maybe) return { tone: 'warn', key: 'usage_state_maybe' }
 	if (r.hint) return { tone: '', key: 'usage_state_hint' }

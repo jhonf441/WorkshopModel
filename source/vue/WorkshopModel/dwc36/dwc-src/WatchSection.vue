@@ -1,24 +1,15 @@
 <template>
 	<div>
-		<v-card class="mb-3">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-eye-outline</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('watch_title') }}</h2>
-						<p class="mo-head-lead">{{ t('look_watch_lead') }}</p>
-					</div>
-					<div class="mo-head-right">
-						<span v-if="rows.length" class="mo-pill"><v-icon x-small>mdi-eye-outline</v-icon>{{ t('look_watch_count', { n: rows.length }) }}</span>
-						<span class="mo-pill mo-pill-quiet" :title="storage === 'sbc' ? t('watch_saved_sbc') : t('watch_saved_browser')"><v-icon x-small>{{ storage === 'sbc' ? 'mdi-content-save-outline' : 'mdi-web' }}</v-icon>{{ t(storage === 'sbc' ? 'look_watch_store_sbc' : 'look_watch_store_browser') }}</span>
-					</div>
-				</div>
-				<div class="mo-actions">
-					<div class="help-tip-row">
-						<v-switch v-model="markers" dense inset color="success" hide-details :label="t(MARKERS_SETTING.label)" />
-						<info-tip :choice="MARKERS_SETTING" :title="t(MARKERS_SETTING.label)" />
-					</div>
-				</div>
+		<div class="wf-group mb-3">
+				<!-- redesign 2026-11-23 (FAMILIA-REDISENO.md 3): the head of the family (the count and where the list is kept as data chips of 24), the marks as a
+				     row of 48 with its switch, ONE help at the foot (the lead and the help of the marks) -->
+				<card-head icon="mdi-eye-outline" :title="t('watch_title')">
+					<span v-if="rows.length" class="wf-chip">{{ t('look_watch_count', { n: rows.length }) }}</span>
+					<span class="wf-chip" :title="storage === 'sbc' ? t('watch_saved_sbc') : t('watch_saved_browser')"><v-icon x-small>{{ storage === 'sbc' ? 'mdi-content-save-outline' : 'mdi-web' }}</v-icon>{{ t(storage === 'sbc' ? 'look_watch_store_sbc' : 'look_watch_store_browser') }}</span>
+				</card-head>
+				<action-row :title="t(MARKERS_SETTING.label)" :text="t(MARKERS_SETTING.what)">
+					<v-switch v-model="markers" dense inset color="success" hide-details :aria-label="t(MARKERS_SETTING.label)" />
+				</action-row>
 				<div v-if="!rows.length" class="mo-empty mo-empty-small">
 					<v-icon class="mo-empty-icon">mdi-eye-plus-outline</v-icon>
 					<div class="mo-empty-title">{{ t('look_watch_empty_title') }}</div>
@@ -44,21 +35,13 @@
 						<div v-if="open.indexOf(r.path) >= 0" class="mo-wrow-more mo-fade-in"><watch-events :events="r.events" :tick="tick" /></div>
 					</div>
 				</div>
-			</v-card-text>
-		</v-card>
-		<v-card class="mb-3">
-			<v-card-text>
-				<div class="mo-head">
-					<span class="mo-head-icon"><v-icon>mdi-history</v-icon></span>
-					<div class="mo-head-text">
-						<h2 class="mo-head-title">{{ t('changes_title') }}</h2>
-						<p class="mo-head-lead">{{ t('changes_help') }}</p>
-					</div>
-					<div class="mo-head-right">
-						<v-switch :input-value="track" dense inset color="success" hide-details :label="t('changes_track')" @change="onTrack" />
-						<v-btn small text :disabled="!changes.length" @click="$emit('clear')">{{ t('changes_clear') }}</v-btn>
-					</div>
-				</div>
+				<help-fold :what="t('look_watch_lead')" :items="helpBlocks" />
+		</div>
+		<div class="wf-group mb-3">
+				<card-head icon="mdi-history" :title="t('changes_title')">
+					<v-switch :input-value="track" dense inset color="success" hide-details :label="t('changes_track')" @change="onTrack" />
+					<v-btn small text :disabled="!changes.length" @click="$emit('clear')">{{ t('changes_clear') }}</v-btn>
+				</card-head>
 				<div v-if="!changes.length" class="mo-empty mo-empty-small">
 					<v-icon class="mo-empty-icon">mdi-history</v-icon>
 					<div class="mo-empty-title">{{ t('look_changes_empty_title') }}</div>
@@ -71,8 +54,8 @@
 						<span class="mo-crow-vals"><span>{{ c.before }}</span><v-icon x-small>mdi-arrow-right</v-icon><span class="mo-crow-after">{{ c.after }}</span></span>
 					</div>
 				</div>
-			</v-card-text>
-		</v-card>
+				<help-fold :what="t('changes_help')" />
+		</div>
 		<watch-export :entries="entries" :changes="changes" :tick="tick" />
 	</div>
 </template>
@@ -91,7 +74,10 @@ import Sparkline from './Sparkline.vue'
 import WatchBands from './WatchBands.vue'
 import WatchEvents from './WatchEvents.vue'
 import WatchExport from './WatchExport.vue'
-import InfoTip from './InfoTip.vue'
+import CardHead from './CardHead.vue' // vue/_shared36
+import ActionRow from './ActionRow.vue' // vue/_shared36
+import HelpFold from './HelpFold.vue' // vue/_shared36
+import { helpItems } from './section-help.js'
 import { seriesStats } from './watch-series.js'
 import { MARKERS_SETTING, rendererFor, jumpMarkers } from './watch-render.js'
 import { WATCH_GRAPH } from './look-tokens.js'
@@ -101,7 +87,7 @@ function fmt(v) {
 }
 
 export default {
-	components: { Sparkline, WatchBands, WatchEvents, WatchExport, InfoTip },
+	components: { Sparkline, WatchBands, WatchEvents, WatchExport, CardHead, ActionRow, HelpFold },
 	props: {
 		tick: { type: Number, default: 0 },
 		entries: { type: Array, default: () => [] },
@@ -113,6 +99,10 @@ export default {
 		return { markers: false, open: [], MARKERS_SETTING, GRAPH: WATCH_GRAPH }
 	},
 	computed: {
+		// the one fold at the foot of the watch card (redesign 2026-11-23): the lead and the whole help of the marks (it was a "?" next to the switch)
+		helpBlocks() {
+			return helpItems(k => this.t(k), [MARKERS_SETTING])
+		},
 		rows() {
 			void this.tick
 			return this.entries.map(e => {

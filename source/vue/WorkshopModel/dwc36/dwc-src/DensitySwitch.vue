@@ -1,6 +1,6 @@
 <template>
-	<div class="mo-density-switch" role="group" :aria-label="t('density_label')">
-		<button v-for="c in choices" :key="c.id" type="button" class="mo-density-switch-btn" :class="{ 'mo-density-switch-on': c.id === value }" :aria-pressed="c.id === value ? 'true' : 'false'" :title="t(c.what)" @click="$emit('pick', c.id)">
+	<div class="wf-seg mo-density-switch" role="group" :aria-label="t('density_label')">
+		<button v-for="c in choices" :key="c.id" type="button" class="wf-btn mo-density-switch-btn" :class="{ 'mo-density-switch-on': c.id === value }" :aria-pressed="c.id === value ? 'true' : 'false'" :title="t(c.what)" @click="$emit('pick', c.id)">
 			<v-icon small class="mo-density-switch-icon">{{ c.icon }}</v-icon>{{ t(c.label) }}
 		</button>
 	</div>
@@ -35,12 +35,10 @@ export default {
 </script>
 
 <style>
-/* DensitySwitch: two segments; the chosen one has the accent border and tint of a selection (DESIGN.md section 2) */
-.mo-page .mo-density-switch { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--wf-line); border-radius: 6px; overflow: hidden; }
-.mo-page .mo-density-switch-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 10px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
-.mo-page .mo-density-switch-btn + .mo-density-switch-btn { border-left: 1px solid var(--wf-line); }
-.mo-page .mo-density-switch-btn:focus-visible { outline: 2px solid var(--wf-accent); outline-offset: -2px; }
-.mo-page .mo-density-switch-on { background: color-mix(in srgb, var(--wf-accent) 16%, transparent); font-weight: 600; }
+/* DensitySwitch: the segments of the family (.wf-seg, 32 px buttons with a 40 px touch area, the chosen one filled; redesign 2026-11-23): only the
+   icon colour is the plugin's */
+.mo-page .mo-density-switch { flex: none; }
+.mo-page .mo-density-switch-btn { padding: 0 10px; font-size: 13px; }
 .mo-page .mo-density-switch-icon { color: var(--wf-icon); }
-@media (pointer: coarse) { .mo-page .mo-density-switch-btn { min-height: 44px; } }
+.mo-page .mo-density-switch-on .mo-density-switch-icon { color: inherit; }
 </style>

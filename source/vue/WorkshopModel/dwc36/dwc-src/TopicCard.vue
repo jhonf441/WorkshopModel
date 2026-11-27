@@ -1,7 +1,7 @@
 <template>
 	<section class="mo-topic" :aria-labelledby="'mo-topic-' + card.id">
 		<div class="mo-topic-head">
-			<v-icon :size="20">{{ card.icon }}</v-icon>
+			<v-icon :size="16" aria-hidden="true">{{ card.icon }}</v-icon>
 			<span :id="'mo-topic-' + card.id" class="mo-topic-title">{{ t(card.title) }}</span>
 			<v-btn v-if="card.path" x-small text class="mo-topic-all" :title="t('topic_see_all_help', { path: card.path })" @click="$emit('open', card.path)">{{ t('topic_see_all') }}</v-btn>
 		</div>
@@ -25,7 +25,8 @@
 <script>
 'use strict'
 
-// One card of the Topics view (topic-catalog.js): a title with its gray icon, "See all" (the branch in the technical tree), and the
+// One group of the Topics view (topic-catalog.js; since the redesign of 2026-11-23 a group of the Model card, not a grey sub-card: a title 13/600 over a
+// divider, rows of 40): a title with its gray icon, "See all" (the branch in the technical tree), and the
 // readable rows: the label, the value with its unit (value-human.js), a short second line (a target, the machine position) and the
 // state as a dot + the word (DESIGN.md). A row opens its own path in the technical tree. A value that just changed glows for a moment
 // (changeTimes of the view contract, globals-quick.js recentlyChanged).
