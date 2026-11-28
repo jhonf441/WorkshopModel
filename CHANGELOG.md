@@ -1,5 +1,9 @@
 # WorkshopModel -- historial de versiones
 
+## 1.9.1 -- 2026-11-28
+
+- fix: buttons, chips and tabs no longer show a framed shadow around them (the invisible touch area was drawing Vuetify's raise shadow)
+
 ## 1.9.0 -- 2026-11-24
 
 - Redesign on the family scale: one card per section with the family head, rows of 48, buttons 32/36, 40 px touch area, one help at the foot of each card (no more guides spread over it)
